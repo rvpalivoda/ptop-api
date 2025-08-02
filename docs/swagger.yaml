@@ -85,6 +85,15 @@ definitions:
       to_asset_id:
         type: string
     type: object
+  handlers.OrderRequest:
+    properties:
+      amount:
+        type: string
+      offer_id:
+        type: string
+      payment_method_id:
+        type: string
+    type: object
   handlers.ProfileResponse:
     properties:
       pincode_set:
@@ -161,6 +170,23 @@ definitions:
       type:
         type: string
     type: object
+  models.Balance:
+    properties:
+      amount:
+        type: number
+      amountEscrow:
+        type: number
+      assetID:
+        type: string
+      clientID:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: string
+      updatedAt:
+        type: string
+    type: object
   models.ClientPaymentMethod:
     properties:
       city:
@@ -183,6 +209,25 @@ definitions:
       id:
         type: string
       name:
+        type: string
+    type: object
+  models.Escrow:
+    properties:
+      amount:
+        type: number
+      assetID:
+        type: string
+      clientID:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: string
+      offerID:
+        type: string
+      orderID:
+        type: string
+      updatedAt:
         type: string
     type: object
   models.Offer:
@@ -216,6 +261,39 @@ definitions:
       toAssetID:
         type: string
       ttl:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  models.Order:
+    properties:
+      amount:
+        type: number
+      buyerID:
+        type: string
+      createdAt:
+        type: string
+      expiresAt:
+        type: string
+      fromAssetID:
+        type: string
+      id:
+        type: string
+      isEscrow:
+        type: boolean
+      offerID:
+        type: string
+      paymentMethodID:
+        type: string
+      price:
+        type: number
+      releasedAt:
+        type: string
+      sellerID:
+        type: string
+      status:
+        type: string
+      toAssetID:
         type: string
       updatedAt:
         type: string
@@ -527,6 +605,38 @@ paths:
       summary: Смена имени пользователя
       tags:
       - auth
+  /client/balances:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Balance'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Список балансов клиента
+      tags:
+      - balances
+  /client/escrows:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Escrow'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Список эскроу клиента
+      tags:
+      - escrows
   /client/offers:
     get:
       parameters:
@@ -658,6 +768,48 @@ paths:
       summary: Включить объявление
       tags:
       - offers
+  /client/orders:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Order'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Список ордеров клиента
+      tags:
+      - orders
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: данные
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.OrderRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Order'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Создать ордер
+      tags:
+      - orders
   /client/payment-methods:
     get:
       produces:
