@@ -8,3 +8,5 @@ dev:
 prod:
 	APP_ENV=prod go run ./cmd/api
 
+seed:
+	APP_ENV=dev go run ./cmd/seed
