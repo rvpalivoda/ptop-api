@@ -73,6 +73,13 @@ func main() {
 	api.POST("/client/payment-methods", handlers.CreateClientPaymentMethod(gormDB))
 	api.DELETE("/client/payment-methods/:id", handlers.DeleteClientPaymentMethod(gormDB))
 
+	api.GET("/offers", handlers.ListOffers(gormDB))
+	api.GET("/client/offers", handlers.ListClientOffers(gormDB))
+	api.POST("/client/offers", handlers.CreateOffer(gormDB))
+	api.PUT("/client/offers/:id", handlers.UpdateOffer(gormDB))
+	api.POST("/client/offers/:id/enable", handlers.EnableOffer(gormDB, cfg.MaxActiveOffersPerClient))
+	api.POST("/client/offers/:id/disable", handlers.DisableOffer(gormDB))
+
 	// 4. Запускаем сервер
 	addr := ":" + cfg.Port
 	log.Printf("listening on %s …", addr)
