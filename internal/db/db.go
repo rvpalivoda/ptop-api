@@ -16,6 +16,7 @@ func NewDB(dsn string) (*gorm.DB, error) {
 	// Автомуграция ваших моделей
 	if err := db.AutoMigrate(
 		&models.User{},
+		&models.Client{},
 		// &models.Product{}, и т.д.
 	); err != nil {
 		return nil, fmt.Errorf("auto migrate failed: %w", err)
