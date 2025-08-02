@@ -1,4 +1,11 @@
-// main.go
+// @title PTOP API
+// @version 1.0
+// @description API сервиса PTOP
+// @BasePath /
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+
 package main
 
 import (
@@ -6,9 +13,14 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
 	"ptop/config"
 	"ptop/internal/db"
 	"ptop/internal/handlers"
+
+	docs "ptop/docs"
 )
 
 func main() {
@@ -32,11 +44,25 @@ func main() {
 		log.Fatalf("db connect failed: %v", err)
 	}
 
+	docs.SwaggerInfo.BasePath = "/"
+
 	// 3. Создаём Gin-роутер и регистрируем /health
 	r := gin.Default()
 	r.GET("/health", handlers.Health(gormDB))
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	// (здесь можно добавить другие роуты)
+	auth := r.Group("/auth")
+	auth.POST("/register", handlers.Register(gormDB, cfg.TokenTypeTTL))
+	auth.POST("/login", handlers.Login(gormDB, cfg.TokenTypeTTL))
+	auth.POST("/refresh", handlers.Refresh(gormDB, cfg.TokenTypeTTL))
+	auth.GET("/recover/:username", handlers.RecoverChallenge(gormDB))
+	auth.POST("/recover", handlers.Recover(gormDB, cfg.TokenTypeTTL))
+	auth.Use(handlers.AuthMiddleware(gormDB))
+	auth.GET("/profile", handlers.Profile(gormDB))
+	auth.POST("/username", handlers.ChangeUsername(gormDB))
+	auth.POST("/pincode", handlers.SetPinCode(gormDB))
+	auth.POST("/2fa/enable", handlers.Enable2FA(gormDB))
+	auth.POST("/password", handlers.ChangePassword(gormDB))
 
 	// 4. Запускаем сервер
 	addr := ":" + cfg.Port
