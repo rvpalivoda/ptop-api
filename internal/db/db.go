@@ -22,6 +22,7 @@ func NewDB(dsn string) (*gorm.DB, error) {
 		&models.ClientPaymentMethod{},
 		&models.Asset{},
 		&models.Offer{},
+		&models.Wallet{},
 		// &models.Product{}, и т.д.
 	); err != nil {
 		return nil, fmt.Errorf("auto migrate failed: %w", err)

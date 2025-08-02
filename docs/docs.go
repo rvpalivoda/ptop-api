@@ -772,6 +772,75 @@ const docTemplate = `{
                 }
             }
         },
+        "/client/wallets": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "wallets"
+                ],
+                "summary": "Список кошельков клиента",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Wallet"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "wallets"
+                ],
+                "summary": "Создать кошелёк",
+                "parameters": [
+                    {
+                        "description": "данные",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.WalletRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Wallet"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/countries": {
             "get": {
                 "security": [
@@ -794,6 +863,31 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/models.Country"
                             }
+                        }
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "health"
+                ],
+                "summary": "Проверка состояния сервиса",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.StatusResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -972,9 +1066,6 @@ const docTemplate = `{
                 "amount": {
                     "type": "string"
                 },
-                "price": {
-                    "type": "string"
-                },
                 "client_payment_method_ids": {
                     "type": "array",
                     "items": {
@@ -995,6 +1086,9 @@ const docTemplate = `{
                 },
                 "order_expiration_timeout": {
                     "type": "integer"
+                },
+                "price": {
+                    "type": "string"
                 },
                 "to_asset_id": {
                     "type": "string"
@@ -1095,6 +1189,14 @@ const docTemplate = `{
                 }
             }
         },
+        "handlers.WalletRequest": {
+            "type": "object",
+            "properties": {
+                "asset_id": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Asset": {
             "type": "object",
             "properties": {
@@ -1155,9 +1257,6 @@ const docTemplate = `{
                 "amount": {
                     "type": "number"
                 },
-                "price": {
-                    "type": "number"
-                },
                 "clientID": {
                     "type": "string"
                 },
@@ -1191,6 +1290,9 @@ const docTemplate = `{
                 "orderExpirationTimeout": {
                     "type": "integer"
                 },
+                "price": {
+                    "type": "number"
+                },
                 "toAssetID": {
                     "type": "string"
                 },
@@ -1209,6 +1311,35 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Wallet": {
+            "type": "object",
+            "properties": {
+                "assetID": {
+                    "type": "string"
+                },
+                "clientID": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "disabledAt": {
+                    "type": "string"
+                },
+                "enabledAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "isEnabled": {
+                    "type": "boolean"
+                },
+                "value": {
                     "type": "string"
                 }
             }
