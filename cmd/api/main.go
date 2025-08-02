@@ -64,6 +64,15 @@ func main() {
 	auth.POST("/2fa/enable", handlers.Enable2FA(gormDB))
 	auth.POST("/password", handlers.ChangePassword(gormDB))
 
+	api := r.Group("/")
+	api.Use(handlers.AuthMiddleware(gormDB))
+	api.GET("/countries", handlers.GetCountries(gormDB))
+	api.GET("/payment-methods", handlers.GetPaymentMethods(gormDB))
+	api.GET("/assets", handlers.GetAssets(gormDB))
+	api.GET("/client/payment-methods", handlers.ListClientPaymentMethods(gormDB))
+	api.POST("/client/payment-methods", handlers.CreateClientPaymentMethod(gormDB))
+	api.DELETE("/client/payment-methods/:id", handlers.DeleteClientPaymentMethod(gormDB))
+
 	// 4. Запускаем сервер
 	addr := ":" + cfg.Port
 	log.Printf("listening on %s …", addr)
