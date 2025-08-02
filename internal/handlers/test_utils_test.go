@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -16,7 +17,8 @@ func setupTest(t *testing.T) (*gorm.DB, *gin.Engine, map[string]time.Duration) {
 	t.Helper()
 	gin.SetMode(gin.TestMode)
 
-	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
+	dsn := fmt.Sprintf("file:%s?mode=memory&cache=shared", t.Name())
+	db, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{})
 	if err != nil {
 		t.Fatalf("db open: %v", err)
 	}
@@ -29,6 +31,12 @@ func setupTest(t *testing.T) (*gorm.DB, *gin.Engine, map[string]time.Duration) {
 		&models.Asset{},
 		&models.Offer{},
 		&models.Wallet{},
+		&models.Balance{},
+		&models.Escrow{},
+		&models.Order{},
+		&models.TransactionIn{},
+		&models.TransactionOut{},
+		&models.TransactionInternal{},
 	); err != nil {
 		t.Fatalf("migrate: %v", err)
 	}
@@ -59,6 +67,10 @@ func setupTest(t *testing.T) (*gorm.DB, *gin.Engine, map[string]time.Duration) {
 	api.DELETE("/client/payment-methods/:id", DeleteClientPaymentMethod(db))
 	api.GET("/client/wallets", ListClientWallets(db))
 	api.POST("/client/wallets", CreateWallet(db))
+	api.GET("/client/balances", ListClientBalances(db))
+	api.GET("/client/escrows", ListClientEscrows(db))
+	api.GET("/client/orders", ListClientOrders(db))
+	api.POST("/client/orders", CreateOrder(db))
 
 	maxOffers := 1
 	api.GET("/offers", ListOffers(db))

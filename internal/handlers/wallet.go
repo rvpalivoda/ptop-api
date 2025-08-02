@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 
 	"ptop/internal/models"
@@ -63,6 +64,11 @@ func CreateWallet(db *gorm.DB) gin.HandlerFunc {
 			EnabledAt: now,
 		}
 		if err := db.Create(&w).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
+			return
+		}
+		b := models.Balance{ClientID: clientID, AssetID: r.AssetID, Amount: decimal.Zero, AmountEscrow: decimal.Zero}
+		if err := db.Create(&b).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
 			return
 		}
