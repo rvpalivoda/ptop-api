@@ -13,12 +13,13 @@ func NewDB(dsn string) (*gorm.DB, error) {
 		return nil, fmt.Errorf("failed to connect to Postgres: %w", err)
 	}
 
-	// Автомуграция ваших моделей
+	// Автоматическая миграция всех моделей
 	if err := db.AutoMigrate(
 		&models.Client{},
 		&models.Token{},
 		&models.Country{},
 		&models.PaymentMethod{},
+		&models.Order{},
 		&models.ClientPaymentMethod{},
 		&models.Asset{},
 		&models.Offer{},
@@ -28,7 +29,7 @@ func NewDB(dsn string) (*gorm.DB, error) {
 		&models.TransactionInternal{},
 		&models.Balance{},
 		&models.Escrow{},
-		// &models.Product{}, и т.д.
+	// &models.Product{}, и т.д.
 	); err != nil {
 		return nil, fmt.Errorf("auto migrate failed: %w", err)
 	}
