@@ -9,13 +9,14 @@ import (
 )
 
 type Client struct {
-	ID          string         `gorm:"primaryKey;size:21"`
-	Username    string         `gorm:"type:varchar(255);not null;unique"`
-	PinCode     *string        `gorm:"type:varchar(20)"`
-	Enabled     bool           `gorm:"not null;default:false"`
-	Bip39       datatypes.JSON `gorm:"type:json"`
-	Password    *string        `gorm:"type:varchar(255)"`
-	RegistredAt time.Time      `gorm:"autoCreateTime"`
+        ID           string         `gorm:"primaryKey;size:21"`
+        Username     string         `gorm:"type:varchar(255);not null;unique"`
+        PinCode      *string        `gorm:"type:varchar(255)"`
+        TwoFAEnabled bool           `gorm:"not null;default:false"`
+        TOTPSecret   *string        `gorm:"type:varchar(255)"`
+        Bip39        datatypes.JSON `gorm:"type:json"`
+        Password     *string        `gorm:"type:varchar(255)"`
+        RegistredAt  time.Time      `gorm:"autoCreateTime"`
 }
 
 func (c *Client) BeforeCreate(tx *gorm.DB) (err error) {

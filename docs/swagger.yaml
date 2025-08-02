@@ -1,0 +1,382 @@
+basePath: /
+definitions:
+  handlers.ChangePasswordRequest:
+    properties:
+      confirm_password:
+        type: string
+      new_password:
+        type: string
+      old_password:
+        type: string
+    type: object
+  handlers.ChangeUsernameRequest:
+    properties:
+      new_username:
+        type: string
+      password:
+        type: string
+    type: object
+  handlers.Enable2FARequest:
+    properties:
+      password:
+        type: string
+    type: object
+  handlers.Enable2FAResponse:
+    properties:
+      secret:
+        type: string
+      url:
+        type: string
+    type: object
+  handlers.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  handlers.LoginRequest:
+    properties:
+      code:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  handlers.MnemonicWord:
+    properties:
+      position:
+        type: integer
+      word:
+        type: string
+    type: object
+  handlers.ProfileResponse:
+    properties:
+      pincode_set:
+        type: boolean
+      twofa_enabled:
+        type: boolean
+      username:
+        type: string
+    type: object
+  handlers.RecoverChallengeResponse:
+    properties:
+      positions:
+        items:
+          type: integer
+        type: array
+    type: object
+  handlers.RefreshRequest:
+    properties:
+      refresh_token:
+        type: string
+    type: object
+  handlers.RegisterRequest:
+    properties:
+      password:
+        type: string
+      password_confirm:
+        type: string
+      username:
+        type: string
+    type: object
+  handlers.RegisterResponse:
+    properties:
+      access_token:
+        type: string
+      mnemonic:
+        items:
+          $ref: '#/definitions/handlers.MnemonicWord'
+        type: array
+      refresh_token:
+        type: string
+    type: object
+  handlers.SetPinCodeRequest:
+    properties:
+      password:
+        type: string
+      pincode:
+        type: string
+    type: object
+  handlers.StatusResponse:
+    properties:
+      status:
+        type: string
+    type: object
+  handlers.TokenResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: API сервиса PTOP
+  title: PTOP API
+  version: "1.0"
+paths:
+  /auth/2fa/enable:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: подтверждение пароля
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.Enable2FARequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.Enable2FAResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Включение двухфакторной аутентификации
+      tags:
+      - auth
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Аутентифицирует клиента и выдаёт пару токенов. При включённой 2FA
+        требуется код.
+      parameters:
+      - description: учётные данные
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.TokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Вход клиента
+      tags:
+      - auth
+  /auth/password:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: пароли
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.ChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.StatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Смена пароля
+      tags:
+      - auth
+  /auth/pincode:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: пин-код
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.SetPinCodeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.StatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Установка PIN-кода
+      tags:
+      - auth
+  /auth/profile:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.ProfileResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Профиль клиента
+      tags:
+      - auth
+  /auth/recover/{username}:
+    get:
+      parameters:
+      - description: имя пользователя
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.RecoverChallengeResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Запрос позиций для восстановления
+      tags:
+      - auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: refresh токен
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.RefreshRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.TokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Обновление access токена
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Создаёт нового клиента с уникальным именем, хешем пароля и мнемонической
+        фразой
+      parameters:
+      - description: данные регистрации
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.RegisterResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Регистрация клиента
+      tags:
+      - auth
+  /auth/username:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: новое имя
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.ChangeUsernameRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.StatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Смена имени пользователя
+      tags:
+      - auth
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
