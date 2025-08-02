@@ -3,6 +3,7 @@ module ptop
 go 1.24.1
 
 require (
+	github.com/biter777/countries v1.7.5
 	github.com/gin-gonic/gin v1.10.1
 	github.com/joho/godotenv v1.5.1
 	github.com/matoous/go-nanoid/v2 v2.1.0
