@@ -13,6 +13,7 @@ type Offer struct {
 	MaxAmount              decimal.Decimal `gorm:"type:decimal(32,8);not null"`
 	MinAmount              decimal.Decimal `gorm:"type:decimal(32,8);not null"`
 	Amount                 decimal.Decimal `gorm:"type:decimal(32,8);not null"`
+	Price                  decimal.Decimal `gorm:"type:decimal(32,8);not null"`
 	FromAssetID            string          `gorm:"size:21;not null"`
 	FromAsset              Asset           `gorm:"foreignKey:FromAssetID" json:"-"`
 	ToAssetID              string          `gorm:"size:21;not null"`

@@ -21,6 +21,12 @@ func main() {
 	if err := db.SeedCountries(gormDB); err != nil {
 		log.Fatalf("seed countries failed: %v", err)
 	}
+	if err := db.SeedPaymentMethods(gormDB); err != nil {
+		log.Fatalf("seed payment methods failed: %v", err)
+	}
+	if err := db.SeedAssets(gormDB); err != nil {
+		log.Fatalf("seed assets failed: %v", err)
+	}
 
-	log.Println("countries seeded")
+	log.Println("seed completed")
 }
