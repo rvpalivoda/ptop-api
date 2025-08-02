@@ -3,6 +3,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"ptop/config"
@@ -15,6 +16,14 @@ func main() {
 	cfg, err := config.Load()
 	if err != nil {
 		log.Fatalf("config load failed: %v", err)
+	}
+
+	// 1.1 Определяем режим запуска (dev/prod)
+	env := os.Getenv("APP_ENV")
+	if env == "prod" || env == "production" {
+		gin.SetMode(gin.ReleaseMode)
+	} else {
+		gin.SetMode(gin.DebugMode)
 	}
 
 	// 2. Открываем GORM-подключение
