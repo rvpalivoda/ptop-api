@@ -27,6 +27,7 @@ func setupTest(t *testing.T) (*gorm.DB, *gin.Engine, map[string]time.Duration) {
 		&models.PaymentMethod{},
 		&models.ClientPaymentMethod{},
 		&models.Asset{},
+		&models.Offer{},
 	); err != nil {
 		t.Fatalf("migrate: %v", err)
 	}
@@ -55,6 +56,14 @@ func setupTest(t *testing.T) (*gorm.DB, *gin.Engine, map[string]time.Duration) {
 	api.GET("/client/payment-methods", ListClientPaymentMethods(db))
 	api.POST("/client/payment-methods", CreateClientPaymentMethod(db))
 	api.DELETE("/client/payment-methods/:id", DeleteClientPaymentMethod(db))
+
+	maxOffers := 1
+	api.GET("/offers", ListOffers(db))
+	api.GET("/client/offers", ListClientOffers(db))
+	api.POST("/client/offers", CreateOffer(db))
+	api.PUT("/client/offers/:id", UpdateOffer(db))
+	api.POST("/client/offers/:id/enable", EnableOffer(db, maxOffers))
+	api.POST("/client/offers/:id/disable", DisableOffer(db))
 
 	return db, r, ttl
 }
