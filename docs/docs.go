@@ -972,6 +972,9 @@ const docTemplate = `{
                 "amount": {
                     "type": "string"
                 },
+                "price": {
+                    "type": "string"
+                },
                 "client_payment_method_ids": {
                     "type": "array",
                     "items": {
@@ -1150,6 +1153,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "amount": {
+                    "type": "number"
+                },
+                "price": {
                     "type": "number"
                 },
                 "clientID": {

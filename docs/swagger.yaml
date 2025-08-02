@@ -66,6 +66,8 @@ definitions:
     properties:
       amount:
         type: string
+      price:
+        type: string
       client_payment_method_ids:
         items:
           type: string
@@ -181,6 +183,8 @@ definitions:
   models.Offer:
     properties:
       amount:
+        type: number
+      price:
         type: number
       clientID:
         type: string

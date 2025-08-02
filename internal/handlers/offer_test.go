@@ -71,6 +71,7 @@ func TestOfferLifecycle(t *testing.T) {
 		MaxAmount:              "100",
 		MinAmount:              "10",
 		Amount:                 "50",
+		Price:                  "0.12345678",
 		FromAssetID:            asset1.ID,
 		ToAssetID:              asset2.ID,
 		OrderExpirationTimeout: 20,
@@ -89,6 +90,9 @@ func TestOfferLifecycle(t *testing.T) {
 	json.Unmarshal(w.Body.Bytes(), &offer1)
 	if offer1.IsEnabled {
 		t.Fatalf("offer should be disabled by default")
+	}
+	if offer1.Price.String() != "0.12345678" {
+		t.Fatalf("price not set")
 	}
 
 	// enable first offer
@@ -172,6 +176,7 @@ func TestOfferLifecycle(t *testing.T) {
 
 	// update second offer
 	reqBody.Conditions = "updated"
+	reqBody.Price = "0.87654321"
 	b, _ = json.Marshal(reqBody)
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("PUT", "/client/offers/"+offer2.ID, bytes.NewReader(b))
@@ -184,6 +189,9 @@ func TestOfferLifecycle(t *testing.T) {
 	json.Unmarshal(w.Body.Bytes(), &offer2)
 	if offer2.Conditions != "updated" {
 		t.Fatalf("offer not updated")
+	}
+	if offer2.Price.String() != "0.87654321" {
+		t.Fatalf("price not updated")
 	}
 
 	// disable second offer

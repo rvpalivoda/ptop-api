@@ -15,6 +15,7 @@ type OfferRequest struct {
 	MaxAmount              string   `json:"max_amount"`
 	MinAmount              string   `json:"min_amount"`
 	Amount                 string   `json:"amount"`
+	Price                  string   `json:"price"`
 	FromAssetID            string   `json:"from_asset_id"`
 	ToAssetID              string   `json:"to_asset_id"`
 	Conditions             string   `json:"conditions"`
@@ -61,6 +62,11 @@ func CreateOffer(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "invalid amount"})
 			return
 		}
+		price, err := decimal.NewFromString(r.Price)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "invalid price"})
+			return
+		}
 		timeout := r.OrderExpirationTimeout
 		if timeout < 15 {
 			timeout = 15
@@ -103,6 +109,7 @@ func CreateOffer(db *gorm.DB) gin.HandlerFunc {
 			MaxAmount:              maxAmount,
 			MinAmount:              minAmount,
 			Amount:                 amount,
+			Price:                  price,
 			FromAssetID:            r.FromAssetID,
 			ToAssetID:              r.ToAssetID,
 			Conditions:             r.Conditions,
@@ -176,6 +183,11 @@ func UpdateOffer(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "invalid amount"})
 			return
 		}
+		price, err := decimal.NewFromString(r.Price)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "invalid price"})
+			return
+		}
 		timeout := r.OrderExpirationTimeout
 		if timeout < 15 {
 			timeout = 15
@@ -214,6 +226,7 @@ func UpdateOffer(db *gorm.DB) gin.HandlerFunc {
 		offer.MaxAmount = maxAmount
 		offer.MinAmount = minAmount
 		offer.Amount = amount
+		offer.Price = price
 		offer.FromAssetID = r.FromAssetID
 		offer.ToAssetID = r.ToAssetID
 		offer.Conditions = r.Conditions
