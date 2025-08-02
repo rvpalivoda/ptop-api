@@ -1,0 +1,48 @@
+{
+  "doctype": "DocType",
+  "name": "API Token",
+  "actions": [],
+  "creation": "2025-06-29 17:43:59.105895",
+  "engine": "InnoDB",
+  "module": "Peerex",
+  "fields": [
+    {
+      "label": "User",
+      "fieldname": "user",
+      "fieldtype": "Link",
+      "options": "Client"
+    },
+    {
+      "label": "Token",
+      "fieldname": "token",
+      "fieldtype": "Data"
+    },
+    {
+      "label": "Expiry Date",
+      "fieldname": "expiry_date",
+      "fieldtype": "Datetime"
+    },
+    {
+      "label": "Scopes",
+      "fieldname": "scopes",
+      "fieldtype": "JSON"
+    }
+  ],
+  "istable": 0,
+  "is_submittable": 0,
+  "track_changes": 1,
+  "permissions": [
+    {
+      "create": 1,
+      "delete": 1,
+      "email": 1,
+      "export": 1,
+      "print": 1,
+      "read": 1,
+      "report": 1,
+      "role": "System Manager",
+      "share": 1,
+      "write": 1
+    }
+  ]
+}

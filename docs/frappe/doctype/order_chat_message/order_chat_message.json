@@ -1,0 +1,48 @@
+{
+  "doctype": "DocType",
+  "name": "Order Chat Message",
+  "module": "Peerex",
+  "fields": [
+    {
+      "label": "Order",
+      "fieldname": "order",
+      "fieldtype": "Link",
+      "options": "Order"
+    },
+    {
+      "label": "Sender",
+      "fieldname": "sender",
+      "fieldtype": "Link",
+      "options": "Client"
+    },
+    {
+      "label": "Message",
+      "fieldname": "message",
+      "fieldtype": "Text"
+    },
+    {
+      "label": "Timestamp",
+      "fieldname": "timestamp",
+      "fieldtype": "Datetime"
+    }
+  ],
+  "istable": 1,
+  "is_submittable": 0,
+
+
+  "track_changes": 1,
+  "permissions": [
+    {
+      "create": 1,
+      "delete": 1,
+      "email": 1,
+      "export": 1,
+      "print": 1,
+      "read": 1,
+      "report": 1,
+      "role": "System Manager",
+      "share": 1,
+      "write": 1
+    }
+  ]
+}

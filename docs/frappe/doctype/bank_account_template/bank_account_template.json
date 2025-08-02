@@ -1,0 +1,37 @@
+{
+  "doctype": "DocType",
+  "name": "Bank Account Template",
+  "module": "Peerex",
+  "fields": [
+    {
+      "label": "Payment Method",
+      "fieldname": "payment_method",
+      "fieldtype": "Link",
+      "options": "Payment Method"
+    },
+    {
+      "label": "Template Fields",
+      "fieldname": "template_fields",
+      "fieldtype": "JSON"
+    }
+  ],
+  "istable": 1,
+  "is_submittable": 0,
+
+
+  "track_changes": 1,
+  "permissions": [
+    {
+      "create": 1,
+      "delete": 1,
+      "email": 1,
+      "export": 1,
+      "print": 1,
+      "read": 1,
+      "report": 1,
+      "role": "System Manager",
+      "share": 1,
+      "write": 1
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "doctype": "DocType",
+  "name": "P2P Settings",
+  "module": "Peerex",
+  "fields": [
+    {
+      "label": "Key",
+      "fieldname": "key",
+      "fieldtype": "Data"
+    },
+    {
+      "label": "Value",
+      "fieldname": "value",
+      "fieldtype": "Data"
+    }
+  ],
+  "istable": 0,
+  "is_submittable": 0,
+
+
+  "track_changes": 1,
+  "permissions": [
+    {
+      "create": 1,
+      "delete": 1,
+      "email": 1,
+      "export": 1,
+      "print": 1,
+      "read": 1,
+      "report": 1,
+      "role": "System Manager",
+      "share": 1,
+      "write": 1
+    }
+  ]
+}

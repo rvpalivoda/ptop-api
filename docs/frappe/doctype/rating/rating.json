@@ -1,0 +1,48 @@
+{
+  "doctype": "DocType",
+  "name": "Rating",
+  "module": "Peerex",
+  "fields": [
+    {
+      "label": "Order",
+      "fieldname": "order",
+      "fieldtype": "Link",
+      "options": "Order"
+    },
+    {
+      "label": "Rated User",
+      "fieldname": "rated_user",
+      "fieldtype": "Link",
+      "options": "Client"
+    },
+    {
+      "label": "Score",
+      "fieldname": "score",
+      "fieldtype": "Int"
+    },
+    {
+      "label": "Comments",
+      "fieldname": "comments",
+      "fieldtype": "Text"
+    }
+  ],
+  "istable": 0,
+  "is_submittable": 0,
+
+
+  "track_changes": 1,
+  "permissions": [
+    {
+      "create": 1,
+      "delete": 1,
+      "email": 1,
+      "export": 1,
+      "print": 1,
+      "read": 1,
+      "report": 1,
+      "role": "System Manager",
+      "share": 1,
+      "write": 1
+    }
+  ]
+}
