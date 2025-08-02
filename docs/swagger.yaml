@@ -16,6 +16,19 @@ definitions:
       password:
         type: string
     type: object
+  handlers.CreateClientPaymentMethodRequest:
+    properties:
+      city:
+        type: string
+      country_id:
+        type: string
+      name:
+        type: string
+      payment_method_id:
+        type: string
+      post_code:
+        type: string
+    type: object
   handlers.Enable2FARequest:
     properties:
       password:
@@ -109,12 +122,70 @@ definitions:
       refresh_token:
         type: string
     type: object
+  models.Asset:
+    properties:
+      id:
+        type: string
+      isConvertible:
+        type: boolean
+      name:
+        type: string
+      type:
+        type: string
+    type: object
+  models.ClientPaymentMethod:
+    properties:
+      city:
+        type: string
+      clientID:
+        type: string
+      countryID:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      paymentMethodID:
+        type: string
+      postCode:
+        type: string
+    type: object
+  models.Country:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  models.PaymentMethod:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
 info:
   contact: {}
   description: API сервиса PTOP
   title: PTOP API
   version: "1.0"
 paths:
+  /assets:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Asset'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Список активов
+      tags:
+      - reference
   /auth/2fa/enable:
     post:
       consumes:
@@ -374,6 +445,106 @@ paths:
       summary: Смена имени пользователя
       tags:
       - auth
+  /client/payment-methods:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ClientPaymentMethod'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Список платёжных методов клиента
+      tags:
+      - client-payment-methods
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: данные
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateClientPaymentMethodRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ClientPaymentMethod'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Создать платёжный метод клиента
+      tags:
+      - client-payment-methods
+  /client/payment-methods/{id}:
+    delete:
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.StatusResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Удалить платёжный метод клиента
+      tags:
+      - client-payment-methods
+  /countries:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Country'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Список стран
+      tags:
+      - reference
+  /payment-methods:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.PaymentMethod'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Список платёжных методов
+      tags:
+      - reference
 securityDefinitions:
   BearerAuth:
     in: header

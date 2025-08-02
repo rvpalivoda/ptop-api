@@ -17,6 +17,10 @@ func NewDB(dsn string) (*gorm.DB, error) {
 	if err := db.AutoMigrate(
 		&models.Client{},
 		&models.Token{},
+		&models.Country{},
+		&models.PaymentMethod{},
+		&models.ClientPaymentMethod{},
+		&models.Asset{},
 		// &models.Product{}, и т.д.
 	); err != nil {
 		return nil, fmt.Errorf("auto migrate failed: %w", err)

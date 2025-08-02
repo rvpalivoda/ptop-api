@@ -20,7 +20,14 @@ func setupTest(t *testing.T) (*gorm.DB, *gin.Engine, map[string]time.Duration) {
 	if err != nil {
 		t.Fatalf("db open: %v", err)
 	}
-	if err := db.AutoMigrate(&models.Client{}, &models.Token{}); err != nil {
+	if err := db.AutoMigrate(
+		&models.Client{},
+		&models.Token{},
+		&models.Country{},
+		&models.PaymentMethod{},
+		&models.ClientPaymentMethod{},
+		&models.Asset{},
+	); err != nil {
 		t.Fatalf("migrate: %v", err)
 	}
 
@@ -39,6 +46,15 @@ func setupTest(t *testing.T) (*gorm.DB, *gin.Engine, map[string]time.Duration) {
 	auth.POST("/pincode", SetPinCode(db))
 	auth.POST("/2fa/enable", Enable2FA(db))
 	auth.POST("/password", ChangePassword(db))
+
+	api := r.Group("/")
+	api.Use(AuthMiddleware(db))
+	api.GET("/countries", GetCountries(db))
+	api.GET("/payment-methods", GetPaymentMethods(db))
+	api.GET("/assets", GetAssets(db))
+	api.GET("/client/payment-methods", ListClientPaymentMethods(db))
+	api.POST("/client/payment-methods", CreateClientPaymentMethod(db))
+	api.DELETE("/client/payment-methods/:id", DeleteClientPaymentMethod(db))
 
 	return db, r, ttl
 }
