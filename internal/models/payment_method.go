@@ -16,7 +16,8 @@ const (
 )
 
 func (FeeSideType) GormDBDataType(db *gorm.DB, field *schema.Field) string {
-	if db.Dialector.Name() == "sqlite" {
+	switch db.Dialector.Name() {
+	case "sqlite", "postgres":
 		return "text"
 	}
 	return "enum('sender','receiver','shared')"
@@ -31,7 +32,8 @@ const (
 )
 
 func (KycLevelHintType) GormDBDataType(db *gorm.DB, field *schema.Field) string {
-	if db.Dialector.Name() == "sqlite" {
+	switch db.Dialector.Name() {
+	case "sqlite", "postgres":
 		return "text"
 	}
 	return "enum('low','medium','high')"
@@ -49,8 +51,8 @@ type PaymentMethod struct {
 	IsReversible          bool
 	SettlementMinutes     uint
 	ChargebackWindowHours uint
-	FeeSide               FeeSideType      `gorm:"type:enum('sender','receiver','shared')"`
-	KycLevelHint          KycLevelHintType `gorm:"type:enum('low','medium','high')"`
+	FeeSide               FeeSideType
+	KycLevelHint          KycLevelHintType
 }
 
 func (p *PaymentMethod) BeforeCreate(tx *gorm.DB) (err error) {

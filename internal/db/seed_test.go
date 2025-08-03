@@ -58,8 +58,8 @@ func TestSeedPaymentMethodsAndAssets(t *testing.T) {
 	var pmCount, assetCount int64
 	gdb.Model(&models.PaymentMethod{}).Count(&pmCount)
 	gdb.Model(&models.Asset{}).Count(&assetCount)
-	if pmCount != 6 || assetCount != 10 {
-		t.Fatalf("expected 6 methods and 10 assets, got %d and %d", pmCount, assetCount)
+	if pmCount != 22 || assetCount != 10 {
+		t.Fatalf("expected 22 methods and 10 assets, got %d and %d", pmCount, assetCount)
 	}
 	var assets []models.Asset
 	if err := gdb.Find(&assets).Error; err != nil {
@@ -81,12 +81,28 @@ func TestSeedPaymentMethodsAndAssets(t *testing.T) {
 		t.Fatalf("list methods: %v", err)
 	}
 	wantCountries := map[string][]string{
-		"Interac":      {"Canada"},
-		"SPEI":         {"Mexico"},
-		"RTP":          {"United States"},
-		"Orange Money": {"Senegal", "Cote d'Ivoire", "Mali", "Burkina Faso", "Benin"},
-		"SEPA":         regionCountries["EU"],
-		"SWIFT":        regionCountries["GLOBAL"],
+		"Interac e-Transfer": {"Canada"},
+		"SPEI":               {"Mexico"},
+		"RTP (Network)":      {"United States"},
+		"FedNow":             {"United States"},
+		"NPP / Osko":         {"Australia"},
+		"PayNow (FAST)":      {"Singapore"},
+		"PromptPay":          {"Thailand"},
+		"DuitNow":            {"Malaysia"},
+		"FPS (Hong Kong)":    {"Hong Kong (Special Administrative Region of China)"},
+		"SBP (Система быстрых платежей)": {"Russian Federation"},
+		"Orange Money":           {"Senegal", "Cote d'Ivoire", "Mali", "Burkina Faso", "Benin"},
+		"MTN MoMo":               {"Ghana", "Uganda", "South Africa"},
+		"TIPS (pan-EU rail)":     {},
+		"Alipay":                 {"China"},
+		"WeChat Pay":             {"China"},
+		"Cash App":               {"United States"},
+		"Venmo":                  {"United States"},
+		"Ria Money Transfer":     {},
+		"WorldRemit cash pickup": {},
+		"Flexepin code":          {"Canada", "Australia"},
+		"SEPA":                   {},
+		"SWIFT":                  {},
 	}
 	for _, m := range methods {
 		expected, ok := wantCountries[m.Name]
