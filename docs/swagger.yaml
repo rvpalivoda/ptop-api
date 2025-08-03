@@ -344,6 +344,10 @@ definitions:
         type: string
       provider:
         type: string
+      countries:
+        items:
+          $ref: '#/definitions/models.Country'
+        type: array
       regions:
         items:
           type: string

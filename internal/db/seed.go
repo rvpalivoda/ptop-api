@@ -109,7 +109,27 @@ func SeedPaymentMethods(db *gorm.DB) error {
 			KycLevelHint:          models.KycLevelHintHigh,
 		},
 	}
-	return db.Create(&methods).Error
+
+	for _, m := range methods {
+		method := m
+		if err := db.Create(&method).Error; err != nil {
+			return err
+		}
+		for _, region := range method.Regions {
+			name := countries.ByName(region).String()
+			if name == "Unknown" {
+				continue
+			}
+			var country models.Country
+			if err := db.Where("name = ?", name).First(&country).Error; err != nil {
+				return err
+			}
+			if err := db.Model(&method).Association("Countries").Append(&country); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 // SeedAssets добавляет базовые активы, если таблица пуста.
