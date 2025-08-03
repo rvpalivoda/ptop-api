@@ -35,7 +35,7 @@ func SeedPaymentMethods(db *gorm.DB) error {
 	}
 	methods := []models.PaymentMethod{
 		{
-			Name:              "Interac",
+			Name:              "Interac e-Transfer",
 			MethodGroup:       "bank_transfer",
 			Provider:          "Interac",
 			TypicalFiatCCY:    "CAD",
@@ -59,9 +59,9 @@ func SeedPaymentMethods(db *gorm.DB) error {
 			KycLevelHint:      models.KycLevelHintMedium,
 		},
 		{
-			Name:              "RTP",
+			Name:              "RTP (Network)",
 			MethodGroup:       "bank_transfer",
-			Provider:          "TCH",
+			Provider:          "RTP",
 			TypicalFiatCCY:    "USD",
 			Regions:           []string{"US"},
 			IsRealtime:        true,
@@ -71,15 +71,207 @@ func SeedPaymentMethods(db *gorm.DB) error {
 			KycLevelHint:      models.KycLevelHintHigh,
 		},
 		{
+			Name:              "FedNow",
+			MethodGroup:       "bank_transfer",
+			Provider:          "Federal Reserve",
+			TypicalFiatCCY:    "USD",
+			Regions:           []string{"US"},
+			IsRealtime:        true,
+			IsReversible:      false,
+			SettlementMinutes: 1,
+			FeeSide:           models.FeeSideSender,
+			KycLevelHint:      models.KycLevelHintHigh,
+		},
+		{
+			Name:              "NPP / Osko",
+			MethodGroup:       "bank_transfer",
+			Provider:          "NPP",
+			TypicalFiatCCY:    "AUD",
+			Regions:           []string{"AU"},
+			IsRealtime:        true,
+			IsReversible:      false,
+			SettlementMinutes: 1,
+			FeeSide:           models.FeeSideSender,
+			KycLevelHint:      models.KycLevelHintMedium,
+		},
+		{
+			Name:              "PayNow (FAST)",
+			MethodGroup:       "bank_transfer",
+			Provider:          "FAST",
+			TypicalFiatCCY:    "SGD",
+			Regions:           []string{"SG"},
+			IsRealtime:        true,
+			IsReversible:      false,
+			SettlementMinutes: 1,
+			FeeSide:           models.FeeSideSender,
+			KycLevelHint:      models.KycLevelHintMedium,
+		},
+		{
+			Name:              "PromptPay",
+			MethodGroup:       "bank_transfer",
+			Provider:          "PromptPay",
+			TypicalFiatCCY:    "THB",
+			Regions:           []string{"TH"},
+			IsRealtime:        true,
+			IsReversible:      false,
+			SettlementMinutes: 1,
+			FeeSide:           models.FeeSideSender,
+			KycLevelHint:      models.KycLevelHintMedium,
+		},
+		{
+			Name:              "DuitNow",
+			MethodGroup:       "bank_transfer",
+			Provider:          "DuitNow",
+			TypicalFiatCCY:    "MYR",
+			Regions:           []string{"MY"},
+			IsRealtime:        true,
+			IsReversible:      false,
+			SettlementMinutes: 1,
+			FeeSide:           models.FeeSideSender,
+			KycLevelHint:      models.KycLevelHintMedium,
+		},
+		{
+			Name:              "FPS (Hong Kong)",
+			MethodGroup:       "bank_transfer",
+			Provider:          "FPS",
+			TypicalFiatCCY:    "HKD",
+			Regions:           []string{"HK"},
+			IsRealtime:        true,
+			IsReversible:      false,
+			SettlementMinutes: 1,
+			FeeSide:           models.FeeSideSender,
+			KycLevelHint:      models.KycLevelHintMedium,
+		},
+		{
+			Name:              "SBP (Система быстрых платежей)",
+			MethodGroup:       "bank_transfer",
+			Provider:          "SBP",
+			TypicalFiatCCY:    "RUB",
+			Regions:           []string{"RU"},
+			IsRealtime:        true,
+			IsReversible:      false,
+			SettlementMinutes: 1,
+			FeeSide:           models.FeeSideSender,
+			KycLevelHint:      models.KycLevelHintMedium,
+		},
+		{
 			Name:              "Orange Money",
 			MethodGroup:       "mobile_money",
 			Provider:          "Orange",
-			TypicalFiatCCY:    "XOF",
+			TypicalFiatCCY:    "XOF/XAF",
 			Regions:           []string{"SN", "CI", "ML", "BF", "BJ"},
 			IsRealtime:        true,
 			IsReversible:      false,
 			SettlementMinutes: 1,
 			FeeSide:           models.FeeSideReceiver,
+			KycLevelHint:      models.KycLevelHintLow,
+		},
+		{
+			Name:              "MTN MoMo",
+			MethodGroup:       "mobile_money",
+			Provider:          "MTN",
+			TypicalFiatCCY:    "GHS/UGX/ZAR",
+			Regions:           []string{"GH", "UG", "ZA"},
+			IsRealtime:        true,
+			IsReversible:      false,
+			SettlementMinutes: 1,
+			FeeSide:           models.FeeSideReceiver,
+			KycLevelHint:      models.KycLevelHintLow,
+		},
+		{
+			Name:              "TIPS (pan-EU rail)",
+			MethodGroup:       "instant_pay_net",
+			Provider:          "TIPS",
+			TypicalFiatCCY:    "EUR",
+			Regions:           []string{"EEA"},
+			IsRealtime:        true,
+			IsReversible:      false,
+			SettlementMinutes: 1,
+			FeeSide:           models.FeeSideSender,
+			KycLevelHint:      models.KycLevelHintMedium,
+		},
+		{
+			Name:              "Alipay",
+			MethodGroup:       "e_wallet",
+			Provider:          "Ant Financial",
+			TypicalFiatCCY:    "CNY",
+			Regions:           []string{"CN"},
+			IsRealtime:        true,
+			IsReversible:      false,
+			SettlementMinutes: 1,
+			FeeSide:           models.FeeSideSender,
+			KycLevelHint:      models.KycLevelHintLow,
+		},
+		{
+			Name:              "WeChat Pay",
+			MethodGroup:       "e_wallet",
+			Provider:          "Tencent",
+			TypicalFiatCCY:    "CNY",
+			Regions:           []string{"CN"},
+			IsRealtime:        true,
+			IsReversible:      false,
+			SettlementMinutes: 1,
+			FeeSide:           models.FeeSideSender,
+			KycLevelHint:      models.KycLevelHintLow,
+		},
+		{
+			Name:              "Cash App",
+			MethodGroup:       "e_wallet",
+			Provider:          "Block",
+			TypicalFiatCCY:    "USD",
+			Regions:           []string{"US"},
+			IsRealtime:        true,
+			IsReversible:      false,
+			SettlementMinutes: 1,
+			FeeSide:           models.FeeSideSender,
+			KycLevelHint:      models.KycLevelHintLow,
+		},
+		{
+			Name:              "Venmo",
+			MethodGroup:       "e_wallet",
+			Provider:          "PayPal",
+			TypicalFiatCCY:    "USD",
+			Regions:           []string{"US"},
+			IsRealtime:        true,
+			IsReversible:      false,
+			SettlementMinutes: 1,
+			FeeSide:           models.FeeSideSender,
+			KycLevelHint:      models.KycLevelHintLow,
+		},
+		{
+			Name:              "Ria Money Transfer",
+			MethodGroup:       "money_xfer_svc",
+			Provider:          "Ria",
+			TypicalFiatCCY:    "multi-currency",
+			Regions:           []string{"GLOBAL"},
+			IsRealtime:        false,
+			IsReversible:      false,
+			SettlementMinutes: 180,
+			FeeSide:           models.FeeSideSender,
+			KycLevelHint:      models.KycLevelHintMedium,
+		},
+		{
+			Name:              "WorldRemit cash pickup",
+			MethodGroup:       "money_xfer_svc",
+			Provider:          "WorldRemit",
+			TypicalFiatCCY:    "multi-currency",
+			Regions:           []string{"GLOBAL"},
+			IsRealtime:        false,
+			IsReversible:      false,
+			SettlementMinutes: 180,
+			FeeSide:           models.FeeSideSender,
+			KycLevelHint:      models.KycLevelHintMedium,
+		},
+		{
+			Name:              "Flexepin code",
+			MethodGroup:       "prepaid_voucher",
+			Provider:          "Flexepin",
+			TypicalFiatCCY:    "CAD/AUD/EUR",
+			Regions:           []string{"CA", "AU", "EU"},
+			IsRealtime:        true,
+			IsReversible:      false,
+			SettlementMinutes: 1,
+			FeeSide:           models.FeeSideSender,
 			KycLevelHint:      models.KycLevelHintLow,
 		},
 		{
@@ -109,7 +301,27 @@ func SeedPaymentMethods(db *gorm.DB) error {
 			KycLevelHint:          models.KycLevelHintHigh,
 		},
 	}
-	return db.Create(&methods).Error
+
+	for _, m := range methods {
+		method := m
+		if err := db.Create(&method).Error; err != nil {
+			return err
+		}
+		for _, region := range method.Regions {
+			name := countries.ByName(region).String()
+			if name == "Unknown" {
+				continue
+			}
+			var country models.Country
+			if err := db.Where("name = ?", name).First(&country).Error; err != nil {
+				return err
+			}
+			if err := db.Model(&method).Association("Countries").Append(&country); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 // SeedAssets добавляет базовые активы, если таблица пуста.
