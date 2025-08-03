@@ -6,6 +6,7 @@ import {
   recover as apiRecover,
   regenerateWords as apiRegenerate,
   changePassword as apiChangePassword,
+  profile as apiProfile,
   type RegisterResponse,
   type MnemonicResponse,
 } from "@/api/auth";
@@ -60,6 +61,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const t = loadTokens();
     setTokens(t);
+    if (t) {
+      apiProfile()
+        .then((p) => {
+          const info: UserInfo = {
+            username: p.username,
+            twofaEnabled: p.twofa_enabled,
+            pinCodeSet: p.pincode_set,
+          };
+          saveUserInfo(info);
+          setUserInfo(info);
+        })
+        .catch(() => {});
+    }
   }, []);
 
   const login = async (
@@ -69,8 +83,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const t = await apiLogin(username, password);
     saveTokens(t);
     setTokens(t);
-    const payload = JSON.parse(atob(t.access.split(".")[1] || ""));
-    const info: UserInfo = { username, name: payload.sub || "" };
+    const p = await apiProfile();
+    const info: UserInfo = {
+      username: p.username,
+      twofaEnabled: p.twofa_enabled,
+      pinCodeSet: p.pincode_set,
+    };
     saveUserInfo(info);
     setUserInfo(info);
   };
@@ -95,12 +113,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const t = await apiRefresh();
     saveTokens(t);
     setTokens(t);
-    setUserInfo((prev) => {
-      const payload = JSON.parse(atob(t.access.split(".")[1] || ""));
-      const info = { username: prev?.username || "", name: payload.sub || "" };
-      saveUserInfo(info);
-      return info;
-    });
+    const p = await apiProfile();
+    const info: UserInfo = {
+      username: p.username,
+      twofaEnabled: p.twofa_enabled,
+      pinCodeSet: p.pincode_set,
+    };
+    saveUserInfo(info);
+    setUserInfo(info);
   };
 
   const recover = async (
@@ -119,8 +139,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     );
     saveTokens(t);
     setTokens(t);
-    const payload = JSON.parse(atob(t.access.split(".")[1] || ""));
-    const info: UserInfo = { username, name: payload.sub || "" };
+    const p = await apiProfile();
+    const info: UserInfo = {
+      username: p.username,
+      twofaEnabled: p.twofa_enabled,
+      pinCodeSet: p.pincode_set,
+    };
     saveUserInfo(info);
     setUserInfo(info);
   };

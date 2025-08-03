@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { login, register, recover, refresh } from "./auth";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { login, register, recover, refresh, profile } from "./auth";
 
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
@@ -105,6 +106,28 @@ describe("auth api", () => {
     const body = JSON.parse(mockFetch.mock.calls[0][1].body);
     expect(body).toEqual({ refresh_token: "r" });
     expect(res).toEqual({ access: "na", refresh: "nr" });
+  });
+
+  it("profile возвращает данные профиля", async () => {
+    const mockFetch = vi
+      .spyOn(global, "fetch" as any)
+      .mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          username: "u",
+          twofa_enabled: true,
+          pincode_set: false,
+        }),
+      } as any);
+
+    const res = await profile();
+    expect(mockFetch).toHaveBeenCalled();
+    expect(res).toEqual({
+      username: "u",
+      twofa_enabled: true,
+      pincode_set: false,
+    });
   });
 });
 

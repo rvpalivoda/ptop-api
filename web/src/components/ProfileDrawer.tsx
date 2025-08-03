@@ -42,7 +42,9 @@ export const ProfileDrawer = ({triggerClassName}: Props) => {
     const [twoFactorSecret, setTwoFactorSecret] = useState<string | null>(null);
     const [otpAuthUrl, setOtpAuthUrl] = useState<string | null>(null);
     const [twoFactorCode, setTwoFactorCode] = useState("");
-    const [twoFactorEnabled, setTwoFactorEnabled] = useState(() => loadTwoFactorEnabled());
+    const [twoFactorEnabled, setTwoFactorEnabled] = useState(
+        userInfo?.twofaEnabled ?? loadTwoFactorEnabled()
+    );
     const [newSeed, setNewSeed] = useState<string | null>(null);
     const [disablePassword, setDisablePassword] = useState("");
     const [regeneratePassword, setRegeneratePassword] = useState("");
@@ -83,6 +85,12 @@ export const ProfileDrawer = ({triggerClassName}: Props) => {
             clearTwoFactorEnabled();
         }
     }, [twoFactorEnabled]);
+
+    useEffect(() => {
+        if (userInfo) {
+            setTwoFactorEnabled(userInfo.twofaEnabled);
+        }
+    }, [userInfo]);
 
     const handlePasswordSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -215,9 +223,9 @@ export const ProfileDrawer = ({triggerClassName}: Props) => {
                 </SheetHeader>
                 <div className="space-y-2 text-sm">
 
-                    <button type="button" onClick={() => navigator.clipboard.writeText(userInfo?.name)}
+                    <button type="button" onClick={() => navigator.clipboard.writeText(userInfo?.username)}
                             className="flex items-center text-blue-500  font-semibold  hover:text-blue-300">
-                        {userInfo?.name || ""} <Copy className="w-5 h-5 ml-2"/>
+                        {userInfo?.username || ""} <Copy className="w-5 h-5 ml-2"/>
                     </button>
 
                 </div>
