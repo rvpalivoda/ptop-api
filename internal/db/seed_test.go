@@ -77,6 +77,7 @@ func TestSeedPaymentMethodsAndAssets(t *testing.T) {
 	}
 
 	var methods []models.PaymentMethod
+	flexepinCountries := append([]string{"Canada", "Australia"}, regionCountries["EU"]...)
 	if err := gdb.Preload("Countries").Find(&methods).Error; err != nil {
 		t.Fatalf("list methods: %v", err)
 	}
@@ -93,16 +94,16 @@ func TestSeedPaymentMethodsAndAssets(t *testing.T) {
 		"SBP (Система быстрых платежей)": {"Russian Federation"},
 		"Orange Money":           {"Senegal", "Cote d'Ivoire", "Mali", "Burkina Faso", "Benin"},
 		"MTN MoMo":               {"Ghana", "Uganda", "South Africa"},
-		"TIPS (pan-EU rail)":     {},
+		"TIPS (pan-EU rail)":     regionCountries["EEA"],
 		"Alipay":                 {"China"},
 		"WeChat Pay":             {"China"},
 		"Cash App":               {"United States"},
 		"Venmo":                  {"United States"},
-		"Ria Money Transfer":     {},
-		"WorldRemit cash pickup": {},
-		"Flexepin code":          {"Canada", "Australia"},
-		"SEPA":                   {},
-		"SWIFT":                  {},
+		"Ria Money Transfer":     regionCountries["GLOBAL"],
+		"WorldRemit cash pickup": regionCountries["GLOBAL"],
+		"Flexepin code":          flexepinCountries,
+		"SEPA":                   regionCountries["EU"],
+		"SWIFT":                  regionCountries["GLOBAL"],
 	}
 	for _, m := range methods {
 		expected, ok := wantCountries[m.Name]
@@ -121,6 +122,13 @@ func TestSeedPaymentMethodsAndAssets(t *testing.T) {
 				t.Fatalf("method %s missing country %s", m.Name, name)
 			}
 		}
+	}
+	var mtn models.PaymentMethod
+	if err := gdb.Where("name = ?", "MTN MoMo").First(&mtn).Error; err != nil {
+		t.Fatalf("get MTN MoMo: %v", err)
+	}
+	if mtn.TypicalFiatCCY != "GHS/UGX/ZAR" {
+		t.Fatalf("expected MTN MoMo TypicalFiatCCY to be GHS/UGX/ZAR, got %s", mtn.TypicalFiatCCY)
 	}
 	if err := SeedPaymentMethods(gdb); err != nil {
 		t.Fatalf("reseeding methods: %v", err)
