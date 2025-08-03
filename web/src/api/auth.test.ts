@@ -7,6 +7,7 @@ import {
   refresh,
   profile,
   recoverChallenge,
+  changePassword,
 } from "./auth";
 
 const localStorageMock = (() => {
@@ -109,6 +110,26 @@ describe("auth api", () => {
     const res = await recoverChallenge("user");
     expect(mockFetch).toHaveBeenCalled();
     expect(res).toEqual({ positions: [1, 2, 3] });
+  });
+
+  it("changePassword отправляет корректный payload", async () => {
+    const mockFetch = vi
+      .spyOn(global, "fetch" as any)
+      .mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({ status: "ok" }),
+      } as any);
+
+    await changePassword("old", "new");
+    const [url, opts] = mockFetch.mock.calls[0];
+    expect((url as string).endsWith("/auth/password")).toBe(true);
+    const body = JSON.parse(opts.body);
+    expect(body).toEqual({
+      old_password: "old",
+      new_password: "new",
+      confirm_password: "new",
+    });
   });
 
   it("refresh использует refresh_token", async () => {
