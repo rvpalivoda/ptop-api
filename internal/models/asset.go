@@ -10,6 +10,7 @@ type Asset struct {
 	Name          string `gorm:"type:varchar(255);unique;not null"`
 	Type          string `gorm:"type:varchar(10);not null"`
 	IsConvertible bool   `gorm:"not null;default:false"`
+	Xpub          string `gorm:"type:varchar(255)" json:"-"`
 }
 
 func (a *Asset) BeforeCreate(tx *gorm.DB) (err error) {

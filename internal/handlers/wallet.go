@@ -50,18 +50,19 @@ func CreateWallet(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "wallet exists"})
 			return
 		}
-		val, err := services.GetAddress(clientID, r.AssetID)
+		val, idx, err := services.GetAddress(db, clientID, r.AssetID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "address error"})
 			return
 		}
 		now := time.Now()
 		w := models.Wallet{
-			ClientID:  clientID,
-			AssetID:   r.AssetID,
-			Value:     val,
-			IsEnabled: true,
-			EnabledAt: now,
+			ClientID:        clientID,
+			AssetID:         r.AssetID,
+			Value:           val,
+			DerivationIndex: idx,
+			IsEnabled:       true,
+			EnabledAt:       now,
 		}
 		if err := db.Create(&w).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
