@@ -3,6 +3,7 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -123,5 +124,57 @@ func TestWalletHandlers(t *testing.T) {
 	}
 	if list[0].ID == wal.ID {
 		t.Fatalf("disabled wallet returned")
+	}
+}
+
+func TestCreateWalletFake(t *testing.T) {
+	t.Setenv("DEBUG_FAKE_NETWORK", "true")
+	db, r, _ := setupTest(t)
+
+	body := `{"username":"fakeuser","password":"pass","password_confirm":"pass"}`
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/auth/register", bytes.NewBufferString(body))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+
+	w = httptest.NewRecorder()
+	body = `{"username":"fakeuser","password":"pass"}`
+	req, _ = http.NewRequest("POST", "/auth/login", bytes.NewBufferString(body))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("login status %d", w.Code)
+	}
+	var tok struct {
+		AccessToken string `json:"access_token"`
+	}
+	json.Unmarshal(w.Body.Bytes(), &tok)
+
+	asset := models.Asset{Name: "BTC_fake", Type: models.AssetTypeCrypto, IsActive: true}
+	if err := db.Create(&asset).Error; err != nil {
+		t.Fatalf("asset: %v", err)
+	}
+
+	w = httptest.NewRecorder()
+	body = `{"asset_id":"` + asset.ID + `"}`
+	req, _ = http.NewRequest("POST", "/client/wallets", bytes.NewBufferString(body))
+	req.Header.Set("Authorization", "Bearer "+tok.AccessToken)
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("create status %d", w.Code)
+	}
+	var wal models.Wallet
+	json.Unmarshal(w.Body.Bytes(), &wal)
+	if wal.Value == "" {
+		t.Fatalf("empty value")
+	}
+	var client models.Client
+	if err := db.Where("username = ?", "fakeuser").First(&client).Error; err != nil {
+		t.Fatalf("client: %v", err)
+	}
+	exp := fmt.Sprintf("fake:%s:%s:%d", asset.ID, client.ID, 0)
+	if wal.Value != exp {
+		t.Fatalf("expected %s, got %s", exp, wal.Value)
 	}
 }

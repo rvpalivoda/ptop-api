@@ -37,6 +37,14 @@ func GetAddress(db *gorm.DB, clientID, assetID string) (string, uint32, error) {
 		return "", 0, err
 	}
 
+	if strings.EqualFold(os.Getenv("DEBUG_FAKE_NETWORK"), "true") {
+		idx, err := nextIndex(db, assetID)
+		if err != nil {
+			return "", 0, err
+		}
+		return fmt.Sprintf("fake:%s:%s:%d", assetID, clientID, idx), idx, nil
+	}
+
 	switch {
 	case strings.HasPrefix(asset.Name, "BTC"):
 		idx, err := nextIndex(db, assetID)
