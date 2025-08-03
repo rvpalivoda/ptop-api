@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"context"
 	"fmt"
+	"io"
 	"testing"
 	"time"
 
@@ -13,9 +15,22 @@ import (
 
 	"ptop/internal/models"
 	"ptop/internal/services"
+	storage "ptop/internal/services/storage"
 )
 
 // setupTest создаёт in-memory БД и маршруты для тестов.
+type dummyStorage struct{}
+
+func (d *dummyStorage) Upload(ctx context.Context, objectName string, r io.Reader, size int64, contentType string) (string, error) {
+	return objectName, nil
+}
+
+func (d *dummyStorage) GetURL(ctx context.Context, objectName string, expiry time.Duration) (string, error) {
+	return "https://example.com/" + objectName, nil
+}
+
+var _ storage.Storage = (*dummyStorage)(nil)
+
 func setupTest(t *testing.T) (*gorm.DB, *gin.Engine, map[string]time.Duration) {
 	t.Helper()
 	gin.SetMode(gin.TestMode)
@@ -48,6 +63,11 @@ func setupTest(t *testing.T) (*gorm.DB, *gin.Engine, map[string]time.Duration) {
 
 	ttl := map[string]time.Duration{"access": time.Minute, "refresh": time.Hour}
 
+	mr := miniredis.RunT(t)
+	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	cache := services.NewChatCache(rdb, 50)
+	store := &dummyStorage{}
+
 	r := gin.Default()
 	auth := r.Group("/auth")
 	auth.POST("/register", Register(db, ttl))
@@ -77,7 +97,7 @@ func setupTest(t *testing.T) (*gorm.DB, *gin.Engine, map[string]time.Duration) {
 	api.GET("/client/orders", ListClientOrders(db))
 	api.POST("/client/orders", CreateOrder(db))
 	api.GET("/orders/:id/messages", ListOrderMessages(db))
-	api.POST("/orders/:id/messages", CreateOrderMessage(db))
+	api.POST("/orders/:id/messages", CreateOrderMessage(db, store, cache))
 	api.PATCH("/orders/:id/messages/:msgId/read", ReadOrderMessage(db))
 
 	maxOffers := 1
@@ -87,10 +107,6 @@ func setupTest(t *testing.T) (*gorm.DB, *gin.Engine, map[string]time.Duration) {
 	api.PUT("/client/offers/:id", UpdateOffer(db))
 	api.POST("/client/offers/:id/enable", EnableOffer(db, maxOffers))
 	api.POST("/client/offers/:id/disable", DisableOffer(db))
-
-	mr := miniredis.RunT(t)
-	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
-	cache := services.NewChatCache(rdb, 50)
 
 	ws := r.Group("/ws")
 	ws.Use(AuthMiddleware(db))

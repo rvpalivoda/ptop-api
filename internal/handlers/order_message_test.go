@@ -6,6 +6,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
@@ -129,8 +130,8 @@ func TestOrderMessageHandler(t *testing.T) {
 	w = httptest.NewRecorder()
 	buf := &bytes.Buffer{}
 	mw := multipart.NewWriter(buf)
-	fw, _ := mw.CreateFormFile("file", "test.txt")
-	fw.Write([]byte("file"))
+	fw, _ := mw.CreateFormFile("file", "test.png")
+	fw.Write([]byte{0x89, 'P', 'N', 'G', '\r', '\n', 0x1a, '\n'})
 	mw.Close()
 	req, _ = http.NewRequest("POST", "/orders/"+ord.ID+"/messages", buf)
 	req.Header.Set("Authorization", "Bearer "+buyerTok.AccessToken)
@@ -141,7 +142,7 @@ func TestOrderMessageHandler(t *testing.T) {
 	}
 	var fileMsg models.OrderMessage
 	json.Unmarshal(w.Body.Bytes(), &fileMsg)
-	if fileMsg.FileURL == nil {
+	if fileMsg.FileURL == nil || !strings.HasPrefix(*fileMsg.FileURL, "https://example.com/") {
 		t.Fatalf("expected file url")
 	}
 
@@ -167,7 +168,7 @@ func TestOrderMessageHandler(t *testing.T) {
 	if len(list) != 2 {
 		t.Fatalf("expected 2 messages, got %d", len(list))
 	}
-	if list[1].FileURL == nil {
+	if list[1].FileURL == nil || !strings.HasPrefix(*list[1].FileURL, "https://example.com/") {
 		t.Fatalf("expected file url in second message")
 	}
 
