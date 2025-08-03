@@ -17,8 +17,11 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"ptop/config"
+	"ptop/internal/btcwatcher"
 	"ptop/internal/db"
+	"ptop/internal/ethwatcher"
 	"ptop/internal/handlers"
+	"ptop/internal/xmrwatcher"
 
 	docs "ptop/docs"
 )
@@ -81,6 +84,31 @@ func main() {
 	api.PUT("/client/offers/:id", handlers.UpdateOffer(gormDB))
 	api.POST("/client/offers/:id/enable", handlers.EnableOffer(gormDB, cfg.MaxActiveOffersPerClient))
 	api.POST("/client/offers/:id/disable", handlers.DisableOffer(gormDB))
+
+	if cfg.WatchersDebug {
+		btcW, err := btcwatcher.New(gormDB, nil, nil, true)
+		if err != nil {
+			log.Fatalf("btc watcher: %v", err)
+		}
+		if err := btcW.Start(); err != nil {
+			log.Fatalf("btc watcher start: %v", err)
+		}
+		ethW, err := ethwatcher.New(gormDB, "", true)
+		if err != nil {
+			log.Fatalf("eth watcher: %v", err)
+		}
+		if err := ethW.Start(); err != nil {
+			log.Fatalf("eth watcher start: %v", err)
+		}
+		xmrW := xmrwatcher.New(gormDB, "", 0, true)
+		xmrW.Start()
+		watchers := map[string]handlers.DebugDepositor{
+			"BTC": btcW,
+			"ETH": ethW,
+			"XMR": xmrW,
+		}
+		r.POST("/debug/deposit", handlers.DebugDeposit(gormDB, watchers))
+	}
 
 	// 4. Запускаем сервер
 	addr := ":" + cfg.Port

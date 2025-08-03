@@ -15,6 +15,7 @@ type Config struct {
 	DSN                      string
 	TokenTypeTTL             map[string]time.Duration
 	MaxActiveOffersPerClient int
+	WatchersDebug            bool
 	// Другие поля, например:
 	// JWTSecret string
 	// Timezone  string
@@ -43,6 +44,8 @@ func Load() (*Config, error) {
 		maxOffers = v
 	}
 
+	debug := os.Getenv("WATCHERS_DEBUG") == "1"
+
 	return &Config{
 		Port: port,
 		DSN:  dsn,
@@ -51,6 +54,7 @@ func Load() (*Config, error) {
 			"refresh": refreshTTL,
 		},
 		MaxActiveOffersPerClient: maxOffers,
+		WatchersDebug:            debug,
 		// JWTSecret: os.Getenv("JWT_SECRET"),
 		// Timezone:  os.Getenv("TIMEZONE"),
 	}, nil

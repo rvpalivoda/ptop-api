@@ -991,6 +991,55 @@ const docTemplate = `{
                 }
             }
         },
+        "/debug/deposit": {
+            "post": {
+                "description": "Создаёт фейковый депозит на указанный кошелёк",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "debug"
+                ],
+                "summary": "Тестовый депозит",
+                "parameters": [
+                    {
+                        "description": "Запрос",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.DebugDepositRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/health": {
             "get": {
                 "produces": [
@@ -1131,6 +1180,21 @@ const docTemplate = `{
                 }
             }
         },
+        "handlers.DebugDepositRequest": {
+            "type": "object",
+            "required": [
+                "amount",
+                "wallet_id"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "string"
+                },
+                "wallet_id": {
+                    "type": "string"
+                }
+            }
+        },
         "handlers.Enable2FARequest": {
             "type": "object",
             "properties": {
@@ -1224,10 +1288,10 @@ const docTemplate = `{
                 "amount": {
                     "type": "string"
                 },
-                "offer_id": {
+                "client_payment_method_id": {
                     "type": "string"
                 },
-                "client_payment_method_id": {
+                "offer_id": {
                     "type": "string"
                 }
             }
@@ -1508,6 +1572,9 @@ const docTemplate = `{
                 "buyerID": {
                     "type": "string"
                 },
+                "clientPaymentMethodID": {
+                    "type": "string"
+                },
                 "createdAt": {
                     "type": "string"
                 },
@@ -1524,9 +1591,6 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "offerID": {
-                    "type": "string"
-                },
-                "clientPaymentMethodID": {
                     "type": "string"
                 },
                 "price": {
