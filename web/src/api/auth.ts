@@ -44,17 +44,24 @@ export async function register(
   return { access: access_token, refresh: refresh_token, mnemonic };
 }
 
+export interface RecoverPhrase {
+  position: number;
+  word: string;
+}
+
+export async function recoverChallenge(username: string) {
+  return apiRequest<{ positions: number[] }>(`/auth/recover/${username}`);
+}
+
 export async function recover(
   username: string,
-  words: string[],
-  indices: number[],
+  phrases: RecoverPhrase[],
   newPassword: string,
   passwordConfirm: string,
 ) {
   const payload = {
     username,
-    words,
-    indices,
+    phrases,
     new_password: newPassword,
     password_confirm: passwordConfirm,
   };

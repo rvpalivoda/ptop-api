@@ -1,6 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { login, register, recover, refresh, profile } from "./auth";
+import {
+  login,
+  register,
+  recover,
+  refresh,
+  profile,
+  recoverChallenge,
+} from "./auth";
 
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
@@ -74,22 +81,34 @@ describe("auth api", () => {
         json: async () => ({ access_token: "a", refresh_token: "r" }),
       } as any);
 
-    const res = await recover(
-      "user",
-      ["w1", "w2", "w3"],
-      [1, 2, 3],
-      "new",
-      "new",
-    );
+    const phrases = [
+      { position: 1, word: "w1" },
+      { position: 2, word: "w2" },
+      { position: 3, word: "w3" },
+    ];
+    const res = await recover("user", phrases, "new", "new");
     const body = JSON.parse(mockFetch.mock.calls[0][1].body);
     expect(body).toEqual({
       username: "user",
-      words: ["w1", "w2", "w3"],
-      indices: [1, 2, 3],
+      phrases,
       new_password: "new",
       password_confirm: "new",
     });
     expect(res).toEqual({ access: "a", refresh: "r" });
+  });
+
+  it("recoverChallenge возвращает позиции", async () => {
+    const mockFetch = vi
+      .spyOn(global, "fetch" as any)
+      .mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({ positions: [1, 2, 3] }),
+      } as any);
+
+    const res = await recoverChallenge("user");
+    expect(mockFetch).toHaveBeenCalled();
+    expect(res).toEqual({ positions: [1, 2, 3] });
   });
 
   it("refresh использует refresh_token", async () => {

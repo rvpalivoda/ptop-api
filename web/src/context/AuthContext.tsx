@@ -9,6 +9,7 @@ import {
   profile as apiProfile,
   type RegisterResponse,
   type MnemonicResponse,
+  type RecoverPhrase,
 } from "@/api/auth";
 import { setPinCode as apiSetPinCode } from "@/api/pin";
 import {
@@ -38,8 +39,7 @@ interface AuthContextValue {
   refresh: () => Promise<void>;
   recover: (
     username: string,
-    words: string[],
-    indices: number[],
+    phrases: RecoverPhrase[],
     newPassword: string,
     passwordConfirm: string,
   ) => Promise<void>;
@@ -123,15 +123,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const recover = async (
     username: string,
-    words: string[],
-    indices: number[],
+    phrases: RecoverPhrase[],
     newPassword: string,
     passwordConfirm: string,
   ): Promise<void> => {
     const t = await apiRecover(
       username,
-      words,
-      indices,
+      phrases,
       newPassword,
       passwordConfirm,
     );
