@@ -85,8 +85,8 @@ func TestSeedPaymentMethodsAndAssets(t *testing.T) {
 		"SPEI":         {"Mexico"},
 		"RTP":          {"United States"},
 		"Orange Money": {"Senegal", "Cote d'Ivoire", "Mali", "Burkina Faso", "Benin"},
-		"SEPA":         {},
-		"SWIFT":        {},
+		"SEPA":         regionCountries["EU"],
+		"SWIFT":        regionCountries["GLOBAL"],
 	}
 	for _, m := range methods {
 		expected, ok := wantCountries[m.Name]
