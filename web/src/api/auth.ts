@@ -82,12 +82,17 @@ export async function regenerateWords(password: string) {
   });
 }
 
-export async function changePassword(currentPassword: string, newPassword: string) {
-  return apiRequest<
-    { status: string }
-  >("/auth/change-password", {
+export async function changePassword(
+  currentPassword: string,
+  newPassword: string,
+) {
+  return apiRequest<{ status: string }>("/auth/password", {
     method: "POST",
-    body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
+    body: JSON.stringify({
+      old_password: currentPassword,
+      new_password: newPassword,
+      confirm_password: newPassword,
+    }),
   });
 }
 
