@@ -1,13 +1,15 @@
-import {useEffect, useState} from "react";
-import {Link} from "react-router-dom";
-import {ArrowLeft, Key, Check, Eye, EyeOff} from "lucide-react";
-import {useAuth} from "@/context";
-import {toast} from "@/components/ui/sonner";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { ArrowLeft, Key, Check, Eye, EyeOff } from "lucide-react";
+import { useAuth } from "@/context";
+import { toast } from "@/components/ui/sonner";
+import { recoverChallenge } from "@/api/auth";
 
 const Recover = () => {
     const [username, setUsername] = useState("");
     const [words, setWords] = useState(["", "", ""]);
     const [indices, setIndices] = useState<number[]>([]);
+    const [challengeLoaded, setChallengeLoaded] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -15,15 +17,17 @@ const Recover = () => {
     const [showConfirm, setShowConfirm] = useState(false);
     const {recover} = useAuth();
 
-    useEffect(() => {
-        setWords(["", "", ""]);
-        const nums: number[] = [];
-        while (nums.length < 3) {
-            const n = Math.floor(Math.random() * 24) + 1;
-            if (!nums.includes(n)) nums.push(n);
+    const handleUsernameBlur = async () => {
+        if (!username) return;
+        try {
+            const res = await recoverChallenge(username);
+            setIndices(res.positions);
+            setWords(["", "", ""]);
+            setChallengeLoaded(true);
+        } catch (err) {
+            toast("Не удалось получить позиции");
         }
-        setIndices(nums);
-    }, []);
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -36,7 +40,11 @@ const Recover = () => {
             return;
         }
         try {
-            await recover(username, words, indices, newPassword, confirmPassword);
+            const phrases = indices.map((pos, idx) => ({
+                position: pos,
+                word: words[idx],
+            }));
+            await recover(username, phrases, newPassword, confirmPassword);
             setIsSubmitted(true);
             toast("Пароль обновлён и доступ восстановлен");
         } catch (err) {
@@ -97,32 +105,35 @@ const Recover = () => {
                                     required
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
+                                    onBlur={handleUsernameBlur}
                                     className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     placeholder="username"
                                 />
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-2">
-                                    Введите слова № {indices[0]}, {indices[1]}, {indices[2]}
-                                </label>
-                                <div className="grid grid-cols-3 gap-2">
-                                    {words.map((w, idx) => (
-                                        <input
-                                            key={idx}
-                                            type="text"
-                                            required
-                                            value={w}
-                                            onChange={(e) => {
-                                                const arr = [...words];
-                                                arr[idx] = e.target.value.trim();
-                                                setWords(arr);
-                                            }}
-                                            placeholder={indices[idx] ? indices[idx].toString() : ""}
-                                            className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        />
-                                    ))}
+                            {challengeLoaded && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                                        Введите слова № {indices[0]}, {indices[1]}, {indices[2]}
+                                    </label>
+                                    <div className="grid grid-cols-3 gap-2">
+                                        {words.map((w, idx) => (
+                                            <input
+                                                key={idx}
+                                                type="text"
+                                                required
+                                                value={w}
+                                                onChange={(e) => {
+                                                    const arr = [...words];
+                                                    arr[idx] = e.target.value.trim();
+                                                    setWords(arr);
+                                                }}
+                                                placeholder={indices[idx] ? indices[idx].toString() : ""}
+                                                className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            />
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
+                            )}
 
                             {words.every((w) => w) && (
                                 <>
