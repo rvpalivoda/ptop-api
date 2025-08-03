@@ -1,5 +1,4 @@
 import {useEffect, useState} from "react";
-import Captcha from "@/components/Captcha";
 import {Link} from "react-router-dom";
 import {ArrowLeft, Key, Check, Eye, EyeOff} from "lucide-react";
 import {useAuth} from "@/context";
@@ -9,7 +8,6 @@ const Recover = () => {
     const [username, setUsername] = useState("");
     const [words, setWords] = useState(["", "", ""]);
     const [indices, setIndices] = useState<number[]>([]);
-    const [captcha, setCaptcha] = useState("");
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -38,7 +36,7 @@ const Recover = () => {
             return;
         }
         try {
-            await recover(username, words, indices, captcha, newPassword);
+            await recover(username, words, indices, newPassword, confirmPassword);
             setIsSubmitted(true);
             toast("Пароль обновлён и доступ восстановлен");
         } catch (err) {
@@ -186,7 +184,6 @@ const Recover = () => {
                             >
                                 Восстановить
                             </button>
-                            <Captcha onChange={setCaptcha}/>
                         </form>
                     ) : (
                         <div className="space-y-4">

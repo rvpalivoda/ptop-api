@@ -2,12 +2,12 @@ import { createContext, useContext, useEffect, useState } from "react";
 import {
   login as apiLogin,
   register as apiRegister,
-  logout as apiLogout,
   refresh as apiRefresh,
   recover as apiRecover,
   regenerateWords as apiRegenerate,
   changePassword as apiChangePassword,
   type RegisterResponse,
+  type MnemonicResponse,
 } from "@/api/auth";
 import { setPinCode as apiSetPinCode } from "@/api/pin";
 import { disable2fa as apiDisable2fa } from "@/api/two_factor";
@@ -28,11 +28,11 @@ interface AuthContextValue {
   tokens: Tokens | null;
   isAuthenticated: boolean;
   userInfo: UserInfo | null;
-  login: (username: string, password: string, captcha: string) => Promise<void>;
+  login: (username: string, password: string) => Promise<void>;
   register: (
     username: string,
     password: string,
-    captcha: string,
+    passwordConfirm: string,
   ) => Promise<RegisterResponse>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
@@ -40,10 +40,10 @@ interface AuthContextValue {
     username: string,
     words: string[],
     indices: number[],
-    captcha: string,
-    newPassword?: string,
+    newPassword: string,
+    passwordConfirm: string,
   ) => Promise<void>;
-  regenerateWords: (password: string) => Promise<RegisterResponse>;
+  regenerateWords: (password: string) => Promise<MnemonicResponse>;
   changePassword: (current: string, newPwd: string) => Promise<void>;
   disable2fa: (password: string) => Promise<void>;
   setPinCode: (password: string, pin: string) => Promise<void>;
@@ -65,9 +65,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const login = async (
     username: string,
     password: string,
-    captcha: string,
   ): Promise<void> => {
-    const t = await apiLogin(username, password, captcha);
+    const t = await apiLogin(username, password);
     saveTokens(t);
     setTokens(t);
     const payload = JSON.parse(atob(t.access.split(".")[1] || ""));
@@ -79,14 +78,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const register = async (
     username: string,
     password: string,
-    captcha: string,
+    passwordConfirm: string,
   ): Promise<RegisterResponse> => {
-    const res = await apiRegister(username, password, captcha);
+    const res = await apiRegister(username, password, passwordConfirm);
     return res;
   };
 
   const logout = async (): Promise<void> => {
-    await apiLogout();
     clearTokens();
     setTokens(null);
     clearUserInfo();
@@ -109,10 +107,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     username: string,
     words: string[],
     indices: number[],
-    captcha: string,
-    newPassword?: string,
+    newPassword: string,
+    passwordConfirm: string,
   ): Promise<void> => {
-    const t = await apiRecover(username, words, indices, captcha, newPassword);
+    const t = await apiRecover(
+      username,
+      words,
+      indices,
+      newPassword,
+      passwordConfirm,
+    );
     saveTokens(t);
     setTokens(t);
     const payload = JSON.parse(atob(t.access.split(".")[1] || ""));
@@ -121,7 +125,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setUserInfo(info);
   };
 
-  const regenerateWords = async (password: string): Promise<RegisterResponse> => {
+  const regenerateWords = async (
+    password: string,
+  ): Promise<MnemonicResponse> => {
     return apiRegenerate(password);
   };
 

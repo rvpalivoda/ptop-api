@@ -1,5 +1,4 @@
 import {useState} from 'react';
-import Captcha from '@/components/Captcha';
 import {Link, useNavigate} from 'react-router-dom';
 import {Eye, EyeOff, ArrowLeft} from 'lucide-react';
 import {toast} from '@/components/ui/sonner';
@@ -14,12 +13,11 @@ const Login = () => {
         username: '',
         password: ''
     });
-    const [captcha, setCaptcha] = useState('');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await login(formData.username, formData.password, captcha);
+            await login(formData.username, formData.password);
             toast('Вы успешно вошли в систему');
             navigate('/');
         } catch (err) {
@@ -88,7 +86,6 @@ const Login = () => {
                         >
                             Войти
                         </button>
-                         <Captcha onChange={setCaptcha}/>
                     </form>
 
                     <div className="mt-10 flex justify-between text-sm text-gray-300">

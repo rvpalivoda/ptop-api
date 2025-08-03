@@ -1,5 +1,4 @@
 import {useState} from 'react';
-import Captcha from '@/components/Captcha';
 import {Link} from 'react-router-dom';
 import {Eye, EyeOff, ArrowLeft, Copy, Download} from 'lucide-react';
 import {toast} from '@/components/ui/sonner';
@@ -14,8 +13,7 @@ const Register = () => {
         password: '',
         confirmPassword: '',
     });
-    const [captcha, setCaptcha] = useState('');
-    const [seed, setSeed] = useState<string | null>(null);
+    const [mnemonic, setMnemonic] = useState<string | null>(null);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -30,12 +28,12 @@ const Register = () => {
         }
 
         try {
-            const {seed} = await register(
+            const {mnemonic} = await register(
                 formData.username,
                 formData.password,
-                captcha,
+                formData.confirmPassword,
             );
-            setSeed(seed);
+            setMnemonic(mnemonic);
             toast('Успешная регистрация');
         } catch (err) {
             console.error('Registration error:', err);
@@ -63,7 +61,7 @@ const Register = () => {
                         <p className="text-gray-300">Создайте аккаунт для начала торговли</p>
                     </div>
 
-                    {!seed ? (
+                    {!mnemonic ? (
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div>
                                 <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -139,14 +137,14 @@ const Register = () => {
                             >
                                 Создать аккаунт
                             </button>
-                            <Captcha onChange={setCaptcha}/>
+                            
                         </form>
                     ) : (
                         <div className="space-y-4">
                             <div className="p-4 bg-gray-700 border border-gray-600 rounded-md text-center">
                                 <p className="mb-2 text-sm text-gray-300">Ваша seed-фраза:</p>
                                 <div className="grid grid-cols-2 gap-2 mb-4">
-                                    {seed.split(' ').map((word, idx) => (
+                                    {mnemonic.split(' ').map((word, idx) => (
                                         <div
                                             key={idx}
                                             className="px-3 py-1 bg-gray-800 border border-gray-600 rounded-md text-sm"
@@ -158,7 +156,7 @@ const Register = () => {
                                 <div className="flex items-center justify-center space-x-4">
                                     <button
                                         type="button"
-                                        onClick={() => navigator.clipboard.writeText(seed)}
+                                        onClick={() => navigator.clipboard.writeText(mnemonic)}
                                         className="flex items-center text-blue-400 hover:text-blue-300"
                                     >
                                         <Copy className="w-4 h-4 mr-1"/> Скопировать
@@ -166,7 +164,7 @@ const Register = () => {
                                     <button
                                         type="button"
                                         onClick={() => {
-                                            const blob = new Blob([JSON.stringify(seed.split(' '))], {type: 'application/json'});
+                                            const blob = new Blob([JSON.stringify(mnemonic.split(' '))], {type: 'application/json'});
                                             const url = URL.createObjectURL(blob);
                                             const link = document.createElement('a');
                                             link.href = url;
