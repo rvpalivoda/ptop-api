@@ -5,11 +5,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/alicebob/miniredis/v2"
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 
 	"ptop/internal/models"
+	"ptop/internal/services"
 )
 
 // setupTest создаёт in-memory БД и маршруты для тестов.
@@ -85,9 +88,13 @@ func setupTest(t *testing.T) (*gorm.DB, *gin.Engine, map[string]time.Duration) {
 	api.POST("/client/offers/:id/enable", EnableOffer(db, maxOffers))
 	api.POST("/client/offers/:id/disable", DisableOffer(db))
 
+	mr := miniredis.RunT(t)
+	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	cache := services.NewChatCache(rdb, 50)
+
 	ws := r.Group("/ws")
 	ws.Use(AuthMiddleware(db))
-	ws.GET("/orders/:id/chat", OrderChatWS(db))
+	ws.GET("/orders/:id/chat", OrderChatWS(db, cache))
 
 	return db, r, ttl
 }

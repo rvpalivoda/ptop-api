@@ -21,6 +21,9 @@ type Config struct {
 	BtcRPCPass               string
 	EthRPCURL                string
 	MoneroRPCURL             string
+	RedisAddr                string
+	RedisPassword            string
+	RedisDB                  int
 	// Другие поля, например:
 	// JWTSecret string
 	// Timezone  string
@@ -57,6 +60,16 @@ func Load() (*Config, error) {
 	ethURL := os.Getenv("ETH_RPC_URL")
 	moneroURL := os.Getenv("MONERO_RPC_URL")
 
+	redisAddr := os.Getenv("REDIS_ADDR")
+	if redisAddr == "" {
+		redisAddr = "localhost:6379"
+	}
+	redisPass := os.Getenv("REDIS_PASSWORD")
+	redisDB := 0
+	if v, err := strconv.Atoi(os.Getenv("REDIS_DB")); err == nil {
+		redisDB = v
+	}
+
 	return &Config{
 		Port: port,
 		DSN:  dsn,
@@ -71,6 +84,9 @@ func Load() (*Config, error) {
 		BtcRPCPass:               btcPass,
 		EthRPCURL:                ethURL,
 		MoneroRPCURL:             moneroURL,
+		RedisAddr:                redisAddr,
+		RedisPassword:            redisPass,
+		RedisDB:                  redisDB,
 		// JWTSecret: os.Getenv("JWT_SECRET"),
 		// Timezone:  os.Getenv("TIMEZONE"),
 	}, nil

@@ -13,6 +13,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
@@ -21,6 +22,7 @@ import (
 	"ptop/internal/db"
 	"ptop/internal/ethwatcher"
 	"ptop/internal/handlers"
+	"ptop/internal/services"
 	"ptop/internal/xmrwatcher"
 
 	docs "ptop/docs"
@@ -46,6 +48,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("db connect failed: %v", err)
 	}
+
+	rdb := redis.NewClient(&redis.Options{Addr: cfg.RedisAddr, Password: cfg.RedisPassword, DB: cfg.RedisDB})
+	chatCache := services.NewChatCache(rdb, 50)
 
 	docs.SwaggerInfo.BasePath = "/"
 
@@ -87,7 +92,7 @@ func main() {
 
 	ws := r.Group("/ws")
 	ws.Use(handlers.AuthMiddleware(gormDB))
-	ws.GET("/orders/:id/chat", handlers.OrderChatWS(gormDB))
+	ws.GET("/orders/:id/chat", handlers.OrderChatWS(gormDB, chatCache))
 
 	if cfg.WatchersDebug {
 		btcW, err := btcwatcher.New(gormDB, cfg.BtcRPCHost, cfg.BtcRPCUser, cfg.BtcRPCPass, nil, true)

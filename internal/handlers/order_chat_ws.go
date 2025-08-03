@@ -11,6 +11,7 @@ import (
 	"gorm.io/gorm"
 
 	"ptop/internal/models"
+	"ptop/internal/services"
 )
 
 var upgrader = websocket.Upgrader{
@@ -24,6 +25,7 @@ var orderChatClients = struct {
 
 // OrderChatWS godoc
 // @Summary Websocket чат ордера
+// @Description При подключении отправляет историю сообщений из кеша Redis
 // @Tags orders
 // @Security BearerAuth
 // @Param id path string true "ID ордера"
@@ -31,7 +33,7 @@ var orderChatClients = struct {
 // @Failure 403 {object} ErrorResponse
 // @Failure 404 {object} ErrorResponse
 // @Router /ws/orders/{id}/chat [get]
-func OrderChatWS(db *gorm.DB) gin.HandlerFunc {
+func OrderChatWS(db *gorm.DB, cache *services.ChatCache) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		orderID := c.Param("id")
 		clientIDVal, ok := c.Get("client_id")
@@ -80,6 +82,18 @@ func OrderChatWS(db *gorm.DB) gin.HandlerFunc {
 			delete(orderChatClients.m[chat.ID], conn)
 			orderChatClients.Unlock()
 		}()
+
+		if cache != nil {
+			if history, err := cache.GetHistory(c.Request.Context(), chat.ID); err == nil {
+				for _, m := range history {
+					b, _ := json.Marshal(m)
+					if err := conn.WriteMessage(websocket.TextMessage, b); err != nil {
+						return
+					}
+				}
+			}
+		}
+
 		for {
 			_, msgBytes, err := conn.ReadMessage()
 			if err != nil {
@@ -92,6 +106,9 @@ func OrderChatWS(db *gorm.DB) gin.HandlerFunc {
 			msg := models.OrderMessage{ChatID: chat.ID, ClientID: clientID, Type: models.MessageTypeText, Content: r.Content}
 			if err := db.Create(&msg).Error; err != nil {
 				continue
+			}
+			if cache != nil {
+				_ = cache.AddMessage(c.Request.Context(), chat.ID, msg)
 			}
 			b, _ := json.Marshal(msg)
 			orderChatClients.Lock()

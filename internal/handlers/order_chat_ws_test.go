@@ -124,36 +124,37 @@ func TestOrderChatWS(t *testing.T) {
 		t.Fatalf("expected forbidden, got %v %v", err, resp)
 	}
 
-	// buyer connects
+	// buyer connects and sends message
 	header = http.Header{"Authorization": {"Bearer " + buyerTok.AccessToken}}
 	buyerConn, _, err := websocket.DefaultDialer.Dial(wsURL, header)
 	if err != nil {
 		t.Fatalf("buyer dial: %v", err)
 	}
-	defer buyerConn.Close()
+	if err := buyerConn.WriteJSON(OrderMessageRequest{Content: "hello"}); err != nil {
+		t.Fatalf("write: %v", err)
+	}
+	var echo models.OrderMessage
+	if err := buyerConn.ReadJSON(&echo); err != nil {
+		t.Fatalf("read echo: %v", err)
+	}
+	buyerConn.Close()
 
-	// seller connects
+	// seller connects after message and receives history
 	header = http.Header{"Authorization": {"Bearer " + sellerTok.AccessToken}}
 	sellerConn, _, err := websocket.DefaultDialer.Dial(wsURL, header)
 	if err != nil {
 		t.Fatalf("seller dial: %v", err)
 	}
 	defer sellerConn.Close()
-
-	// buyer sends message
-	if err := buyerConn.WriteJSON(OrderMessageRequest{Content: "hello"}); err != nil {
-		t.Fatalf("write: %v", err)
+	var history models.OrderMessage
+	if err := sellerConn.ReadJSON(&history); err != nil {
+		t.Fatalf("history read: %v", err)
 	}
-
-	var recv models.OrderMessage
-	if err := sellerConn.ReadJSON(&recv); err != nil {
-		t.Fatalf("read: %v", err)
-	}
-	if recv.Content != "hello" {
-		t.Fatalf("unexpected content %s", recv.Content)
+	if history.Content != "hello" {
+		t.Fatalf("unexpected content %s", history.Content)
 	}
 	var dbMsg models.OrderMessage
-	if err := db.Where("id = ?", recv.ID).First(&dbMsg).Error; err != nil {
+	if err := db.Where("id = ?", history.ID).First(&dbMsg).Error; err != nil {
 		t.Fatalf("db message: %v", err)
 	}
 }
