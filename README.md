@@ -8,6 +8,7 @@ Rest api на golang, gin, postgresql, GORN ORM.
 |------------|----------|
 | `DB_DSN` | строка подключения к базе данных |
 | `PORT` | порт HTTP-сервера (по умолчанию 8080) |
+| `CORS_ALLOWED_ORIGINS` | список разрешённых доменов для CORS, через запятую |
 | `BTC_RPC_HOST` | адрес Bitcoin RPC |
 | `BTC_RPC_USER` | логин Bitcoin RPC |
 | `BTC_RPC_PASS` | пароль Bitcoin RPC |
