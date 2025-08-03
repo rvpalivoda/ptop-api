@@ -24,6 +24,7 @@ type Config struct {
 	RedisAddr                string
 	RedisPassword            string
 	RedisDB                  int
+	ChatCacheLimit           int64
 	// Другие поля, например:
 	// JWTSecret string
 	// Timezone  string
@@ -70,6 +71,11 @@ func Load() (*Config, error) {
 		redisDB = v
 	}
 
+	chatLimit := int64(50)
+	if v, err := strconv.ParseInt(os.Getenv("CHAT_CACHE_LIMIT"), 10, 64); err == nil {
+		chatLimit = v
+	}
+
 	return &Config{
 		Port: port,
 		DSN:  dsn,
@@ -87,6 +93,7 @@ func Load() (*Config, error) {
 		RedisAddr:                redisAddr,
 		RedisPassword:            redisPass,
 		RedisDB:                  redisDB,
+		ChatCacheLimit:           chatLimit,
 		// JWTSecret: os.Getenv("JWT_SECRET"),
 		// Timezone:  os.Getenv("TIMEZONE"),
 	}, nil

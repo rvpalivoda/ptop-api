@@ -50,7 +50,7 @@ func main() {
 	}
 
 	rdb := redis.NewClient(&redis.Options{Addr: cfg.RedisAddr, Password: cfg.RedisPassword, DB: cfg.RedisDB})
-	chatCache := services.NewChatCache(rdb, 50)
+	chatCache := services.NewChatCache(rdb, cfg.ChatCacheLimit)
 
 	docs.SwaggerInfo.BasePath = "/"
 
