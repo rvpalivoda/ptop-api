@@ -7,6 +7,49 @@ import (
 	"ptop/internal/models"
 )
 
+var (
+	euCountries = []string{
+		countries.AT.String(),
+		countries.BE.String(),
+		countries.BG.String(),
+		countries.HR.String(),
+		countries.CY.String(),
+		countries.CZ.String(),
+		countries.DK.String(),
+		countries.EE.String(),
+		countries.FI.String(),
+		countries.FR.String(),
+		countries.DE.String(),
+		countries.GR.String(),
+		countries.HU.String(),
+		countries.IE.String(),
+		countries.IT.String(),
+		countries.LV.String(),
+		countries.LT.String(),
+		countries.LU.String(),
+		countries.MT.String(),
+		countries.NL.String(),
+		countries.PL.String(),
+		countries.PT.String(),
+		countries.RO.String(),
+		countries.SK.String(),
+		countries.SI.String(),
+		countries.ES.String(),
+		countries.SE.String(),
+	}
+	regionCountries = map[string][]string{
+		"EU":  euCountries,
+		"EEA": append(append([]string{}, euCountries...), countries.IS.String(), countries.LI.String(), countries.NO.String()),
+		"GLOBAL": func() []string {
+			list := make([]string, 0, countries.Total())
+			for _, c := range countries.All() {
+				list = append(list, c.String())
+			}
+			return list
+		}(),
+	}
+)
+
 // SeedCountries заполняет таблицу стран перечнем всех стран на английском языке.
 func SeedCountries(db *gorm.DB) error {
 	var count int64
@@ -310,6 +353,21 @@ func SeedPaymentMethods(db *gorm.DB) error {
 		for _, region := range method.Regions {
 			name := countries.ByName(region).String()
 			if name == "Unknown" {
+
+				names, ok := regionCountries[region]
+				if !ok {
+					continue
+				}
+				for _, n := range names {
+					var country models.Country
+					if err := db.Where("name = ?", n).First(&country).Error; err != nil {
+						return err
+					}
+					if err := db.Model(&method).Association("Countries").Append(&country); err != nil {
+						return err
+					}
+				}
+
 				continue
 			}
 			var country models.Country

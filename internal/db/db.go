@@ -18,7 +18,6 @@ func NewDB(dsn string) (*gorm.DB, error) {
 		&models.Token{},
 		&models.Country{},
 		&models.PaymentMethod{},
-		&models.Order{},
 		&models.ClientPaymentMethod{},
 		&models.Asset{},
 		&models.Offer{},
@@ -33,8 +32,12 @@ func NewDB(dsn string) (*gorm.DB, error) {
 		return nil, fmt.Errorf("auto migrate failed: %w", err)
 	}
 
-	// Отдельная миграция для Order, чтобы избежать ссылки на несуществующие таблицы
-	if err := db.AutoMigrate(&models.Order{}); err != nil {
+	// Отдельная миграция для Order и связанных с ним сущностей, чтобы избежать ссылок на несуществующие таблицы
+	if err := db.AutoMigrate(
+		&models.Order{},
+		&models.OrderChat{},
+		&models.OrderMessage{},
+	); err != nil {
 		return nil, fmt.Errorf("auto migrate failed: %w", err)
 	}
 
