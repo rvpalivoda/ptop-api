@@ -19,19 +19,35 @@ type Watcher struct {
 	client       wallet.Client
 	db           *gorm.DB
 	pollInterval time.Duration
+	debug        bool
+	debugCh      chan debugDeposit
+}
+
+type debugDeposit struct {
+	walletID string
+	amount   decimal.Decimal
 }
 
 // New создаёт нового наблюдателя.
-func New(db *gorm.DB, rpcURL string, interval time.Duration) *Watcher {
+func New(db *gorm.DB, rpcURL string, interval time.Duration, debug bool) *Watcher {
 	if interval == 0 {
 		interval = time.Minute
 	}
-	cl := wallet.New(wallet.Config{Address: rpcURL})
-	return &Watcher{client: cl, db: db, pollInterval: interval}
+	w := &Watcher{db: db, pollInterval: interval, debug: debug}
+	if debug {
+		w.debugCh = make(chan debugDeposit)
+		return w
+	}
+	w.client = wallet.New(wallet.Config{Address: rpcURL})
+	return w
 }
 
 // Start запускает периодический опрос get_transfers.
 func (w *Watcher) Start() {
+	if w.debug {
+		go w.debugLoop()
+		return
+	}
 	go w.check()
 	ticker := time.NewTicker(w.pollInterval)
 	go func() {
@@ -39,6 +55,39 @@ func (w *Watcher) Start() {
 			w.check()
 		}
 	}()
+}
+
+func (w *Watcher) debugLoop() {
+	for dep := range w.debugCh {
+		w.createDebugDeposit(dep.walletID, dep.amount)
+	}
+}
+
+// TriggerDeposit отправляет фейковый депозит в канал.
+func (w *Watcher) TriggerDeposit(walletID string, amount decimal.Decimal) {
+	if w.debug {
+		w.debugCh <- debugDeposit{walletID: walletID, amount: amount}
+	}
+}
+
+func (w *Watcher) createDebugDeposit(walletID string, amount decimal.Decimal) {
+	var wal models.Wallet
+	if err := w.db.First(&wal, "id = ?", walletID).Error; err != nil {
+		log.Printf("ошибка поиска кошелька: %v", err)
+		return
+	}
+	data, _ := json.Marshal(map[string]any{"debug": true})
+	dep := models.TransactionIn{
+		ClientID: wal.ClientID,
+		WalletID: wal.ID,
+		AssetID:  wal.AssetID,
+		Amount:   amount,
+		Status:   models.TransactionInStatusConfirmed,
+		Data:     datatypes.JSON(data),
+	}
+	if err := w.db.Create(&dep).Error; err != nil {
+		log.Printf("не удалось сохранить депозит: %v", err)
+	}
 }
 
 func (w *Watcher) check() {

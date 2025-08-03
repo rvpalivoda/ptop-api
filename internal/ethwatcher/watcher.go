@@ -30,17 +30,20 @@ type tokenInfo struct {
 
 // Watcher отслеживает блоки Ethereum и события Transfer выбранных токенов.
 type Watcher struct {
-	client *ethclient.Client
-	db     *gorm.DB
-	tokens map[common.Address]*tokenInfo
+	client  *ethclient.Client
+	db      *gorm.DB
+	tokens  map[common.Address]*tokenInfo
+	debug   bool
+	debugCh chan debugDeposit
+}
+
+type debugDeposit struct {
+	walletID string
+	amount   decimal.Decimal
 }
 
 // New создаёт новый наблюдатель.
-func New(db *gorm.DB, rpcURL string) (*Watcher, error) {
-	client, err := ethclient.Dial(rpcURL)
-	if err != nil {
-		return nil, err
-	}
+func New(db *gorm.DB, rpcURL string, debug bool) (*Watcher, error) {
 	tokens := make(map[common.Address]*tokenInfo)
 
 	var usdtAsset models.Asset
@@ -52,11 +55,25 @@ func New(db *gorm.DB, rpcURL string) (*Watcher, error) {
 		tokens[common.HexToAddress("0xA0b86991c6218b36c1d19D4a2e9EB0cE3606eB48")] = &tokenInfo{assetID: usdcAsset.ID, decimals: 6}
 	}
 
-	return &Watcher{client: client, db: db, tokens: tokens}, nil
+	w := &Watcher{db: db, tokens: tokens, debug: debug}
+	if debug {
+		w.debugCh = make(chan debugDeposit)
+		return w, nil
+	}
+	client, err := ethclient.Dial(rpcURL)
+	if err != nil {
+		return nil, err
+	}
+	w.client = client
+	return w, nil
 }
 
 // Start запускает подписку на новые блоки и события Transfer.
 func (w *Watcher) Start() error {
+	if w.debug {
+		go w.debugLoop()
+		return nil
+	}
 	heads := make(chan *types.Header)
 	sub, err := w.client.SubscribeNewHead(context.Background(), heads)
 	if err != nil {
@@ -92,6 +109,39 @@ func (w *Watcher) Start() error {
 	}
 
 	return nil
+}
+
+func (w *Watcher) debugLoop() {
+	for dep := range w.debugCh {
+		w.createDebugDeposit(dep.walletID, dep.amount)
+	}
+}
+
+// TriggerDeposit отправляет фейковый депозит для тестов.
+func (w *Watcher) TriggerDeposit(walletID string, amount decimal.Decimal) {
+	if w.debug {
+		w.debugCh <- debugDeposit{walletID: walletID, amount: amount}
+	}
+}
+
+func (w *Watcher) createDebugDeposit(walletID string, amount decimal.Decimal) {
+	var wallet models.Wallet
+	if err := w.db.First(&wallet, "id = ?", walletID).Error; err != nil {
+		log.Printf("ошибка поиска кошелька: %v", err)
+		return
+	}
+	data, _ := json.Marshal(map[string]any{"debug": true})
+	dep := models.TransactionIn{
+		ClientID: wallet.ClientID,
+		WalletID: wallet.ID,
+		AssetID:  wallet.AssetID,
+		Amount:   amount,
+		Status:   models.TransactionInStatusConfirmed,
+		Data:     datatypes.JSON(data),
+	}
+	if err := w.db.Create(&dep).Error; err != nil {
+		log.Printf("не удалось сохранить депозит: %v", err)
+	}
 }
 
 func (w *Watcher) handleBlock(hash common.Hash, number uint64) {

@@ -21,18 +21,29 @@ import (
 
 // Watcher следит за блоками Bitcoin и записывает подтвержденные депозиты.
 type Watcher struct {
-	client *rpcclient.Client
-	db     *gorm.DB
-	params *chaincfg.Params
+	client  *rpcclient.Client
+	db      *gorm.DB
+	params  *chaincfg.Params
+	debug   bool
+	debugCh chan debugDeposit
+}
+
+type debugDeposit struct {
+	walletID string
+	amount   decimal.Decimal
 }
 
 // New создаёт нового наблюдателя.
-func New(db *gorm.DB, cfg *rpcclient.ConnConfig, params *chaincfg.Params) (*Watcher, error) {
+func New(db *gorm.DB, cfg *rpcclient.ConnConfig, params *chaincfg.Params, debug bool) (*Watcher, error) {
 	if params == nil {
 		params = &chaincfg.MainNetParams
 	}
+	w := &Watcher{db: db, params: params, debug: debug}
+	if debug {
+		w.debugCh = make(chan debugDeposit)
+		return w, nil
+	}
 	ntfnHandlers := rpcclient.NotificationHandlers{}
-	w := &Watcher{db: db, params: params}
 	ntfnHandlers.OnBlockConnected = func(hash *chainhash.Hash, height int32, t time.Time) {
 		go w.handleBlock(hash)
 	}
@@ -46,10 +57,47 @@ func New(db *gorm.DB, cfg *rpcclient.ConnConfig, params *chaincfg.Params) (*Watc
 
 // Start запускает подписку на новые блоки.
 func (w *Watcher) Start() error {
+	if w.debug {
+		go w.debugLoop()
+		return nil
+	}
 	if err := w.client.NotifyBlocks(); err != nil {
 		return fmt.Errorf("notify blocks: %w", err)
 	}
 	return nil
+}
+
+func (w *Watcher) debugLoop() {
+	for dep := range w.debugCh {
+		w.createDebugDeposit(dep.walletID, dep.amount)
+	}
+}
+
+// TriggerDeposit отправляет фейковый депозит в канал для обработки.
+func (w *Watcher) TriggerDeposit(walletID string, amount decimal.Decimal) {
+	if w.debug {
+		w.debugCh <- debugDeposit{walletID: walletID, amount: amount}
+	}
+}
+
+func (w *Watcher) createDebugDeposit(walletID string, amount decimal.Decimal) {
+	var wallet models.Wallet
+	if err := w.db.First(&wallet, "id = ?", walletID).Error; err != nil {
+		log.Printf("ошибка поиска кошелька: %v", err)
+		return
+	}
+	data, _ := json.Marshal(map[string]any{"debug": true})
+	dep := models.TransactionIn{
+		ClientID: wallet.ClientID,
+		WalletID: wallet.ID,
+		AssetID:  wallet.AssetID,
+		Amount:   amount,
+		Status:   "confirmed",
+		Data:     datatypes.JSON(data),
+	}
+	if err := w.db.Create(&dep).Error; err != nil {
+		log.Printf("не удалось сохранить депозит: %v", err)
+	}
 }
 
 // handleBlock обрабатывает подключенный блок.

@@ -29,6 +29,16 @@ definitions:
       post_code:
         type: string
     type: object
+  handlers.DebugDepositRequest:
+    properties:
+      amount:
+        type: string
+      wallet_id:
+        type: string
+    required:
+    - amount
+    - wallet_id
+    type: object
   handlers.Enable2FARequest:
     properties:
       password:
@@ -956,6 +966,38 @@ paths:
       summary: Список стран
       tags:
       - reference
+  /debug/deposit:
+    post:
+      consumes:
+      - application/json
+      description: Создаёт фейковый депозит на указанный кошелёк
+      parameters:
+      - description: Запрос
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.DebugDepositRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Тестовый депозит
+      tags:
+      - debug
   /health:
     get:
       produces:
