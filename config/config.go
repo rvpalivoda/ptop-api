@@ -17,6 +17,7 @@ type Config struct {
 	TokenTypeTTL             map[string]time.Duration
 	MaxActiveOffersPerClient int
 	WatchersDebug            bool
+	CORSAllowedOrigins       []string
 	BtcRPCHost               string
 	BtcRPCUser               string
 	BtcRPCPass               string
@@ -62,6 +63,12 @@ func Load() (*Config, error) {
 
 	debug := os.Getenv("WATCHERS_DEBUG") == "1"
 
+	corsEnv := os.Getenv("CORS_ALLOWED_ORIGINS")
+	if corsEnv == "" {
+		corsEnv = "http://localhost:5173"
+	}
+	corsOrigins := strings.Split(corsEnv, ",")
+
 	btcHost := os.Getenv("BTC_RPC_HOST")
 	btcUser := os.Getenv("BTC_RPC_USER")
 	btcPass := os.Getenv("BTC_RPC_PASS")
@@ -99,6 +106,7 @@ func Load() (*Config, error) {
 		},
 		MaxActiveOffersPerClient: maxOffers,
 		WatchersDebug:            debug,
+		CORSAllowedOrigins:       corsOrigins,
 		BtcRPCHost:               btcHost,
 		BtcRPCUser:               btcUser,
 		BtcRPCPass:               btcPass,
