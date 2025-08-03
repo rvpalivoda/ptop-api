@@ -12,9 +12,9 @@ import (
 )
 
 type OrderRequest struct {
-	OfferID         string `json:"offer_id"`
-	Amount          string `json:"amount"`
-	PaymentMethodID string `json:"payment_method_id"`
+	OfferID               string `json:"offer_id"`
+	Amount                string `json:"amount"`
+	ClientPaymentMethodID string `json:"client_payment_method_id"`
 }
 
 // CreateOrder godoc
@@ -51,16 +51,16 @@ func CreateOrder(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		order := models.Order{
-			OfferID:         offer.ID,
-			BuyerID:         clientID,
-			SellerID:        offer.ClientID,
-			FromAssetID:     offer.FromAssetID,
-			ToAssetID:       offer.ToAssetID,
-			Amount:          amt,
-			Price:           offer.Price,
-			PaymentMethodID: r.PaymentMethodID,
-			Status:          models.OrderStatusWaitPayment,
-			ExpiresAt:       time.Now().Add(time.Duration(offer.OrderExpirationTimeout) * time.Minute),
+			OfferID:               offer.ID,
+			BuyerID:               clientID,
+			SellerID:              offer.ClientID,
+			FromAssetID:           offer.FromAssetID,
+			ToAssetID:             offer.ToAssetID,
+			Amount:                amt,
+			Price:                 offer.Price,
+			ClientPaymentMethodID: r.ClientPaymentMethodID,
+			Status:                models.OrderStatusWaitPayment,
+			ExpiresAt:             time.Now().Add(time.Duration(offer.OrderExpirationTimeout) * time.Minute),
 		}
 		if offer.FromAsset.Type == "crypto" || offer.ToAsset.Type == "crypto" {
 			order.IsEscrow = true

@@ -91,7 +91,7 @@ definitions:
         type: string
       offer_id:
         type: string
-      payment_method_id:
+      client_payment_method_id:
         type: string
     type: object
   handlers.ProfileResponse:
@@ -283,7 +283,7 @@ definitions:
         type: boolean
       offerID:
         type: string
-      paymentMethodID:
+      clientPaymentMethodID:
         type: string
       price:
         type: number
