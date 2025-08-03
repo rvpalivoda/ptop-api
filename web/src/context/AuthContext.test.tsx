@@ -61,4 +61,125 @@ describe("AuthContext", () => {
       pinCodeSet: false,
     });
   });
+
+  it("register возвращает мнемонику", async () => {
+    const { register } = await import("@/api/auth");
+    vi.mocked(register).mockResolvedValue({ access: "a", refresh: "r", mnemonic: "one two" });
+
+    let ctx: ReturnType<typeof useAuth> | undefined;
+    const Consumer = () => {
+      ctx = useAuth();
+      return null;
+    };
+
+    const container = document.createElement("div");
+    const root = createRoot(container);
+    act(() => {
+      root.render(
+        <AuthProvider>
+          <Consumer />
+        </AuthProvider>,
+      );
+    });
+
+    let res: any;
+    await act(async () => {
+      res = await ctx!.register("u", "p", "p");
+    });
+
+    expect(register).toHaveBeenCalledWith("u", "p", "p");
+    expect(res).toEqual({ access: "a", refresh: "r", mnemonic: "one two" });
+  });
+
+  it("refresh обновляет токены и userInfo", async () => {
+    const { refresh, profile } = await import("@/api/auth");
+    vi.mocked(refresh).mockResolvedValue({ access: "na", refresh: "nr" });
+    vi.mocked(profile).mockResolvedValue({
+      username: "u2",
+      twofa_enabled: false,
+      pincode_set: true,
+    });
+
+    localStorage.setItem("peerex_tokens", JSON.stringify({ access: "a", refresh: "r" }));
+
+    let ctx: ReturnType<typeof useAuth> | undefined;
+    const Consumer = () => {
+      ctx = useAuth();
+      return null;
+    };
+    const container = document.createElement("div");
+    const root = createRoot(container);
+    act(() => {
+      root.render(
+        <AuthProvider>
+          <Consumer />
+        </AuthProvider>,
+      );
+    });
+
+    await act(async () => {
+      await ctx!.refresh();
+    });
+
+    expect(refresh).toHaveBeenCalled();
+    expect(ctx!.userInfo).toEqual({ username: "u2", twofaEnabled: false, pinCodeSet: true });
+  });
+
+  it("recover устанавливает userInfo", async () => {
+    const { recover, profile } = await import("@/api/auth");
+    vi.mocked(recover).mockResolvedValue({ access: "a", refresh: "r" });
+    vi.mocked(profile).mockResolvedValue({
+      username: "u3",
+      twofa_enabled: true,
+      pincode_set: true,
+    });
+
+    let ctx: ReturnType<typeof useAuth> | undefined;
+    const Consumer = () => {
+      ctx = useAuth();
+      return null;
+    };
+    const container = document.createElement("div");
+    const root = createRoot(container);
+    act(() => {
+      root.render(
+        <AuthProvider>
+          <Consumer />
+        </AuthProvider>,
+      );
+    });
+
+    await act(async () => {
+      await ctx!.recover("u", [], "n", "n");
+    });
+
+    expect(recover).toHaveBeenCalledWith("u", [], "n", "n");
+    expect(ctx!.userInfo).toEqual({ username: "u3", twofaEnabled: true, pinCodeSet: true });
+  });
+
+  it("setPinCode вызывает API", async () => {
+    const { setPinCode } = await import("@/api/pin");
+    vi.mocked(setPinCode).mockResolvedValue(undefined);
+
+    let ctx: ReturnType<typeof useAuth> | undefined;
+    const Consumer = () => {
+      ctx = useAuth();
+      return null;
+    };
+    const container = document.createElement("div");
+    const root = createRoot(container);
+    act(() => {
+      root.render(
+        <AuthProvider>
+          <Consumer />
+        </AuthProvider>,
+      );
+    });
+
+    await act(async () => {
+      await ctx!.setPinCode("pwd", "1234");
+    });
+
+    expect(setPinCode).toHaveBeenCalledWith("pwd", "1234");
+  });
 });
