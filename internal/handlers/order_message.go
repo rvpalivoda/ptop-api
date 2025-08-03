@@ -1,14 +1,22 @@
 package handlers
 
 import (
+	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 	"gorm.io/gorm"
 
 	"ptop/internal/models"
+	"ptop/internal/services"
+	storage "ptop/internal/services/storage"
+	"ptop/internal/utils"
 )
 
 // OrderMessageRequest используется для текстовых сообщений.
@@ -75,6 +83,7 @@ func ListOrderMessages(db *gorm.DB) gin.HandlerFunc {
 
 // CreateOrderMessage godoc
 // @Summary Отправить сообщение в ордер
+// @Description Поддерживаются типы файлов: image/jpeg, image/png, application/pdf
 // @Tags orders
 // @Security BearerAuth
 // @Accept json
@@ -82,13 +91,13 @@ func ListOrderMessages(db *gorm.DB) gin.HandlerFunc {
 // @Produce json
 // @Param id path string true "ID ордера"
 // @Param input body OrderMessageRequest false "данные"
-// @Param file formData file false "файл"
+// @Param file formData file false "файл (image/jpeg, image/png, application/pdf)"
 // @Success 200 {object} models.OrderMessage
 // @Failure 400 {object} ErrorResponse
 // @Failure 403 {object} ErrorResponse
 // @Failure 404 {object} ErrorResponse
 // @Router /orders/{id}/messages [post]
-func CreateOrderMessage(db *gorm.DB) gin.HandlerFunc {
+func CreateOrderMessage(db *gorm.DB, st storage.Storage, cache *services.ChatCache) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		orderID := c.Param("id")
 		clientIDVal, ok := c.Get("client_id")
@@ -120,14 +129,52 @@ func CreateOrderMessage(db *gorm.DB) gin.HandlerFunc {
 			}
 		}
 		var msg models.OrderMessage
-		if c.ContentType() == "multipart/form-data" {
+		if strings.HasPrefix(c.ContentType(), "multipart/form-data") {
 			file, err := c.FormFile("file")
 			if err != nil {
 				c.JSON(http.StatusBadRequest, ErrorResponse{Error: "invalid file"})
 				return
 			}
-			url := file.Filename
-			ftype := file.Header.Get("Content-Type")
+			f, err := file.Open()
+			if err != nil {
+				c.JSON(http.StatusBadRequest, ErrorResponse{Error: "invalid file"})
+				return
+			}
+			defer f.Close()
+			buf := make([]byte, 512)
+			n, _ := f.Read(buf)
+			mimeType := http.DetectContentType(buf[:n])
+			ext := strings.ToLower(filepath.Ext(file.Filename))
+			allowed := map[string]string{
+				".jpg":  "image/jpeg",
+				".jpeg": "image/jpeg",
+				".png":  "image/png",
+				".pdf":  "application/pdf",
+			}
+			if allowed[ext] != mimeType {
+				c.JSON(http.StatusBadRequest, ErrorResponse{Error: "unsupported file type"})
+				return
+			}
+			if _, err := f.Seek(0, io.SeekStart); err != nil {
+				c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "file error"})
+				return
+			}
+			id, err := utils.GenerateNanoID()
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "id error"})
+				return
+			}
+			objectName := id + ext
+			if _, err := st.Upload(c.Request.Context(), objectName, f, file.Size, mimeType); err != nil {
+				c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "storage error"})
+				return
+			}
+			url, err := st.GetURL(c.Request.Context(), objectName, time.Hour)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "storage error"})
+				return
+			}
+			ftype := mimeType
 			size := file.Size
 			msg = models.OrderMessage{
 				ChatID:   chat.ID,
@@ -150,6 +197,18 @@ func CreateOrderMessage(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
 			return
 		}
+		if cache != nil {
+			_ = cache.AddMessage(c.Request.Context(), chat.ID, msg)
+		}
+		b, _ := json.Marshal(msg)
+		orderChatClients.Lock()
+		for conn := range orderChatClients.m[chat.ID] {
+			if err := conn.WriteMessage(websocket.TextMessage, b); err != nil {
+				conn.Close()
+				delete(orderChatClients.m[chat.ID], conn)
+			}
+		}
+		orderChatClients.Unlock()
 		c.JSON(http.StatusOK, msg)
 	}
 }
