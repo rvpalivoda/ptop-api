@@ -23,6 +23,7 @@ type OrderMessage struct {
 	Client    Client      `gorm:"foreignKey:ClientID" json:"-"`
 	Type      MessageType `gorm:"type:varchar(10);not null"`
 	Content   string      `gorm:"type:text;not null"`
+	ReadAt    *time.Time  `gorm:"index"`
 	CreatedAt time.Time   `gorm:"autoCreateTime;index"`
 	UpdatedAt time.Time   `gorm:"autoUpdateTime"`
 }

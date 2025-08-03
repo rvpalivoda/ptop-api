@@ -34,6 +34,8 @@ func setupTest(t *testing.T) (*gorm.DB, *gin.Engine, map[string]time.Duration) {
 		&models.Balance{},
 		&models.Escrow{},
 		&models.Order{},
+		&models.OrderChat{},
+		&models.OrderMessage{},
 		&models.TransactionIn{},
 		&models.TransactionOut{},
 		&models.TransactionInternal{},
@@ -71,6 +73,9 @@ func setupTest(t *testing.T) (*gorm.DB, *gin.Engine, map[string]time.Duration) {
 	api.GET("/client/escrows", ListClientEscrows(db))
 	api.GET("/client/orders", ListClientOrders(db))
 	api.POST("/client/orders", CreateOrder(db))
+	api.GET("/orders/:id/messages", ListOrderMessages(db))
+	api.POST("/orders/:id/messages", CreateOrderMessage(db))
+	api.PATCH("/orders/:id/messages/:msgId/read", ReadOrderMessage(db))
 
 	maxOffers := 1
 	api.GET("/offers", ListOffers(db))
