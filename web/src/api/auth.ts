@@ -1,59 +1,75 @@
 import { apiRequest } from "./client";
 import { loadTokens } from "@/storage/token";
 
-interface AuthResponse {
-  access: string;
-  refresh: string;
+interface TokenResponse {
+  access_token: string;
+  refresh_token: string;
 }
 
-interface RegisterResponse {
-  seed: string;
+export interface MnemonicResponse {
+  mnemonic: string;
+}
+
+export interface RegisterResponse extends MnemonicResponse {
+  access: string;
+  refresh: string;
 }
 
 export async function login(
   username: string,
   password: string,
-  captcha: string,
 ) {
-  return apiRequest<AuthResponse>("/auth/login", {
+  const { access_token, refresh_token } = await apiRequest<TokenResponse>("/auth/login", {
     method: "POST",
-    body: JSON.stringify({ username, password, captcha }),
+    body: JSON.stringify({ username, password }),
   });
+  return { access: access_token, refresh: refresh_token };
 }
 
 export async function register(
   username: string,
   password: string,
-  captcha: string,
+  passwordConfirm: string,
 ): Promise<RegisterResponse> {
-  return apiRequest<RegisterResponse>("/auth/register", {
+  const { access_token, refresh_token, mnemonic } = await apiRequest<
+    TokenResponse & { mnemonic: string }
+  >("/auth/register", {
     method: "POST",
-    body: JSON.stringify({ username, password, captcha }),
+    body: JSON.stringify({
+      username,
+      password,
+      password_confirm: passwordConfirm,
+    }),
   });
+  return { access: access_token, refresh: refresh_token, mnemonic };
 }
 
 export async function recover(
   username: string,
   words: string[],
   indices: number[],
-  captcha: string,
-  newPassword?: string,
+  newPassword: string,
+  passwordConfirm: string,
 ) {
-  const payload: Record<string, unknown> = {
+  const payload = {
     username,
     words,
     indices,
-    captcha,
+    new_password: newPassword,
+    password_confirm: passwordConfirm,
   };
-  if (newPassword) payload.new_password = newPassword;
-  return apiRequest<AuthResponse>("/auth/recover", {
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
+  const { access_token, refresh_token } = await apiRequest<TokenResponse>(
+    "/auth/recover",
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    },
+  );
+  return { access: access_token, refresh: refresh_token };
 }
 
 export async function regenerateWords(password: string) {
-  return apiRequest<RegisterResponse>("/auth/regenerate", {
+  return apiRequest<MnemonicResponse>("/auth/regenerate", {
     method: "POST",
     body: JSON.stringify({ password }),
   });
@@ -78,16 +94,12 @@ export async function verifyPassword(password: string) {
 export async function refresh() {
   const tokens = loadTokens();
   if (!tokens?.refresh) throw new Error("No refresh token");
-  return apiRequest<AuthResponse>("/auth/refresh", {
-    method: "POST",
-    body: JSON.stringify({ refresh: tokens.refresh }),
-  });
-}
-
-export async function logout() {
-  const tokens = loadTokens();
-  await apiRequest("/auth/logout", {
-    method: "POST",
-    body: JSON.stringify({ refresh: tokens?.refresh }),
-  });
+  const { access_token, refresh_token } = await apiRequest<TokenResponse>(
+    "/auth/refresh",
+    {
+      method: "POST",
+      body: JSON.stringify({ refresh_token: tokens.refresh }),
+    },
+  );
+  return { access: access_token, refresh: refresh_token };
 }
