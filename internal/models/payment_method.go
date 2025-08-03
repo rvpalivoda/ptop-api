@@ -44,7 +44,7 @@ type PaymentMethod struct {
 	Name                  string    `gorm:"type:varchar(255);unique;not null"`
 	MethodGroup           string    `gorm:"type:varchar(100)"`
 	Provider              string    `gorm:"type:varchar(100)"`
-	TypicalFiatCCY        string    `gorm:"type:varchar(10)"`
+	TypicalFiatCCY        string    `gorm:"type:varchar(32)"`
 	Regions               []string  `gorm:"type:json;serializer:json"`
 	Countries             []Country `gorm:"many2many:payment_method_countries"`
 	IsRealtime            bool
