@@ -14,7 +14,13 @@ import (
 func TestClientPaymentMethods(t *testing.T) {
 	db, r, _ := setupTest(t)
 	country := models.Country{Name: "Russia"}
-	method := models.PaymentMethod{Name: "Bank"}
+	method := models.PaymentMethod{
+		Name:         "Bank",
+		MethodGroup:  "bank_transfer",
+		IsRealtime:   false,
+		FeeSide:      models.FeeSideSender,
+		KycLevelHint: models.KycLevelHintLow,
+	}
 	db.Create(&country)
 	db.Create(&method)
 

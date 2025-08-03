@@ -32,7 +32,7 @@ func GetCountries(db *gorm.DB) gin.HandlerFunc {
 // @Tags reference
 // @Security BearerAuth
 // @Produce json
-// @Success 200 {array} models.PaymentMethod
+// @Success 200 {array} models.PaymentMethod "Расширенная структура платёжных методов"
 // @Router /payment-methods [get]
 func GetPaymentMethods(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
