@@ -1123,7 +1123,7 @@ const docTemplate = `{
                 "summary": "Список платёжных методов",
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Расширенная структура платёжных методов",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -1634,10 +1634,43 @@ const docTemplate = `{
         "models.PaymentMethod": {
             "type": "object",
             "properties": {
+                "chargebackWindowHours": {
+                    "type": "integer"
+                },
+                "feeSide": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
                 },
+                "isRealtime": {
+                    "type": "boolean"
+                },
+                "isReversible": {
+                    "type": "boolean"
+                },
+                "kycLevelHint": {
+                    "type": "string"
+                },
+                "methodGroup": {
+                    "type": "string"
+                },
                 "name": {
+                    "type": "string"
+                },
+                "provider": {
+                    "type": "string"
+                },
+                "regions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "settlementMinutes": {
+                    "type": "integer"
+                },
+                "typicalFiatCCY": {
                     "type": "string"
                 }
             }

@@ -326,9 +326,31 @@ definitions:
     - OrderStatusDispute
   models.PaymentMethod:
     properties:
+      chargebackWindowHours:
+        type: integer
+      feeSide:
+        type: string
       id:
         type: string
+      isRealtime:
+        type: boolean
+      isReversible:
+        type: boolean
+      kycLevelHint:
+        type: string
+      methodGroup:
+        type: string
       name:
+        type: string
+      provider:
+        type: string
+      regions:
+        items:
+          type: string
+        type: array
+      settlementMinutes:
+        type: integer
+      typicalFiatCCY:
         type: string
     type: object
   models.Wallet:
@@ -1045,7 +1067,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Расширенная структура платёжных методов
           schema:
             items:
               $ref: '#/definitions/models.PaymentMethod'

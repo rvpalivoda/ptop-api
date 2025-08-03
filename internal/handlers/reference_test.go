@@ -14,7 +14,13 @@ func TestReferenceHandlers(t *testing.T) {
 	db, r, _ := setupTest(t)
 	// seed data
 	country := models.Country{Name: "Russia"}
-	method := models.PaymentMethod{Name: "Bank"}
+	method := models.PaymentMethod{
+		Name:         "Bank",
+		MethodGroup:  "bank_transfer",
+		IsRealtime:   false,
+		FeeSide:      models.FeeSideSender,
+		KycLevelHint: models.KycLevelHintLow,
+	}
 	activeAsset := models.Asset{Name: "Ruble", Type: models.AssetTypeFiat, IsActive: true}
 	inactiveAsset := models.Asset{Name: "Inactive", Type: models.AssetTypeFiat}
 	db.Create(&country)
@@ -65,7 +71,7 @@ func TestReferenceHandlers(t *testing.T) {
 	if err := json.Unmarshal(w.Body.Bytes(), &methods); err != nil {
 		t.Fatalf("methods parse: %v", err)
 	}
-	if len(methods) != 1 || methods[0].Name != "Bank" {
+	if len(methods) != 1 || methods[0].Name != "Bank" || methods[0].MethodGroup != "bank_transfer" || methods[0].IsRealtime {
 		t.Fatalf("methods data %+v", methods)
 	}
 

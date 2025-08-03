@@ -38,7 +38,13 @@ func TestOfferLifecycle(t *testing.T) {
 	asset1 := models.Asset{Name: "USD_offer", Type: models.AssetTypeFiat, IsActive: true}
 	asset2 := models.Asset{Name: "BTC_offer", Type: models.AssetTypeCrypto, IsActive: true}
 	country := models.Country{Name: "CountryOffer"}
-	method := models.PaymentMethod{Name: "BankOffer"}
+	method := models.PaymentMethod{
+		Name:         "BankOffer",
+		MethodGroup:  "bank_transfer",
+		IsRealtime:   false,
+		FeeSide:      models.FeeSideSender,
+		KycLevelHint: models.KycLevelHintLow,
+	}
 	if err := db.Create(&asset1).Error; err != nil {
 		t.Fatal(err)
 	}

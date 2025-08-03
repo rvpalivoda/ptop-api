@@ -55,8 +55,8 @@ func TestSeedPaymentMethodsAndAssets(t *testing.T) {
 	var pmCount, assetCount int64
 	gdb.Model(&models.PaymentMethod{}).Count(&pmCount)
 	gdb.Model(&models.Asset{}).Count(&assetCount)
-	if pmCount != 2 || assetCount != 10 {
-		t.Fatalf("expected 2 methods and 10 assets, got %d and %d", pmCount, assetCount)
+	if pmCount != 6 || assetCount != 10 {
+		t.Fatalf("expected 6 methods and 10 assets, got %d and %d", pmCount, assetCount)
 	}
 	var assets []models.Asset
 	if err := gdb.Find(&assets).Error; err != nil {
