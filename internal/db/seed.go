@@ -50,8 +50,18 @@ func SeedAssets(db *gorm.DB) error {
 		return nil
 	}
 	assets := []models.Asset{
+		// fiat
 		{Name: "USD", Type: models.AssetTypeFiat, IsConvertible: true, IsActive: true},
+		{Name: "EUR", Type: models.AssetTypeFiat, IsConvertible: true, IsActive: true},
+		{Name: "UAH", Type: models.AssetTypeFiat, IsConvertible: true, IsActive: true},
+		{Name: "GBP", Type: models.AssetTypeFiat, IsConvertible: true, IsActive: true},
+		{Name: "PLN", Type: models.AssetTypeFiat, IsConvertible: true, IsActive: true},
+		// crypto
 		{Name: "BTC", Type: models.AssetTypeCrypto, IsActive: true},
+		{Name: "ETH", Type: models.AssetTypeCrypto, IsActive: true},
+		{Name: "USDT", Type: models.AssetTypeCrypto, IsActive: true},
+		{Name: "USDC", Type: models.AssetTypeCrypto, IsActive: true},
+		{Name: "XMR", Type: models.AssetTypeCrypto, IsActive: true},
 	}
 	return db.Create(&assets).Error
 }

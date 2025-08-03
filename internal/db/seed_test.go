@@ -55,8 +55,22 @@ func TestSeedPaymentMethodsAndAssets(t *testing.T) {
 	var pmCount, assetCount int64
 	gdb.Model(&models.PaymentMethod{}).Count(&pmCount)
 	gdb.Model(&models.Asset{}).Count(&assetCount)
-	if pmCount != 2 || assetCount != 2 {
-		t.Fatalf("expected 2 methods and 2 assets, got %d and %d", pmCount, assetCount)
+	if pmCount != 2 || assetCount != 10 {
+		t.Fatalf("expected 2 methods and 10 assets, got %d and %d", pmCount, assetCount)
+	}
+	var assets []models.Asset
+	if err := gdb.Find(&assets).Error; err != nil {
+		t.Fatalf("list assets: %v", err)
+	}
+	want := []string{"USD", "EUR", "UAH", "GBP", "PLN", "BTC", "ETH", "USDT", "USDC", "XMR"}
+	names := make(map[string]bool)
+	for _, a := range assets {
+		names[a.Name] = true
+	}
+	for _, n := range want {
+		if !names[n] {
+			t.Fatalf("missing asset %s", n)
+		}
 	}
 	if err := SeedPaymentMethods(gdb); err != nil {
 		t.Fatalf("reseeding methods: %v", err)
