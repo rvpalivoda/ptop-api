@@ -38,7 +38,7 @@ func TestDebugDeposit(t *testing.T) {
 	if err := db.Create(&wallet).Error; err != nil {
 		t.Fatalf("create wallet: %v", err)
 	}
-	w, err := btcwatcher.New(db, nil, nil, true)
+	w, err := btcwatcher.New(db, "", "", "", nil, true)
 	if err != nil {
 		t.Fatalf("watcher: %v", err)
 	}

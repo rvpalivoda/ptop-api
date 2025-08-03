@@ -29,17 +29,20 @@ type debugDeposit struct {
 }
 
 // New создаёт нового наблюдателя.
-func New(db *gorm.DB, rpcURL string, interval time.Duration, debug bool) *Watcher {
+func New(db *gorm.DB, rpcURL string, interval time.Duration, debug bool) (*Watcher, error) {
 	if interval == 0 {
 		interval = time.Minute
 	}
 	w := &Watcher{db: db, pollInterval: interval, debug: debug}
 	if debug {
 		w.debugCh = make(chan debugDeposit)
-		return w
+		return w, nil
+	}
+	if rpcURL == "" {
+		return nil, fmt.Errorf("monero rpc url required")
 	}
 	w.client = wallet.New(wallet.Config{Address: rpcURL})
-	return w
+	return w, nil
 }
 
 // Start запускает периодический опрос get_transfers.

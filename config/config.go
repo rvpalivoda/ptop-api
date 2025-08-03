@@ -16,6 +16,11 @@ type Config struct {
 	TokenTypeTTL             map[string]time.Duration
 	MaxActiveOffersPerClient int
 	WatchersDebug            bool
+	BtcRPCHost               string
+	BtcRPCUser               string
+	BtcRPCPass               string
+	EthRPCURL                string
+	MoneroRPCURL             string
 	// Другие поля, например:
 	// JWTSecret string
 	// Timezone  string
@@ -46,6 +51,12 @@ func Load() (*Config, error) {
 
 	debug := os.Getenv("WATCHERS_DEBUG") == "1"
 
+	btcHost := os.Getenv("BTC_RPC_HOST")
+	btcUser := os.Getenv("BTC_RPC_USER")
+	btcPass := os.Getenv("BTC_RPC_PASS")
+	ethURL := os.Getenv("ETH_RPC_URL")
+	moneroURL := os.Getenv("MONERO_RPC_URL")
+
 	return &Config{
 		Port: port,
 		DSN:  dsn,
@@ -55,6 +66,11 @@ func Load() (*Config, error) {
 		},
 		MaxActiveOffersPerClient: maxOffers,
 		WatchersDebug:            debug,
+		BtcRPCHost:               btcHost,
+		BtcRPCUser:               btcUser,
+		BtcRPCPass:               btcPass,
+		EthRPCURL:                ethURL,
+		MoneroRPCURL:             moneroURL,
 		// JWTSecret: os.Getenv("JWT_SECRET"),
 		// Timezone:  os.Getenv("TIMEZONE"),
 	}, nil

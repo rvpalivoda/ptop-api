@@ -26,7 +26,10 @@ func TestWatcherDebugDeposit(t *testing.T) {
 	wallet := models.Wallet{ClientID: client.ID, AssetID: asset.ID, Value: "subaddr", DerivationIndex: 2}
 	db.Create(&wallet)
 
-	w := New(db, "", time.Second, true)
+	w, err := New(db, "", time.Second, true)
+	if err != nil {
+		t.Fatalf("watcher: %v", err)
+	}
 	w.Start()
 	w.TriggerDeposit(wallet.ID, decimal.RequireFromString("4"))
 	time.Sleep(50 * time.Millisecond)

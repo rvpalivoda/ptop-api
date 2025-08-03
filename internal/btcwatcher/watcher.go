@@ -34,7 +34,7 @@ type debugDeposit struct {
 }
 
 // New создаёт нового наблюдателя.
-func New(db *gorm.DB, cfg *rpcclient.ConnConfig, params *chaincfg.Params, debug bool) (*Watcher, error) {
+func New(db *gorm.DB, host, user, pass string, params *chaincfg.Params, debug bool) (*Watcher, error) {
 	if params == nil {
 		params = &chaincfg.MainNetParams
 	}
@@ -42,6 +42,16 @@ func New(db *gorm.DB, cfg *rpcclient.ConnConfig, params *chaincfg.Params, debug 
 	if debug {
 		w.debugCh = make(chan debugDeposit)
 		return w, nil
+	}
+	if host == "" {
+		return nil, fmt.Errorf("btc rpc host required")
+	}
+	cfg := &rpcclient.ConnConfig{
+		Host:         host,
+		User:         user,
+		Pass:         pass,
+		HTTPPostMode: true,
+		DisableTLS:   true,
 	}
 	ntfnHandlers := rpcclient.NotificationHandlers{}
 	ntfnHandlers.OnBlockConnected = func(hash *chainhash.Hash, height int32, t time.Time) {
