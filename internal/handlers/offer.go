@@ -89,22 +89,6 @@ func CreateOffer(db *gorm.DB) gin.HandlerFunc {
 			clientMethods = append(clientMethods, m)
 		}
 
-		// derive payment methods
-		pmIDSeen := map[string]struct{}{}
-		var pms []models.PaymentMethod
-		for _, cm := range clientMethods {
-			if _, ok := pmIDSeen[cm.PaymentMethodID]; ok {
-				continue
-			}
-			pmIDSeen[cm.PaymentMethodID] = struct{}{}
-			var pm models.PaymentMethod
-			if err := db.Where("id = ?", cm.PaymentMethodID).First(&pm).Error; err != nil {
-				c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
-				return
-			}
-			pms = append(pms, pm)
-		}
-
 		offer := models.Offer{
 			MaxAmount:              maxAmount,
 			MinAmount:              minAmount,
@@ -123,12 +107,6 @@ func CreateOffer(db *gorm.DB) gin.HandlerFunc {
 		}
 		if len(clientMethods) > 0 {
 			if err := db.Model(&offer).Association("ClientPaymentMethods").Replace(clientMethods); err != nil {
-				c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
-				return
-			}
-		}
-		if len(pms) > 0 {
-			if err := db.Model(&offer).Association("PaymentMethods").Replace(pms); err != nil {
 				c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
 				return
 			}
@@ -208,21 +186,6 @@ func UpdateOffer(db *gorm.DB) gin.HandlerFunc {
 			}
 			clientMethods = append(clientMethods, m)
 		}
-		pmIDSeen := map[string]struct{}{}
-		var pms []models.PaymentMethod
-		for _, cm := range clientMethods {
-			if _, ok := pmIDSeen[cm.PaymentMethodID]; ok {
-				continue
-			}
-			pmIDSeen[cm.PaymentMethodID] = struct{}{}
-			var pm models.PaymentMethod
-			if err := db.Where("id = ?", cm.PaymentMethodID).First(&pm).Error; err != nil {
-				c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
-				return
-			}
-			pms = append(pms, pm)
-		}
-
 		offer.MaxAmount = maxAmount
 		offer.MinAmount = minAmount
 		offer.Amount = amount
@@ -236,10 +199,6 @@ func UpdateOffer(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		if err := db.Model(&offer).Association("ClientPaymentMethods").Replace(clientMethods); err != nil {
-			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
-			return
-		}
-		if err := db.Model(&offer).Association("PaymentMethods").Replace(pms); err != nil {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
 			return
 		}

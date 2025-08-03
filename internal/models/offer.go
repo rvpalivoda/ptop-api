@@ -26,7 +26,6 @@ type Offer struct {
 	IsEnabled              bool                  `gorm:"not null;default:false"`
 	ClientID               string                `gorm:"size:21;not null"`
 	Client                 Client                `gorm:"foreignKey:ClientID" json:"-"`
-	PaymentMethods         []PaymentMethod       `gorm:"many2many:offer_payment_methods" json:"-"`
 	ClientPaymentMethods   []ClientPaymentMethod `gorm:"many2many:offer_client_payment_methods" json:"-"`
 	CreatedAt              time.Time
 	UpdatedAt              time.Time

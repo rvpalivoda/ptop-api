@@ -1227,7 +1227,7 @@ const docTemplate = `{
                 "offer_id": {
                     "type": "string"
                 },
-                "payment_method_id": {
+                "client_payment_method_id": {
                     "type": "string"
                 }
             }
@@ -1523,7 +1523,7 @@ const docTemplate = `{
                 "offerID": {
                     "type": "string"
                 },
-                "paymentMethodID": {
+                "clientPaymentMethodID": {
                     "type": "string"
                 },
                 "price": {
