@@ -1661,6 +1661,12 @@ const docTemplate = `{
                 "provider": {
                     "type": "string"
                 },
+                "countries": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Country"
+                    }
+                },
                 "regions": {
                     "type": "array",
                     "items": {

@@ -43,8 +43,11 @@ func TestSeedPaymentMethodsAndAssets(t *testing.T) {
 	if err != nil {
 		t.Fatalf("open db: %v", err)
 	}
-	if err := gdb.AutoMigrate(&models.PaymentMethod{}, &models.Asset{}); err != nil {
+	if err := gdb.AutoMigrate(&models.Country{}, &models.PaymentMethod{}, &models.Asset{}); err != nil {
 		t.Fatalf("migrate: %v", err)
+	}
+	if err := SeedCountries(gdb); err != nil {
+		t.Fatalf("seed countries: %v", err)
 	}
 	if err := SeedPaymentMethods(gdb); err != nil {
 		t.Fatalf("seed payment methods: %v", err)
@@ -70,6 +73,37 @@ func TestSeedPaymentMethodsAndAssets(t *testing.T) {
 	for _, n := range want {
 		if !names[n] {
 			t.Fatalf("missing asset %s", n)
+		}
+	}
+
+	var methods []models.PaymentMethod
+	if err := gdb.Preload("Countries").Find(&methods).Error; err != nil {
+		t.Fatalf("list methods: %v", err)
+	}
+	wantCountries := map[string][]string{
+		"Interac":      {"Canada"},
+		"SPEI":         {"Mexico"},
+		"RTP":          {"United States"},
+		"Orange Money": {"Senegal", "Cote d'Ivoire", "Mali", "Burkina Faso", "Benin"},
+		"SEPA":         {},
+		"SWIFT":        {},
+	}
+	for _, m := range methods {
+		expected, ok := wantCountries[m.Name]
+		if !ok {
+			t.Fatalf("unexpected method %s", m.Name)
+		}
+		if len(m.Countries) != len(expected) {
+			t.Fatalf("method %s expected %d countries, got %d", m.Name, len(expected), len(m.Countries))
+		}
+		got := make(map[string]bool)
+		for _, c := range m.Countries {
+			got[c.Name] = true
+		}
+		for _, name := range expected {
+			if !got[name] {
+				t.Fatalf("method %s missing country %s", m.Name, name)
+			}
 		}
 	}
 	if err := SeedPaymentMethods(gdb); err != nil {
