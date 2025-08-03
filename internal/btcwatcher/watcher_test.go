@@ -26,7 +26,7 @@ func TestWatcherDebugDeposit(t *testing.T) {
 	wallet := models.Wallet{ClientID: client.ID, AssetID: asset.ID, Value: "addr", DerivationIndex: 1}
 	db.Create(&wallet)
 
-	w, err := New(db, nil, nil, true)
+	w, err := New(db, "", "", "", nil, true)
 	if err != nil {
 		t.Fatalf("watcher: %v", err)
 	}

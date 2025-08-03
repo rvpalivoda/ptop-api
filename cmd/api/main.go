@@ -86,21 +86,24 @@ func main() {
 	api.POST("/client/offers/:id/disable", handlers.DisableOffer(gormDB))
 
 	if cfg.WatchersDebug {
-		btcW, err := btcwatcher.New(gormDB, nil, nil, true)
+		btcW, err := btcwatcher.New(gormDB, cfg.BtcRPCHost, cfg.BtcRPCUser, cfg.BtcRPCPass, nil, true)
 		if err != nil {
 			log.Fatalf("btc watcher: %v", err)
 		}
 		if err := btcW.Start(); err != nil {
 			log.Fatalf("btc watcher start: %v", err)
 		}
-		ethW, err := ethwatcher.New(gormDB, "", true)
+		ethW, err := ethwatcher.New(gormDB, cfg.EthRPCURL, true)
 		if err != nil {
 			log.Fatalf("eth watcher: %v", err)
 		}
 		if err := ethW.Start(); err != nil {
 			log.Fatalf("eth watcher start: %v", err)
 		}
-		xmrW := xmrwatcher.New(gormDB, "", 0, true)
+		xmrW, err := xmrwatcher.New(gormDB, cfg.MoneroRPCURL, 0, true)
+		if err != nil {
+			log.Fatalf("xmr watcher: %v", err)
+		}
 		xmrW.Start()
 		watchers := map[string]handlers.DebugDepositor{
 			"BTC": btcW,

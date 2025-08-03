@@ -60,6 +60,9 @@ func New(db *gorm.DB, rpcURL string, debug bool) (*Watcher, error) {
 		w.debugCh = make(chan debugDeposit)
 		return w, nil
 	}
+	if rpcURL == "" {
+		return nil, fmt.Errorf("eth rpc url required")
+	}
 	client, err := ethclient.Dial(rpcURL)
 	if err != nil {
 		return nil, err
