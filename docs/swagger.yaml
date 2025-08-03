@@ -95,6 +95,11 @@ definitions:
       to_asset_id:
         type: string
     type: object
+  handlers.OrderMessageRequest:
+    properties:
+      content:
+        type: string
+    type: object
   handlers.OrderRequest:
     properties:
       amount:
@@ -242,6 +247,36 @@ definitions:
       updatedAt:
         type: string
     type: object
+  models.FeeSideType:
+    enum:
+    - sender
+    - receiver
+    - shared
+    type: string
+    x-enum-varnames:
+    - FeeSideSender
+    - FeeSideReceiver
+    - FeeSideShared
+  models.KycLevelHintType:
+    enum:
+    - low
+    - medium
+    - high
+    type: string
+    x-enum-varnames:
+    - KycLevelHintLow
+    - KycLevelHintMedium
+    - KycLevelHintHigh
+  models.MessageType:
+    enum:
+    - TEXT
+    - SYSTEM
+    - FILE
+    type: string
+    x-enum-varnames:
+    - MessageTypeText
+    - MessageTypeSystem
+    - MessageTypeFile
   models.Offer:
     properties:
       amount:
@@ -310,6 +345,25 @@ definitions:
       updatedAt:
         type: string
     type: object
+  models.OrderMessage:
+    properties:
+      chatID:
+        type: string
+      clientID:
+        type: string
+      content:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: string
+      readAt:
+        type: string
+      type:
+        $ref: '#/definitions/models.MessageType'
+      updatedAt:
+        type: string
+    type: object
   models.OrderStatus:
     enum:
     - WAIT_PAYMENT
@@ -328,8 +382,12 @@ definitions:
     properties:
       chargebackWindowHours:
         type: integer
+      countries:
+        items:
+          $ref: '#/definitions/models.Country'
+        type: array
       feeSide:
-        type: string
+        $ref: '#/definitions/models.FeeSideType'
       id:
         type: string
       isRealtime:
@@ -337,17 +395,13 @@ definitions:
       isReversible:
         type: boolean
       kycLevelHint:
-        type: string
+        $ref: '#/definitions/models.KycLevelHintType'
       methodGroup:
         type: string
       name:
         type: string
       provider:
         type: string
-      countries:
-        items:
-          $ref: '#/definitions/models.Country'
-        type: array
       regions:
         items:
           type: string
@@ -1065,6 +1119,120 @@ paths:
       summary: Список активных объявлений
       tags:
       - offers
+  /orders/{id}/messages:
+    get:
+      parameters:
+      - description: ID ордера
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: cursor
+        in: query
+        name: cursor
+        type: string
+      - description: after
+        in: query
+        name: after
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.OrderMessage'
+            type: array
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Список сообщений ордера
+      tags:
+      - orders
+    post:
+      consumes:
+      - application/json
+      - multipart/form-data
+      parameters:
+      - description: ID ордера
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: данные
+        in: body
+        name: input
+        schema:
+          $ref: '#/definitions/handlers.OrderMessageRequest'
+      - description: файл
+        in: formData
+        name: file
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.OrderMessage'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Отправить сообщение в ордер
+      tags:
+      - orders
+  /orders/{id}/messages/{msgId}/read:
+    patch:
+      parameters:
+      - description: ID ордера
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: ID сообщения
+        in: path
+        name: msgId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.OrderMessage'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Отметить сообщение прочитанным
+      tags:
+      - orders
   /payment-methods:
     get:
       produces:
@@ -1081,6 +1249,32 @@ paths:
       summary: Список платёжных методов
       tags:
       - reference
+  /ws/orders/{id}/chat:
+    get:
+      parameters:
+      - description: ID ордера
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "101":
+          description: Switching Protocols
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Websocket чат ордера
+      tags:
+      - orders
 securityDefinitions:
   BearerAuth:
     in: header

@@ -85,5 +85,9 @@ func setupTest(t *testing.T) (*gorm.DB, *gin.Engine, map[string]time.Duration) {
 	api.POST("/client/offers/:id/enable", EnableOffer(db, maxOffers))
 	api.POST("/client/offers/:id/disable", DisableOffer(db))
 
+	ws := r.Group("/ws")
+	ws.Use(AuthMiddleware(db))
+	ws.GET("/orders/:id/chat", OrderChatWS(db))
+
 	return db, r, ttl
 }

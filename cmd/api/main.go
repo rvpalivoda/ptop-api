@@ -85,6 +85,10 @@ func main() {
 	api.POST("/client/offers/:id/enable", handlers.EnableOffer(gormDB, cfg.MaxActiveOffersPerClient))
 	api.POST("/client/offers/:id/disable", handlers.DisableOffer(gormDB))
 
+	ws := r.Group("/ws")
+	ws.Use(handlers.AuthMiddleware(gormDB))
+	ws.GET("/orders/:id/chat", handlers.OrderChatWS(gormDB))
+
 	if cfg.WatchersDebug {
 		btcW, err := btcwatcher.New(gormDB, cfg.BtcRPCHost, cfg.BtcRPCUser, cfg.BtcRPCPass, nil, true)
 		if err != nil {
