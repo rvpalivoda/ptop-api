@@ -163,6 +163,8 @@ definitions:
     properties:
       id:
         type: string
+      isActive:
+        type: boolean
       isConvertible:
         type: boolean
       name:
@@ -292,12 +294,26 @@ definitions:
       sellerID:
         type: string
       status:
-        type: string
+        $ref: '#/definitions/models.OrderStatus'
       toAssetID:
         type: string
       updatedAt:
         type: string
     type: object
+  models.OrderStatus:
+    enum:
+    - WAIT_PAYMENT
+    - PAID
+    - RELEASED
+    - CANCELLED
+    - DISPUTE
+    type: string
+    x-enum-varnames:
+    - OrderStatusWaitPayment
+    - OrderStatusPaid
+    - OrderStatusReleased
+    - OrderStatusCancelled
+    - OrderStatusDispute
   models.PaymentMethod:
     properties:
       id:
@@ -345,7 +361,7 @@ paths:
             type: array
       security:
       - BearerAuth: []
-      summary: Список активов
+      summary: Список активных активов
       tags:
       - reference
   /auth/2fa/enable:

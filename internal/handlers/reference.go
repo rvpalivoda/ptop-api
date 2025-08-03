@@ -46,7 +46,7 @@ func GetPaymentMethods(db *gorm.DB) gin.HandlerFunc {
 }
 
 // GetAssets godoc
-// @Summary Список активов
+// @Summary Список активных активов
 // @Tags reference
 // @Security BearerAuth
 // @Produce json
@@ -55,7 +55,7 @@ func GetPaymentMethods(db *gorm.DB) gin.HandlerFunc {
 func GetAssets(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var assets []models.Asset
-		if err := db.Find(&assets).Error; err != nil {
+		if err := db.Where("is_active = ?", true).Find(&assets).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
 			return
 		}

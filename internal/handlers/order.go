@@ -62,7 +62,7 @@ func CreateOrder(db *gorm.DB) gin.HandlerFunc {
 			Status:          models.OrderStatusWaitPayment,
 			ExpiresAt:       time.Now().Add(time.Duration(offer.OrderExpirationTimeout) * time.Minute),
 		}
-		if offer.FromAsset.Type == "crypto" || offer.ToAsset.Type == "crypto" {
+		if offer.FromAsset.Type == models.AssetTypeCrypto || offer.ToAsset.Type == models.AssetTypeCrypto {
 			order.IsEscrow = true
 		}
 		if err := db.Create(&order).Error; err != nil {

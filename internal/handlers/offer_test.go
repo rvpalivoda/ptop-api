@@ -35,8 +35,8 @@ func TestOfferLifecycle(t *testing.T) {
 	json.Unmarshal(w.Body.Bytes(), &tok)
 
 	// create assets, payment method, client payment method
-	asset1 := models.Asset{Name: "USD_offer", Type: "fiat"}
-	asset2 := models.Asset{Name: "BTC_offer", Type: "crypto"}
+	asset1 := models.Asset{Name: "USD_offer", Type: models.AssetTypeFiat, IsActive: true}
+	asset2 := models.Asset{Name: "BTC_offer", Type: models.AssetTypeCrypto, IsActive: true}
 	country := models.Country{Name: "CountryOffer"}
 	method := models.PaymentMethod{Name: "BankOffer"}
 	if err := db.Create(&asset1).Error; err != nil {

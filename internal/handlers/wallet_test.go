@@ -47,8 +47,8 @@ func TestWalletHandlers(t *testing.T) {
 	if err != nil {
 		t.Fatalf("neuter: %v", err)
 	}
-	crypto := models.Asset{Name: "BTC_wallet", Type: "crypto", Xpub: xpub.String()}
-	fiat := models.Asset{Name: "USD_wallet", Type: "fiat"}
+	crypto := models.Asset{Name: "BTC_wallet", Type: models.AssetTypeCrypto, Xpub: xpub.String(), IsActive: true}
+	fiat := models.Asset{Name: "USD_wallet", Type: models.AssetTypeFiat, IsActive: true}
 	if err := db.Create(&crypto).Error; err != nil {
 		t.Fatalf("asset: %v", err)
 	}

@@ -36,7 +36,7 @@ func TestEscrowHandler(t *testing.T) {
 	var client models.Client
 	db.Where("username = ?", "escuser").First(&client)
 
-	asset := models.Asset{Name: "BTC_escrow", Type: "crypto"}
+	asset := models.Asset{Name: "BTC_escrow", Type: models.AssetTypeCrypto, IsActive: true}
 	if err := db.Create(&asset).Error; err != nil {
 		t.Fatalf("asset: %v", err)
 	}
