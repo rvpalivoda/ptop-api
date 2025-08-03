@@ -1,6 +1,7 @@
 export interface UserInfo {
   username: string;
-  name: string;
+  twofaEnabled: boolean;
+  pinCodeSet: boolean;
 }
 
 const STORAGE_KEY = 'peerex_user_info';

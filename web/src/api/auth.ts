@@ -103,3 +103,13 @@ export async function refresh() {
   );
   return { access: access_token, refresh: refresh_token };
 }
+
+export interface ProfileResponse {
+  username: string;
+  twofa_enabled: boolean;
+  pincode_set: boolean;
+}
+
+export async function profile() {
+  return apiRequest<ProfileResponse>("/auth/profile");
+}
