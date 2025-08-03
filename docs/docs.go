@@ -1107,6 +1107,185 @@ const docTemplate = `{
                 }
             }
         },
+        "/orders/{id}/messages": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Список сообщений ордера",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID ордера",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "cursor",
+                        "name": "cursor",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "after",
+                        "name": "after",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.OrderMessage"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json",
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Отправить сообщение в ордер",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID ордера",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "данные",
+                        "name": "input",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.OrderMessageRequest"
+                        }
+                    },
+                    {
+                        "type": "file",
+                        "description": "файл",
+                        "name": "file",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.OrderMessage"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/orders/{id}/messages/{msgId}/read": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Отметить сообщение прочитанным",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID ордера",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID сообщения",
+                        "name": "msgId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.OrderMessage"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/payment-methods": {
             "get": {
                 "security": [
@@ -1129,6 +1308,48 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/models.PaymentMethod"
                             }
+                        }
+                    }
+                }
+            }
+        },
+        "/ws/orders/{id}/chat": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Websocket чат ордера",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID ордера",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "101": {
+                        "description": "Switching Protocols",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -1279,6 +1500,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "to_asset_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.OrderMessageRequest": {
+            "type": "object",
+            "properties": {
+                "content": {
                     "type": "string"
                 }
             }
@@ -1511,6 +1740,45 @@ const docTemplate = `{
                 }
             }
         },
+        "models.FeeSideType": {
+            "type": "string",
+            "enum": [
+                "sender",
+                "receiver",
+                "shared"
+            ],
+            "x-enum-varnames": [
+                "FeeSideSender",
+                "FeeSideReceiver",
+                "FeeSideShared"
+            ]
+        },
+        "models.KycLevelHintType": {
+            "type": "string",
+            "enum": [
+                "low",
+                "medium",
+                "high"
+            ],
+            "x-enum-varnames": [
+                "KycLevelHintLow",
+                "KycLevelHintMedium",
+                "KycLevelHintHigh"
+            ]
+        },
+        "models.MessageType": {
+            "type": "string",
+            "enum": [
+                "TEXT",
+                "SYSTEM",
+                "FILE"
+            ],
+            "x-enum-varnames": [
+                "MessageTypeText",
+                "MessageTypeSystem",
+                "MessageTypeFile"
+            ]
+        },
         "models.Offer": {
             "type": "object",
             "properties": {
@@ -1614,6 +1882,35 @@ const docTemplate = `{
                 }
             }
         },
+        "models.OrderMessage": {
+            "type": "object",
+            "properties": {
+                "chatID": {
+                    "type": "string"
+                },
+                "clientID": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "readAt": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/models.MessageType"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
         "models.OrderStatus": {
             "type": "string",
             "enum": [
@@ -1637,8 +1934,14 @@ const docTemplate = `{
                 "chargebackWindowHours": {
                     "type": "integer"
                 },
+                "countries": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Country"
+                    }
+                },
                 "feeSide": {
-                    "type": "string"
+                    "$ref": "#/definitions/models.FeeSideType"
                 },
                 "id": {
                     "type": "string"
@@ -1650,7 +1953,7 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "kycLevelHint": {
-                    "type": "string"
+                    "$ref": "#/definitions/models.KycLevelHintType"
                 },
                 "methodGroup": {
                     "type": "string"
@@ -1660,12 +1963,6 @@ const docTemplate = `{
                 },
                 "provider": {
                     "type": "string"
-                },
-                "countries": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Country"
-                    }
                 },
                 "regions": {
                     "type": "array",
