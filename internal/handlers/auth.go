@@ -373,6 +373,27 @@ func AuthMiddleware(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
+// Logout godoc
+// @Summary Выход клиента
+// @Tags auth
+// @Security BearerAuth
+// @Produce json
+// @Success 200 {object} StatusResponse
+// @Failure 401 {object} ErrorResponse
+// @Router /auth/logout [post]
+func Logout(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		clientIDVal, ok := c.Get("client_id")
+		if !ok {
+			c.JSON(http.StatusUnauthorized, ErrorResponse{Error: "no client"})
+			return
+		}
+		clientID, _ := clientIDVal.(string)
+		db.Where("client_id = ?", clientID).Delete(&models.Token{})
+		c.JSON(http.StatusOK, StatusResponse{Status: "logged out"})
+	}
+}
+
 // ChangePassword godoc
 // @Summary Смена пароля
 // @Tags auth

@@ -355,6 +355,13 @@ definitions:
         type: string
       createdAt:
         type: string
+      fileSize:
+        format: int64
+        type: integer
+      fileType:
+        type: string
+      fileURL:
+        type: string
       id:
         type: string
       readAt:
@@ -514,6 +521,24 @@ paths:
           schema:
             $ref: '#/definitions/handlers.ErrorResponse'
       summary: Вход клиента
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.StatusResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Выход клиента
       tags:
       - auth
   /auth/password:
@@ -1161,6 +1186,7 @@ paths:
       consumes:
       - application/json
       - multipart/form-data
+      description: 'Поддерживаются типы файлов: image/jpeg, image/png, application/pdf'
       parameters:
       - description: ID ордера
         in: path
@@ -1172,7 +1198,7 @@ paths:
         name: input
         schema:
           $ref: '#/definitions/handlers.OrderMessageRequest'
-      - description: файл
+      - description: файл (image/jpeg, image/png, application/pdf)
         in: formData
         name: file
         type: file
@@ -1251,6 +1277,7 @@ paths:
       - reference
   /ws/orders/{id}/chat:
     get:
+      description: При подключении отправляет историю сообщений из кеша Redis
       parameters:
       - description: ID ордера
         in: path
