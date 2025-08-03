@@ -8,16 +8,17 @@ import (
 )
 
 type Wallet struct {
-	ID         string    `gorm:"primaryKey;size:21"`
-	ClientID   string    `gorm:"size:21;not null;uniqueIndex:idx_wallet_client_asset_active"`
-	Client     Client    `gorm:"foreignKey:ClientID" json:"-"`
-	AssetID    string    `gorm:"size:21;not null;uniqueIndex:idx_wallet_client_asset_active"`
-	Asset      Asset     `gorm:"foreignKey:AssetID" json:"-"`
-	Value      string    `gorm:"type:varchar(255);not null"`
-	CreatedAt  time.Time `gorm:"autoCreateTime"`
-	IsEnabled  bool      `gorm:"not null;default:true;uniqueIndex:idx_wallet_client_asset_active"`
-	EnabledAt  time.Time `gorm:"autoCreateTime"`
-	DisabledAt *time.Time
+	ID              string    `gorm:"primaryKey;size:21"`
+	ClientID        string    `gorm:"size:21;not null;uniqueIndex:idx_wallet_client_asset_active"`
+	Client          Client    `gorm:"foreignKey:ClientID" json:"-"`
+	AssetID         string    `gorm:"size:21;not null;uniqueIndex:idx_wallet_client_asset_active"`
+	Asset           Asset     `gorm:"foreignKey:AssetID" json:"-"`
+	Value           string    `gorm:"type:varchar(255);not null"`
+	DerivationIndex uint32    `gorm:"not null" json:"index"`
+	CreatedAt       time.Time `gorm:"autoCreateTime"`
+	IsEnabled       bool      `gorm:"not null;default:true;uniqueIndex:idx_wallet_client_asset_active"`
+	EnabledAt       time.Time `gorm:"autoCreateTime"`
+	DisabledAt      *time.Time
 }
 
 func (w *Wallet) BeforeCreate(tx *gorm.DB) (err error) {

@@ -319,6 +319,8 @@ definitions:
         type: string
       id:
         type: string
+      index:
+        type: integer
       isEnabled:
         type: boolean
       value:

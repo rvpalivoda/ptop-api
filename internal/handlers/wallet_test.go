@@ -8,6 +8,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/btcsuite/btcd/chaincfg"
+	"github.com/btcsuite/btcutil/hdkeychain"
+
 	"ptop/internal/models"
 )
 
@@ -35,7 +38,16 @@ func TestWalletHandlers(t *testing.T) {
 	json.Unmarshal(w.Body.Bytes(), &tok)
 
 	// create assets
-	crypto := models.Asset{Name: "BTC_wallet", Type: "crypto"}
+	seed := bytes.Repeat([]byte{0x01}, 32)
+	master, err := hdkeychain.NewMaster(seed, &chaincfg.MainNetParams)
+	if err != nil {
+		t.Fatalf("master: %v", err)
+	}
+	xpub, err := master.Neuter()
+	if err != nil {
+		t.Fatalf("neuter: %v", err)
+	}
+	crypto := models.Asset{Name: "BTC_wallet", Type: "crypto", Xpub: xpub.String()}
 	fiat := models.Asset{Name: "USD_wallet", Type: "fiat"}
 	if err := db.Create(&crypto).Error; err != nil {
 		t.Fatalf("asset: %v", err)

@@ -7,6 +7,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/btcsuite/btcd/chaincfg"
+	"github.com/btcsuite/btcutil/hdkeychain"
+
 	"ptop/internal/models"
 )
 
@@ -32,7 +35,16 @@ func TestBalanceHandler(t *testing.T) {
 	}
 	json.Unmarshal(w.Body.Bytes(), &tok)
 
-	asset := models.Asset{Name: "BTC_balance", Type: "crypto"}
+	seed := bytes.Repeat([]byte{0x02}, 32)
+	master, err := hdkeychain.NewMaster(seed, &chaincfg.MainNetParams)
+	if err != nil {
+		t.Fatalf("master: %v", err)
+	}
+	xpub, err := master.Neuter()
+	if err != nil {
+		t.Fatalf("neuter: %v", err)
+	}
+	asset := models.Asset{Name: "BTC_balance", Type: "crypto", Xpub: xpub.String()}
 	if err := db.Create(&asset).Error; err != nil {
 		t.Fatalf("asset: %v", err)
 	}
