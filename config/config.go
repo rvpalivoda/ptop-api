@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -25,6 +26,12 @@ type Config struct {
 	RedisPassword            string
 	RedisDB                  int
 	ChatCacheLimit           int64
+	S3Endpoint               string
+	S3AccessKey              string
+	S3SecretKey              string
+	S3Bucket                 string
+	S3Region                 string
+	S3UseSSL                 bool
 	// Другие поля, например:
 	// JWTSecret string
 	// Timezone  string
@@ -61,6 +68,13 @@ func Load() (*Config, error) {
 	ethURL := os.Getenv("ETH_RPC_URL")
 	moneroURL := os.Getenv("MONERO_RPC_URL")
 
+	s3Endpoint := os.Getenv("S3_ENDPOINT")
+	s3Access := os.Getenv("S3_ACCESS_KEY")
+	s3Secret := os.Getenv("S3_SECRET_KEY")
+	s3Bucket := os.Getenv("S3_BUCKET")
+	s3Region := os.Getenv("S3_REGION")
+	s3UseSSL := os.Getenv("S3_USE_SSL") == "1" || strings.ToLower(os.Getenv("S3_USE_SSL")) == "true"
+
 	redisAddr := os.Getenv("REDIS_ADDR")
 	if redisAddr == "" {
 		redisAddr = "localhost:6379"
@@ -94,6 +108,12 @@ func Load() (*Config, error) {
 		RedisPassword:            redisPass,
 		RedisDB:                  redisDB,
 		ChatCacheLimit:           chatLimit,
+		S3Endpoint:               s3Endpoint,
+		S3AccessKey:              s3Access,
+		S3SecretKey:              s3Secret,
+		S3Bucket:                 s3Bucket,
+		S3Region:                 s3Region,
+		S3UseSSL:                 s3UseSSL,
 		// JWTSecret: os.Getenv("JWT_SECRET"),
 		// Timezone:  os.Getenv("TIMEZONE"),
 	}, nil
