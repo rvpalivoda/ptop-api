@@ -40,7 +40,7 @@ func CreateWallet(db *gorm.DB) gin.HandlerFunc {
 		}
 		clientID := clientIDVal.(string)
 		var asset models.Asset
-		if err := db.Where("id = ? AND type = ?", r.AssetID, "crypto").First(&asset).Error; err != nil {
+		if err := db.Where("id = ? AND type = ?", r.AssetID, models.AssetTypeCrypto).First(&asset).Error; err != nil {
 			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "invalid asset"})
 			return
 		}

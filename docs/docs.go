@@ -28,7 +28,7 @@ const docTemplate = `{
                 "tags": [
                     "reference"
                 ],
-                "summary": "Список активов",
+                "summary": "Список активных активов",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1340,6 +1340,9 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "isActive": {
+                    "type": "boolean"
+                },
                 "isConvertible": {
                     "type": "boolean"
                 },
@@ -1536,7 +1539,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "type": "string"
+                    "$ref": "#/definitions/models.OrderStatus"
                 },
                 "toAssetID": {
                     "type": "string"
@@ -1545,6 +1548,23 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "models.OrderStatus": {
+            "type": "string",
+            "enum": [
+                "WAIT_PAYMENT",
+                "PAID",
+                "RELEASED",
+                "CANCELLED",
+                "DISPUTE"
+            ],
+            "x-enum-varnames": [
+                "OrderStatusWaitPayment",
+                "OrderStatusPaid",
+                "OrderStatusReleased",
+                "OrderStatusCancelled",
+                "OrderStatusDispute"
+            ]
         },
         "models.PaymentMethod": {
             "type": "object",

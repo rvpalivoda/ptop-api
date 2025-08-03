@@ -37,8 +37,8 @@ func TestOrderHandler(t *testing.T) {
 	var client models.Client
 	db.Where("username = ?", "orduser").First(&client)
 
-	asset1 := models.Asset{Name: "USD_order", Type: "fiat"}
-	asset2 := models.Asset{Name: "BTC_order", Type: "crypto"}
+	asset1 := models.Asset{Name: "USD_order", Type: models.AssetTypeFiat, IsActive: true}
+	asset2 := models.Asset{Name: "BTC_order", Type: models.AssetTypeCrypto, IsActive: true}
 	if err := db.Create(&asset1).Error; err != nil {
 		t.Fatalf("asset: %v", err)
 	}

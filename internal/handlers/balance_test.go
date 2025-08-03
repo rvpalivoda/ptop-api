@@ -44,7 +44,7 @@ func TestBalanceHandler(t *testing.T) {
 	if err != nil {
 		t.Fatalf("neuter: %v", err)
 	}
-	asset := models.Asset{Name: "BTC_balance", Type: "crypto", Xpub: xpub.String()}
+	asset := models.Asset{Name: "BTC_balance", Type: models.AssetTypeCrypto, Xpub: xpub.String(), IsActive: true}
 	if err := db.Create(&asset).Error; err != nil {
 		t.Fatalf("asset: %v", err)
 	}

@@ -15,10 +15,12 @@ func TestReferenceHandlers(t *testing.T) {
 	// seed data
 	country := models.Country{Name: "Russia"}
 	method := models.PaymentMethod{Name: "Bank"}
-	asset := models.Asset{Name: "Ruble", Type: "fiat"}
+	activeAsset := models.Asset{Name: "Ruble", Type: models.AssetTypeFiat, IsActive: true}
+	inactiveAsset := models.Asset{Name: "Inactive", Type: models.AssetTypeFiat}
 	db.Create(&country)
 	db.Create(&method)
-	db.Create(&asset)
+	db.Create(&activeAsset)
+	db.Create(&inactiveAsset)
 
 	// register user
 	body := `{"username":"refuser","password":"pass","password_confirm":"pass"}`
