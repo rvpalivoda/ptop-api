@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"errors"
 	"io"
 	"net/http"
@@ -10,7 +9,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
 	"gorm.io/gorm"
 
 	"ptop/internal/models"
@@ -200,15 +198,7 @@ func CreateOrderMessage(db *gorm.DB, st storage.Storage, cache *services.ChatCac
 		if cache != nil {
 			_ = cache.AddMessage(c.Request.Context(), chat.ID, msg)
 		}
-		b, _ := json.Marshal(msg)
-		orderChatClients.Lock()
-		for conn := range orderChatClients.m[chat.ID] {
-			if err := conn.WriteMessage(websocket.TextMessage, b); err != nil {
-				conn.Close()
-				delete(orderChatClients.m[chat.ID], conn)
-			}
-		}
-		orderChatClients.Unlock()
+		broadcastOrderChatMessage(chat.ID, msg)
 		c.JSON(http.StatusOK, msg)
 	}
 }
