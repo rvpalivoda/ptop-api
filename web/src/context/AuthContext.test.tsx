@@ -17,7 +17,6 @@ vi.mock("@/api/auth", () => ({
   profile: vi.fn(),
 }));
 vi.mock("@/api/pin", () => ({ setPinCode: vi.fn() }));
-vi.mock("@/api/two_factor", () => ({ disable2fa: vi.fn() }));
 
 describe("AuthContext", () => {
   beforeEach(() => {

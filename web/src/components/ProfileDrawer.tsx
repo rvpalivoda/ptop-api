@@ -2,7 +2,7 @@ import {useEffect, useRef, useState} from "react";
 import {BookOpen, Copy, Download, Eye, EyeOff, Key, KeyRound, LogOut, Settings, ShieldCheck, User,} from "lucide-react";
 import {useNavigate} from "react-router-dom";
 import QRCode from "react-qr-code";
-import {enable2fa, verify2fa, verifyPassword as apiVerifyPassword} from "@/api";
+import {enable2fa, verifyPassword as apiVerifyPassword} from "@/api";
 import {useAuth} from "@/context";
 import {Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger,} from "@/components/ui/sheet";
 import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,} from "@/components/ui/dialog";
@@ -20,7 +20,6 @@ export const ProfileDrawer = ({triggerClassName}: Props) => {
         userInfo,
         regenerateWords,
         changePassword,
-        disable2fa,
         setPinCode,
         refresh,
         logout,
@@ -41,12 +40,10 @@ export const ProfileDrawer = ({triggerClassName}: Props) => {
 
     const [twoFactorSecret, setTwoFactorSecret] = useState<string | null>(null);
     const [otpAuthUrl, setOtpAuthUrl] = useState<string | null>(null);
-    const [twoFactorCode, setTwoFactorCode] = useState("");
     const [twoFactorEnabled, setTwoFactorEnabled] = useState(
         userInfo?.twofaEnabled ?? loadTwoFactorEnabled()
     );
     const [newSeed, setNewSeed] = useState<string | null>(null);
-    const [disablePassword, setDisablePassword] = useState("");
     const [regeneratePassword, setRegeneratePassword] = useState("");
     const [passwordCheck, setPasswordCheck] = useState("");
     const [showPinDialog, setShowPinDialog] = useState(false);
@@ -123,29 +120,10 @@ export const ProfileDrawer = ({triggerClassName}: Props) => {
 
     const startTwoFactor = async () => {
         try {
-            const res = await enable2fa();
+            const res = await enable2fa(passwordCheck);
             setTwoFactorSecret(res.secret);
-            setOtpAuthUrl(res.otpauth_url);
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
-    const startTwoFactorWithVerify = async () => {
-        const ok = await verifyPassword();
-        if (ok) {
-            await startTwoFactor();
-        }
-    };
-
-    const submitTwoFactor = async (e: React.FormEvent) => {
-        e.preventDefault();
-        try {
-            await verify2fa(twoFactorCode);
+            setOtpAuthUrl(res.url);
             setTwoFactorEnabled(true);
-            setTwoFactorSecret(null);
-            setOtpAuthUrl(null);
-            setTwoFactorCode("");
         } catch (err) {
             console.error(err);
         }
@@ -165,17 +143,6 @@ export const ProfileDrawer = ({triggerClassName}: Props) => {
         const ok = await verifyPassword();
         if (ok) {
             await handleRegenerate();
-        }
-    };
-
-    const handleDisable2fa = async () => {
-        try {
-            await disable2fa(disablePassword);
-            setTwoFactorEnabled(false);
-            setDisablePassword("");
-        } catch (err) {
-            console.error(err);
-            alert("Ошибка отключения 2FA");
         }
     };
 
@@ -371,14 +338,14 @@ export const ProfileDrawer = ({triggerClassName}: Props) => {
                                         placeholder="Введите пароль"
                                         className={inputStyles}
                                     />
-                                    <button onClick={startTwoFactorWithVerify}
+                                    <button onClick={startTwoFactor}
                                             className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700  block w-full mt-2">
-                                        Начать настройку
+                                        Включить 2FA
                                     </button>
                                 </div>
                             )}
                             {twoFactorSecret && (
-                                <form onSubmit={submitTwoFactor} className="mt-4 space-y-4">
+                                <div className="mt-4 space-y-4">
                                     {otpAuthUrl && (
                                         <div className="mx-auto w-max bg-white p-2 rounded">
                                             <QRCode value={otpAuthUrl} size={250}/>
@@ -386,32 +353,6 @@ export const ProfileDrawer = ({triggerClassName}: Props) => {
                                     )}
                                     <p className="text-sm">Секрет: <span
                                         className="font-mono break-all">{twoFactorSecret}</span></p>
-                                    <input
-                                        type="text"
-                                        value={twoFactorCode}
-                                        onChange={(e) => setTwoFactorCode(e.target.value)}
-                                        placeholder="Введите код"
-                                        className={inputStyles}
-                                    />
-                                    <button type="submit"
-                                            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700  block w-full mt-2">
-                                        Подтвердить
-                                    </button>
-                                </form>
-                            )}
-                            {twoFactorEnabled && (
-                                <div className="mt-4 space-y-2">
-                                    <input
-                                        type="password"
-                                        value={disablePassword}
-                                        onChange={(e) => setDisablePassword(e.target.value)}
-                                        placeholder="Введите пароль"
-                                        className={inputStyles}
-                                    />
-                                    <button type="button" onClick={handleDisable2fa}
-                                            className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700  block w-full mt-2">
-                                        Отключить 2FA
-                                    </button>
                                 </div>
                             )}
                         </DialogContent>

@@ -11,7 +11,6 @@ import {
   type MnemonicResponse,
 } from "@/api/auth";
 import { setPinCode as apiSetPinCode } from "@/api/pin";
-import { disable2fa as apiDisable2fa } from "@/api/two_factor";
 import {
   loadTokens,
   saveTokens,
@@ -46,7 +45,6 @@ interface AuthContextValue {
   ) => Promise<void>;
   regenerateWords: (password: string) => Promise<MnemonicResponse>;
   changePassword: (current: string, newPwd: string) => Promise<void>;
-  disable2fa: (password: string) => Promise<void>;
   setPinCode: (password: string, pin: string) => Promise<void>;
 }
 
@@ -162,11 +160,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     await apiChangePassword(current, newPwd);
   };
 
-  const disable2fa = async (password: string): Promise<void> => {
-    await apiDisable2fa(password);
-    // optionally refresh state
-  };
-
   const setPinCode = async (
     password: string,
     pin: string,
@@ -187,7 +180,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         recover,
         regenerateWords,
         changePassword,
-        disable2fa,
         setPinCode,
       }}
     >
