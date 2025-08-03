@@ -23,6 +23,30 @@ var orderChatClients = struct {
 	m map[string]map[*websocket.Conn]bool
 }{m: make(map[string]map[*websocket.Conn]bool)}
 
+type orderChatEvent struct {
+	Type    string              `json:"type"`
+	Message models.OrderMessage `json:"message"`
+}
+
+func newOrderChatEvent(msg models.OrderMessage) orderChatEvent {
+	return orderChatEvent{Type: string(msg.Type), Message: msg}
+}
+
+func sendOrderChatEvent(conn *websocket.Conn, msg models.OrderMessage) error {
+	return conn.WriteJSON(newOrderChatEvent(msg))
+}
+
+func broadcastOrderChatMessage(chatID string, msg models.OrderMessage) {
+	orderChatClients.Lock()
+	for c := range orderChatClients.m[chatID] {
+		if err := sendOrderChatEvent(c, msg); err != nil {
+			c.Close()
+			delete(orderChatClients.m[chatID], c)
+		}
+	}
+	orderChatClients.Unlock()
+}
+
 // OrderChatWS godoc
 // @Summary Websocket чат ордера
 // @Description При подключении отправляет историю сообщений из кеша Redis
@@ -86,8 +110,7 @@ func OrderChatWS(db *gorm.DB, cache *services.ChatCache) gin.HandlerFunc {
 		if cache != nil {
 			if history, err := cache.GetHistory(c.Request.Context(), chat.ID); err == nil {
 				for _, m := range history {
-					b, _ := json.Marshal(m)
-					if err := conn.WriteMessage(websocket.TextMessage, b); err != nil {
+					if err := sendOrderChatEvent(conn, m); err != nil {
 						return
 					}
 				}
@@ -110,15 +133,7 @@ func OrderChatWS(db *gorm.DB, cache *services.ChatCache) gin.HandlerFunc {
 			if cache != nil {
 				_ = cache.AddMessage(c.Request.Context(), chat.ID, msg)
 			}
-			b, _ := json.Marshal(msg)
-			orderChatClients.Lock()
-			for c := range orderChatClients.m[chat.ID] {
-				if err := c.WriteMessage(websocket.TextMessage, b); err != nil {
-					c.Close()
-					delete(orderChatClients.m[chat.ID], c)
-				}
-			}
-			orderChatClients.Unlock()
+			broadcastOrderChatMessage(chat.ID, msg)
 		}
 	}
 }

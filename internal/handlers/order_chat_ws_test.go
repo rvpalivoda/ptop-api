@@ -3,6 +3,7 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -133,9 +134,12 @@ func TestOrderChatWS(t *testing.T) {
 	if err := buyerConn.WriteJSON(OrderMessageRequest{Content: "hello"}); err != nil {
 		t.Fatalf("write: %v", err)
 	}
-	var echo models.OrderMessage
+	var echo orderChatEvent
 	if err := buyerConn.ReadJSON(&echo); err != nil {
 		t.Fatalf("read echo: %v", err)
+	}
+	if echo.Type != string(models.MessageTypeText) || echo.Message.Content != "hello" {
+		t.Fatalf("unexpected echo %#v", echo)
 	}
 	buyerConn.Close()
 
@@ -146,15 +150,45 @@ func TestOrderChatWS(t *testing.T) {
 		t.Fatalf("seller dial: %v", err)
 	}
 	defer sellerConn.Close()
-	var history models.OrderMessage
+	var history orderChatEvent
 	if err := sellerConn.ReadJSON(&history); err != nil {
 		t.Fatalf("history read: %v", err)
 	}
-	if history.Content != "hello" {
-		t.Fatalf("unexpected content %s", history.Content)
+	if history.Type != string(models.MessageTypeText) || history.Message.Content != "hello" {
+		t.Fatalf("unexpected content %#v", history)
 	}
 	var dbMsg models.OrderMessage
-	if err := db.Where("id = ?", history.ID).First(&dbMsg).Error; err != nil {
+	if err := db.Where("id = ?", history.Message.ID).First(&dbMsg).Error; err != nil {
 		t.Fatalf("db message: %v", err)
+	}
+
+	// buyer uploads file via REST, seller should receive it over WS
+	fileBody := &bytes.Buffer{}
+	mw := multipart.NewWriter(fileBody)
+	fw, err := mw.CreateFormFile("file", "test.png")
+	if err != nil {
+		t.Fatalf("form file: %v", err)
+	}
+	fw.Write([]byte{137, 80, 78, 71, 13, 10, 26, 10})
+	mw.Close()
+
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("POST", "/orders/"+ord.ID+"/messages", fileBody)
+	req.Header.Set("Authorization", "Bearer "+buyerTok.AccessToken)
+	req.Header.Set("Content-Type", mw.FormDataContentType())
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("file msg status %d", w.Code)
+	}
+
+	var fileEvt orderChatEvent
+	if err := sellerConn.ReadJSON(&fileEvt); err != nil {
+		t.Fatalf("file read: %v", err)
+	}
+	if fileEvt.Type != string(models.MessageTypeFile) || fileEvt.Message.FileURL == nil {
+		t.Fatalf("unexpected file event %#v", fileEvt)
+	}
+	if !strings.HasPrefix(*fileEvt.Message.FileURL, "https://example.com/") {
+		t.Fatalf("unexpected file url %s", *fileEvt.Message.FileURL)
 	}
 }
