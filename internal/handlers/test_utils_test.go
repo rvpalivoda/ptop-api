@@ -76,6 +76,7 @@ func setupTest(t *testing.T) (*gorm.DB, *gin.Engine, map[string]time.Duration) {
 	auth.GET("/recover/:username", RecoverChallenge(db))
 	auth.POST("/recover", Recover(db, ttl))
 	auth.Use(AuthMiddleware(db))
+	auth.POST("/logout", Logout(db))
 	auth.GET("/profile", Profile(db))
 	auth.POST("/username", ChangeUsername(db))
 	auth.POST("/pincode", SetPinCode(db))

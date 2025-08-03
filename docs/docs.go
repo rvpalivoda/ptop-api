@@ -138,6 +138,36 @@ const docTemplate = `{
                 }
             }
         },
+        "/auth/logout": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Выход клиента",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.StatusResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/password": {
             "post": {
                 "security": [
@@ -1172,6 +1202,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
+                "description": "Поддерживаются типы файлов: image/jpeg, image/png, application/pdf",
                 "consumes": [
                     "application/json",
                     "multipart/form-data"
@@ -1201,7 +1232,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "file",
-                        "description": "файл",
+                        "description": "файл (image/jpeg, image/png, application/pdf)",
                         "name": "file",
                         "in": "formData"
                     }
@@ -1320,6 +1351,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
+                "description": "При подключении отправляет историю сообщений из кеша Redis",
                 "tags": [
                     "orders"
                 ],
@@ -1895,6 +1927,16 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "createdAt": {
+                    "type": "string"
+                },
+                "fileSize": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "fileType": {
+                    "type": "string"
+                },
+                "fileURL": {
                     "type": "string"
                 },
                 "id": {

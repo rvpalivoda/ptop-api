@@ -206,3 +206,47 @@ func TestProfileAndSettings(t *testing.T) {
 		t.Fatalf("settings not saved")
 	}
 }
+
+func TestLogout(t *testing.T) {
+	db, r, _ := setupTest(t)
+
+	body := `{"username":"logoutuser","password":"pass","password_confirm":"pass"}`
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/auth/register", bytes.NewBufferString(body))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+
+	body = `{"username":"logoutuser","password":"pass"}`
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("POST", "/auth/login", bytes.NewBufferString(body))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+	var log tokenResp
+	json.Unmarshal(w.Body.Bytes(), &log)
+
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("POST", "/auth/logout", nil)
+	req.Header.Set("Authorization", "Bearer "+log.AccessToken)
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("logout status %d", w.Code)
+	}
+
+	var client models.Client
+	if err := db.Where("username = ?", "logoutuser").First(&client).Error; err != nil {
+		t.Fatalf("client lookup: %v", err)
+	}
+	var count int64
+	db.Model(&models.Token{}).Where("client_id = ?", client.ID).Count(&count)
+	if count != 0 {
+		t.Fatalf("tokens left %d", count)
+	}
+
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("GET", "/auth/profile", nil)
+	req.Header.Set("Authorization", "Bearer "+log.AccessToken)
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusUnauthorized {
+		t.Fatalf("profile status %d", w.Code)
+	}
+}

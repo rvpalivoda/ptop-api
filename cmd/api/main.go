@@ -73,6 +73,7 @@ func main() {
 	auth.GET("/recover/:username", handlers.RecoverChallenge(gormDB))
 	auth.POST("/recover", handlers.Recover(gormDB, cfg.TokenTypeTTL))
 	auth.Use(handlers.AuthMiddleware(gormDB))
+	auth.POST("/logout", handlers.Logout(gormDB))
 	auth.GET("/profile", handlers.Profile(gormDB))
 	auth.POST("/username", handlers.ChangeUsername(gormDB))
 	auth.POST("/pincode", handlers.SetPinCode(gormDB))
