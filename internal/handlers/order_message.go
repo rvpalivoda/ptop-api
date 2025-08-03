@@ -126,7 +126,18 @@ func CreateOrderMessage(db *gorm.DB) gin.HandlerFunc {
 				c.JSON(http.StatusBadRequest, ErrorResponse{Error: "invalid file"})
 				return
 			}
-			msg = models.OrderMessage{ChatID: chat.ID, ClientID: clientID, Type: models.MessageTypeFile, Content: file.Filename}
+			url := file.Filename
+			ftype := file.Header.Get("Content-Type")
+			size := file.Size
+			msg = models.OrderMessage{
+				ChatID:   chat.ID,
+				ClientID: clientID,
+				Type:     models.MessageTypeFile,
+				Content:  file.Filename,
+				FileURL:  &url,
+				FileType: &ftype,
+				FileSize: &size,
+			}
 		} else {
 			var r OrderMessageRequest
 			if err := c.BindJSON(&r); err != nil || r.Content == "" {

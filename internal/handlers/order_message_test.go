@@ -3,6 +3,7 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -124,6 +125,26 @@ func TestOrderMessageHandler(t *testing.T) {
 	var msg models.OrderMessage
 	json.Unmarshal(w.Body.Bytes(), &msg)
 
+	// buyer sends file message
+	w = httptest.NewRecorder()
+	buf := &bytes.Buffer{}
+	mw := multipart.NewWriter(buf)
+	fw, _ := mw.CreateFormFile("file", "test.txt")
+	fw.Write([]byte("file"))
+	mw.Close()
+	req, _ = http.NewRequest("POST", "/orders/"+ord.ID+"/messages", buf)
+	req.Header.Set("Authorization", "Bearer "+buyerTok.AccessToken)
+	req.Header.Set("Content-Type", mw.FormDataContentType())
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("create file message status %d", w.Code)
+	}
+	var fileMsg models.OrderMessage
+	json.Unmarshal(w.Body.Bytes(), &fileMsg)
+	if fileMsg.FileURL == nil {
+		t.Fatalf("expected file url")
+	}
+
 	// hacker tries to get messages
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/orders/"+ord.ID+"/messages", nil)
@@ -143,8 +164,11 @@ func TestOrderMessageHandler(t *testing.T) {
 	}
 	var list []models.OrderMessage
 	json.Unmarshal(w.Body.Bytes(), &list)
-	if len(list) != 1 {
-		t.Fatalf("expected 1 message, got %d", len(list))
+	if len(list) != 2 {
+		t.Fatalf("expected 2 messages, got %d", len(list))
+	}
+	if list[1].FileURL == nil {
+		t.Fatalf("expected file url in second message")
 	}
 
 	// seller marks message read
