@@ -18,6 +18,7 @@ type WalletRequest struct {
 
 // CreateWallet godoc
 // @Summary Создать кошелёк
+// @Description При DEBUG_FAKE_NETWORK=true адрес генерируется без обращения к сети в формате fake:{asset}:{client}:{index}
 // @Tags wallets
 // @Security BearerAuth
 // @Accept json
@@ -50,6 +51,7 @@ func CreateWallet(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "wallet exists"})
 			return
 		}
+		// в режиме DEBUG_FAKE_NETWORK возвращает фейковый адрес
 		val, idx, err := services.GetAddress(db, clientID, r.AssetID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "address error"})

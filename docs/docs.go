@@ -927,6 +927,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
+                "description": "При DEBUG_FAKE_NETWORK=true адрес генерируется без обращения к сети в формате fake:{asset}:{client}:{index}",
                 "consumes": [
                     "application/json"
                 ],
@@ -1224,10 +1225,10 @@ const docTemplate = `{
                 "amount": {
                     "type": "string"
                 },
-                "offer_id": {
+                "client_payment_method_id": {
                     "type": "string"
                 },
-                "client_payment_method_id": {
+                "offer_id": {
                     "type": "string"
                 }
             }
@@ -1508,6 +1509,9 @@ const docTemplate = `{
                 "buyerID": {
                     "type": "string"
                 },
+                "clientPaymentMethodID": {
+                    "type": "string"
+                },
                 "createdAt": {
                     "type": "string"
                 },
@@ -1524,9 +1528,6 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "offerID": {
-                    "type": "string"
-                },
-                "clientPaymentMethodID": {
                     "type": "string"
                 },
                 "price": {
