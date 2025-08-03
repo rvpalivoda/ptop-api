@@ -59,7 +59,7 @@ func CreateOrder(db *gorm.DB) gin.HandlerFunc {
 			Amount:          amt,
 			Price:           offer.Price,
 			PaymentMethodID: r.PaymentMethodID,
-			Status:          "WAIT_PAYMENT",
+			Status:          models.OrderStatusWaitPayment,
 			ExpiresAt:       time.Now().Add(time.Duration(offer.OrderExpirationTimeout) * time.Minute),
 		}
 		if offer.FromAsset.Type == "crypto" || offer.ToAsset.Type == "crypto" {

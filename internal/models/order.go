@@ -8,6 +8,16 @@ import (
 	"ptop/internal/utils"
 )
 
+type OrderStatus string
+
+const (
+	OrderStatusWaitPayment OrderStatus = "WAIT_PAYMENT"
+	OrderStatusPaid        OrderStatus = "PAID"
+	OrderStatusReleased    OrderStatus = "RELEASED"
+	OrderStatusCancelled   OrderStatus = "CANCELLED"
+	OrderStatusDispute     OrderStatus = "DISPUTE"
+)
+
 type Order struct {
 	ID              string              `gorm:"primaryKey;size:21"`
 	OfferID         string              `gorm:"size:21;not null"`
@@ -24,7 +34,7 @@ type Order struct {
 	Price           decimal.Decimal     `gorm:"type:decimal(32,8);not null"`
 	PaymentMethodID string              `gorm:"size:21"`
 	PaymentMethod   ClientPaymentMethod `gorm:"foreignKey:PaymentMethodID" json:"-"`
-	Status          string              `gorm:"type:varchar(20);not null"`
+	Status          OrderStatus         `gorm:"type:varchar(20);not null"`
 	IsEscrow        bool                `gorm:"not null;default:false"`
 	ExpiresAt       time.Time           `gorm:"not null"`
 	ReleasedAt      *time.Time

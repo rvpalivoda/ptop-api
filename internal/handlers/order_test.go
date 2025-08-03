@@ -74,6 +74,9 @@ func TestOrderHandler(t *testing.T) {
 	if !ord.IsEscrow {
 		t.Fatalf("expected escrow true")
 	}
+	if ord.Status != models.OrderStatusWaitPayment {
+		t.Fatalf("unexpected status %s", ord.Status)
+	}
 
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/client/orders", nil)
