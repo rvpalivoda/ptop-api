@@ -8,6 +8,7 @@ import {
   profile,
   recoverChallenge,
   changePassword,
+  verifyPassword,
 } from "./auth";
 
 const localStorageMock = (() => {
@@ -130,6 +131,23 @@ describe("auth api", () => {
       new_password: "new",
       confirm_password: "new",
     });
+  });
+
+  it("verifyPassword отправляет пароль и возвращает результат", async () => {
+    const mockFetch = vi
+      .spyOn(global, "fetch" as any)
+      .mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({ verified: true }),
+      } as any);
+
+    const res = await verifyPassword("pwd");
+    const [url, opts] = mockFetch.mock.calls[0];
+    expect((url as string).endsWith("/auth/verify-password")).toBe(true);
+    const body = JSON.parse(opts.body);
+    expect(body).toEqual({ password: "pwd" });
+    expect(res).toEqual({ verified: true });
   });
 
   it("refresh использует refresh_token", async () => {

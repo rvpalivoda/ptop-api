@@ -94,6 +94,14 @@ type Enable2FAResponse struct {
 	URL    string `json:"url"`
 }
 
+type VerifyPasswordRequest struct {
+	Password string `json:"password"`
+}
+
+type VerifyPasswordResponse struct {
+	Verified bool `json:"verified"`
+}
+
 type ProfileResponse struct {
 	Username     string `json:"username"`
 	TwoFAEnabled bool   `json:"twofa_enabled"`
@@ -391,6 +399,43 @@ func Logout(db *gorm.DB) gin.HandlerFunc {
 		clientID, _ := clientIDVal.(string)
 		db.Where("client_id = ?", clientID).Delete(&models.Token{})
 		c.JSON(http.StatusOK, StatusResponse{Status: "logged out"})
+	}
+}
+
+// VerifyPassword godoc
+// @Summary Проверка текущего пароля
+// @Tags auth
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param input body VerifyPasswordRequest true "пароль"
+// @Success 200 {object} VerifyPasswordResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
+// @Router /auth/verify-password [post]
+func VerifyPassword(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var r VerifyPasswordRequest
+		if err := c.BindJSON(&r); err != nil {
+			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "invalid json"})
+			return
+		}
+		clientIDVal, ok := c.Get("client_id")
+		if !ok {
+			c.JSON(http.StatusUnauthorized, ErrorResponse{Error: "no client"})
+			return
+		}
+		clientID, _ := clientIDVal.(string)
+		var client models.Client
+		if err := db.Where("id = ?", clientID).First(&client).Error; err != nil {
+			c.JSON(http.StatusUnauthorized, ErrorResponse{Error: "invalid client"})
+			return
+		}
+		if client.Password == nil || bcrypt.CompareHashAndPassword([]byte(*client.Password), []byte(r.Password)) != nil {
+			c.JSON(http.StatusUnauthorized, ErrorResponse{Error: "invalid password"})
+			return
+		}
+		c.JSON(http.StatusOK, VerifyPasswordResponse{Verified: true})
 	}
 }
 

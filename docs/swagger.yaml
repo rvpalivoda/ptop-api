@@ -169,6 +169,16 @@ definitions:
       refresh_token:
         type: string
     type: object
+  handlers.VerifyPasswordRequest:
+    properties:
+      password:
+        type: string
+    type: object
+  handlers.VerifyPasswordResponse:
+    properties:
+      verified:
+        type: boolean
+    type: object
   handlers.WalletRequest:
     properties:
       asset_id:
@@ -736,6 +746,37 @@ paths:
       security:
       - BearerAuth: []
       summary: Смена имени пользователя
+      tags:
+      - auth
+  /auth/verify-password:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: пароль
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.VerifyPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.VerifyPasswordResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Проверка текущего пароля
       tags:
       - auth
   /client/balances:

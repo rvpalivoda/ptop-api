@@ -250,3 +250,49 @@ func TestLogout(t *testing.T) {
 		t.Fatalf("profile status %d", w.Code)
 	}
 }
+
+func TestVerifyPassword(t *testing.T) {
+	_, r, _ := setupTest(t)
+	// register user
+	body := `{"username":"veruser","password":"pass","password_confirm":"pass"}`
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/auth/register", bytes.NewBufferString(body))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+
+	// login to get token
+	body = `{"username":"veruser","password":"pass"}`
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("POST", "/auth/login", bytes.NewBufferString(body))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+	var log tokenResp
+	json.Unmarshal(w.Body.Bytes(), &log)
+
+	// correct password
+	body = `{"password":"pass"}`
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("POST", "/auth/verify-password", bytes.NewBufferString(body))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+log.AccessToken)
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("verify status %d", w.Code)
+	}
+	var vresp VerifyPasswordResponse
+	json.Unmarshal(w.Body.Bytes(), &vresp)
+	if !vresp.Verified {
+		t.Fatalf("expected verified true")
+	}
+
+	// wrong password
+	body = `{"password":"wrong"}`
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("POST", "/auth/verify-password", bytes.NewBufferString(body))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+log.AccessToken)
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusUnauthorized {
+		t.Fatalf("verify wrong status %d", w.Code)
+	}
+}
