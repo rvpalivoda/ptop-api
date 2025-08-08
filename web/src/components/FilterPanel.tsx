@@ -1,17 +1,40 @@
 
-import { Search, Filter } from 'lucide-react';
-
 interface FilterPanelProps {
   filters: {
-    currency: string;
+    fromAsset: string;
+    toAsset: string;
+    minAmount: string;
+    maxAmount: string;
     paymentMethod: string;
-    amount: string;
   };
-  onFiltersChange: (filters: any) => void;
+  onFiltersChange: (filters: {
+    fromAsset: string;
+    toAsset: string;
+    minAmount: string;
+    maxAmount: string;
+    paymentMethod: string;
+  }) => void;
   activeTab: 'buy' | 'sell';
   onTabChange: (tab: 'buy' | 'sell') => void;
   onCreate: () => void;
 }
+
+const assets = [
+  { value: 'all', label: 'Все' },
+  { value: 'BTC', label: 'BTC' },
+  { value: 'ETH', label: 'ETH' },
+  { value: 'USDT', label: 'USDT' },
+  { value: 'BNB', label: 'BNB' }
+];
+
+const paymentMethods = [
+  { value: 'all', label: 'Все способы' },
+  { value: 'sberbank', label: 'Сбербанк' },
+  { value: 'tinkoff', label: 'Тинькофф' },
+  { value: 'alfa', label: 'Альфа-Банк' },
+  { value: 'qiwi', label: 'QIWI' },
+  { value: 'yandex', label: 'ЮMoney' }
+];
 
 export const FilterPanel = ({
   filters,
@@ -20,97 +43,88 @@ export const FilterPanel = ({
   onTabChange,
   onCreate
 }: FilterPanelProps) => {
-  const currencies = [
-    { value: 'all', label: 'Все валюты' },
-    { value: 'BTC', label: 'Bitcoin (BTC)' },
-    { value: 'ETH', label: 'Ethereum (ETH)' },
-    { value: 'USDT', label: 'Tether (USDT)' },
-    { value: 'BNB', label: 'Binance Coin (BNB)' }
-  ];
-
-  const paymentMethods = [
-    { value: 'all', label: 'Все способы' },
-    { value: 'sberbank', label: 'Сбербанк' },
-    { value: 'tinkoff', label: 'Тинькофф' },
-    { value: 'alfa', label: 'Альфа-Банк' },
-    { value: 'qiwi', label: 'QIWI' },
-    { value: 'yandex', label: 'ЮMoney' }
-  ];
-
   return (
-    <div className="bg-gray-800 rounded-lg p-6 border border-gray-700 mb-3">
-      <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end">
-
-        {/* Currency Filter */}
-        <div className="sm:w-48">
-          <label className="block text-sm font-medium text-gray-300 mb-1">
-            Криптовалюта
-          </label>
-          <select
-            value={filters.currency}
-            onChange={(e) => onFiltersChange({ ...filters, currency: e.target.value })}
-            className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            {currencies.map((currency) => (
-              <option key={currency.value} value={currency.value}>
-                {currency.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Payment Method Filter */}
-        <div className="sm:w-48">
-          <label className="block text-sm font-medium text-gray-300 mb-1">
-            Способ оплаты
-          </label>
-          <select
-            value={filters.paymentMethod}
-            onChange={(e) => onFiltersChange({ ...filters, paymentMethod: e.target.value })}
-            className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            {paymentMethods.map((method) => (
-              <option key={method.value} value={method.value}>
-                {method.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Clear Filters Button */}
-        <button
-          onClick={() => onFiltersChange({ currency: 'all', paymentMethod: 'all', amount: '' })}
-          className="sm:w-auto py-2 px-4 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg transition-colors"
+    <div className="bg-gray-800 rounded-lg p-4 border border-gray-700 mb-3">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <select
+          data-testid="from-asset"
+          value={filters.fromAsset}
+          onChange={(e) => onFiltersChange({ ...filters, fromAsset: e.target.value })}
+          className="bg-gray-700 border border-gray-600 rounded-md px-2 py-1 text-white focus:outline-none"
         >
-          Очистить фильтры
-        </button>
+          {assets.map((a) => (
+            <option key={a.value} value={a.value}>
+              {a.label}
+            </option>
+          ))}
+        </select>
+
+        <select
+          data-testid="to-asset"
+          value={filters.toAsset}
+          onChange={(e) => onFiltersChange({ ...filters, toAsset: e.target.value })}
+          className="bg-gray-700 border border-gray-600 rounded-md px-2 py-1 text-white focus:outline-none"
+        >
+          {assets.map((a) => (
+            <option key={a.value} value={a.value}>
+              {a.label}
+            </option>
+          ))}
+        </select>
+
+        <input
+          data-testid="min-amount"
+          type="number"
+          placeholder="Мин"
+          value={filters.minAmount}
+          onChange={(e) => onFiltersChange({ ...filters, minAmount: e.target.value })}
+          className="w-24 bg-gray-700 border border-gray-600 rounded-md px-2 py-1 text-white placeholder-gray-400 focus:outline-none"
+        />
+
+        <input
+          data-testid="max-amount"
+          type="number"
+          placeholder="Макс"
+          value={filters.maxAmount}
+          onChange={(e) => onFiltersChange({ ...filters, maxAmount: e.target.value })}
+          className="w-24 bg-gray-700 border border-gray-600 rounded-md px-2 py-1 text-white placeholder-gray-400 focus:outline-none"
+        />
+
+        <select
+          data-testid="payment-method"
+          value={filters.paymentMethod}
+          onChange={(e) => onFiltersChange({ ...filters, paymentMethod: e.target.value })}
+          className="bg-gray-700 border border-gray-600 rounded-md px-2 py-1 text-white focus:outline-none"
+        >
+          {paymentMethods.map((m) => (
+            <option key={m.value} value={m.value}>
+              {m.label}
+            </option>
+          ))}
+        </select>
+
+        <div className="flex rounded-md overflow-hidden border border-gray-600">
+          <button
+            data-testid="buy-tab"
+            onClick={() => onTabChange('buy')}
+            className={`px-3 py-1 text-sm ${
+              activeTab === 'buy' ? 'bg-green-600 text-white' : 'text-gray-300'
+            }`}
+          >
+            Купить
+          </button>
+          <button
+            data-testid="sell-tab"
+            onClick={() => onTabChange('sell')}
+            className={`px-3 py-1 text-sm ${
+              activeTab === 'sell' ? 'bg-red-600 text-white' : 'text-gray-300'
+            }`}
+          >
+            Продать
+          </button>
+        </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex space-x-1 mt-4 bg-gray-700 rounded-lg p-1">
-        <button
-          onClick={() => onTabChange('buy')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            activeTab === 'buy'
-              ? 'bg-green-600 text-white'
-              : 'text-gray-400 hover:text-white'
-          }`}
-        >
-          Купить
-        </button>
-        <button
-          onClick={() => onTabChange('sell')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            activeTab === 'sell'
-              ? 'bg-red-600 text-white'
-              : 'text-gray-400 hover:text-white'
-          }`}
-        >
-          Продать
-        </button>
-      </div>
-
-      {/* Create Order Button */}
       <div className="mt-4">
         <button
           onClick={onCreate}
@@ -122,3 +136,4 @@ export const FilterPanel = ({
     </div>
   );
 };
+
