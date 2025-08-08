@@ -97,19 +97,39 @@ func TestRecoverFlow(t *testing.T) {
 		t.Fatalf("positions %v", ch.Positions)
 	}
 
-	// recover with first three words
+	// recover with first three words and new password
 	phrases := []RecoverPhrase{
 		{Position: 1, Word: reg.Mnemonic[0].Word},
 		{Position: 2, Word: reg.Mnemonic[1].Word},
 		{Position: 3, Word: reg.Mnemonic[2].Word},
 	}
-	reqBody, _ := json.Marshal(RecoverRequest{Username: "recuser", Phrases: phrases})
+	reqBody, _ := json.Marshal(RecoverRequest{Username: "recuser", Phrases: phrases, NewPassword: "newpass", PasswordConfirm: "newpass"})
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("POST", "/auth/recover", bytes.NewReader(reqBody))
 	req.Header.Set("Content-Type", "application/json")
 	r.ServeHTTP(w, req)
 	if w.Code != http.StatusOK {
 		t.Fatalf("recover status %d", w.Code)
+	}
+
+	// login with old password should fail
+	w = httptest.NewRecorder()
+	body = `{"username":"recuser","password":"pass"}`
+	req, _ = http.NewRequest("POST", "/auth/login", bytes.NewBufferString(body))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusUnauthorized {
+		t.Fatalf("login old status %d", w.Code)
+	}
+
+	// login with new password should succeed
+	w = httptest.NewRecorder()
+	body = `{"username":"recuser","password":"newpass"}`
+	req, _ = http.NewRequest("POST", "/auth/login", bytes.NewBufferString(body))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("login new status %d", w.Code)
 	}
 }
 
