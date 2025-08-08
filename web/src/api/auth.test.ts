@@ -9,6 +9,7 @@ import {
   recoverChallenge,
   changePassword,
   verifyPassword,
+  logout,
 } from "./auth";
 
 const localStorageMock = (() => {
@@ -158,6 +159,22 @@ describe("auth api", () => {
     const body = JSON.parse(opts.body);
     expect(body).toEqual({ password: "pwd" });
     expect(res).toEqual({ verified: true });
+  });
+
+  it("logout делает POST без тела", async () => {
+    const mockFetch = vi
+      .spyOn(global, "fetch" as any)
+      .mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({ status: "ok" }),
+      } as any);
+
+    await logout();
+    const [url, opts] = mockFetch.mock.calls[0];
+    expect((url as string).endsWith("/auth/logout")).toBe(true);
+    expect(opts.method).toBe("POST");
+    expect(opts.body).toBeUndefined();
   });
 
   it("refresh использует refresh_token", async () => {
