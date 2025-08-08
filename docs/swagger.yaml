@@ -125,6 +125,26 @@ definitions:
           type: integer
         type: array
     type: object
+  handlers.RecoverPhrase:
+    properties:
+      position:
+        type: integer
+      word:
+        type: string
+    type: object
+  handlers.RecoverRequest:
+    properties:
+      new_password:
+        type: string
+      password_confirm:
+        type: string
+      phrases:
+        items:
+          $ref: '#/definitions/handlers.RecoverPhrase'
+        type: array
+      username:
+        type: string
+    type: object
   handlers.RefreshRequest:
     properties:
       refresh_token:
@@ -629,6 +649,39 @@ paths:
       security:
       - BearerAuth: []
       summary: Профиль клиента
+      tags:
+      - auth
+  /auth/recover:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: фразы и новый пароль
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.RecoverRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.TokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Восстановление доступа
       tags:
       - auth
   /auth/recover/{username}:

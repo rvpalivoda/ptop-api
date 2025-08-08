@@ -65,8 +65,10 @@ type RecoverPhrase struct {
 }
 
 type RecoverRequest struct {
-	Username string          `json:"username"`
-	Phrases  []RecoverPhrase `json:"phrases"`
+	Username        string          `json:"username"`
+	Phrases         []RecoverPhrase `json:"phrases"`
+	NewPassword     string          `json:"new_password"`
+	PasswordConfirm string          `json:"password_confirm"`
 }
 
 type ChangePasswordRequest struct {
@@ -304,18 +306,18 @@ func RecoverChallenge(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
+// Recover godoc
+// @Summary Восстановление доступа
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param input body RecoverRequest true "фразы и новый пароль"
+// @Success 200 {object} TokenResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Router /auth/recover [post]
 func Recover(db *gorm.DB, ttl map[string]time.Duration) gin.HandlerFunc {
-	// Recover godoc
-	// @Summary Восстановление доступа
-	// @Tags auth
-	// @Accept json
-	// @Produce json
-	// @Param input body RecoverRequest true "фразы для восстановления"
-	// @Success 200 {object} TokenResponse
-	// @Failure 400 {object} ErrorResponse
-	// @Failure 401 {object} ErrorResponse
-	// @Failure 404 {object} ErrorResponse
-	// @Router /auth/recover [post]
 	return func(c *gin.Context) {
 		var r RecoverRequest
 		if err := c.BindJSON(&r); err != nil {
@@ -346,6 +348,21 @@ func Recover(db *gorm.DB, ttl map[string]time.Duration) gin.HandlerFunc {
 				c.JSON(http.StatusUnauthorized, ErrorResponse{Error: "invalid phrase"})
 				return
 			}
+		}
+		if r.NewPassword != r.PasswordConfirm {
+			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "passwords do not match"})
+			return
+		}
+		hash, err := bcrypt.GenerateFromPassword([]byte(r.NewPassword), bcrypt.DefaultCost)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "hash error"})
+			return
+		}
+		pwd := string(hash)
+		client.Password = &pwd
+		if err := db.Save(&client).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
+			return
 		}
 		accessStr, _ := utils.GenerateNanoID()
 		refreshStr, _ := utils.GenerateNanoID()
