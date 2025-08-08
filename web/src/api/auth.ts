@@ -6,13 +6,19 @@ interface TokenResponse {
   refresh_token: string;
 }
 
-export interface MnemonicResponse {
-  mnemonic: string;
+export interface MnemonicWord {
+  position: number;
+  word: string;
 }
 
-export interface RegisterResponse extends MnemonicResponse {
+export interface RegisterResponse {
   access: string;
   refresh: string;
+  mnemonic: MnemonicWord[];
+}
+
+export interface MnemonicResponse {
+  mnemonic: string;
 }
 
 export async function login(
@@ -32,7 +38,7 @@ export async function register(
   passwordConfirm: string,
 ): Promise<RegisterResponse> {
   const { access_token, refresh_token, mnemonic } = await apiRequest<
-    TokenResponse & { mnemonic: string }
+    TokenResponse & { mnemonic: MnemonicWord[] }
   >("/auth/register", {
     method: "POST",
     body: JSON.stringify({

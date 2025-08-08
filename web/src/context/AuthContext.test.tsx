@@ -64,7 +64,14 @@ describe("AuthContext", () => {
 
   it("register возвращает мнемонику", async () => {
     const { register } = await import("@/api/auth");
-    vi.mocked(register).mockResolvedValue({ access: "a", refresh: "r", mnemonic: "one two" });
+    vi.mocked(register).mockResolvedValue({
+      access: "a",
+      refresh: "r",
+      mnemonic: [
+        { position: 1, word: "one" },
+        { position: 2, word: "two" },
+      ],
+    });
 
     let ctx: ReturnType<typeof useAuth> | undefined;
     const Consumer = () => {
@@ -88,7 +95,14 @@ describe("AuthContext", () => {
     });
 
     expect(register).toHaveBeenCalledWith("u", "p", "p");
-    expect(res).toEqual({ access: "a", refresh: "r", mnemonic: "one two" });
+    expect(res).toEqual({
+      access: "a",
+      refresh: "r",
+      mnemonic: [
+        { position: 1, word: "one" },
+        { position: 2, word: "two" },
+      ],
+    });
   });
 
   it("refresh обновляет токены и userInfo", async () => {

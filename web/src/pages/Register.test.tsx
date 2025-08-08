@@ -6,7 +6,7 @@ import Register from './Register';
 const registerMock = vi.fn();
 vi.mock('@/context', () => ({ useAuth: () => ({ register: registerMock }) }));
 
-const words = Array.from({ length: 12 }, (_, i) => `w${i + 1}`);
+const words = Array.from({ length: 12 }, (_, i) => ({ position: i + 1, word: `w${i + 1}` }));
 
 // Mock clipboard
 Object.assign(navigator, {
