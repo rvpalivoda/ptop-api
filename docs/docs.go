@@ -42,6 +42,56 @@ const docTemplate = `{
                 }
             }
         },
+        "/auth/2fa/disable": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Отключение двухфакторной аутентификации",
+                "parameters": [
+                    {
+                        "description": "подтверждение пароля",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.Disable2FARequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.StatusResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/2fa/enable": {
             "post": {
                 "security": [
@@ -1223,6 +1273,30 @@ const docTemplate = `{
                         "description": "ID актива к",
                         "name": "to_asset",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "минимальная сумма",
+                        "name": "min_amount",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "максимальная сумма",
+                        "name": "max_amount",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID способа оплаты",
+                        "name": "payment_method",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "тип объявления: buy или sell",
+                        "name": "type",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1546,6 +1620,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "wallet_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.Disable2FARequest": {
+            "type": "object",
+            "properties": {
+                "password": {
                     "type": "string"
                 }
             }

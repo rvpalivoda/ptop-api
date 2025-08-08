@@ -81,6 +81,7 @@ func setupTest(t *testing.T) (*gorm.DB, *gin.Engine, map[string]time.Duration) {
 	auth.POST("/username", ChangeUsername(db))
 	auth.POST("/pincode", SetPinCode(db))
 	auth.POST("/2fa/enable", Enable2FA(db))
+	auth.POST("/2fa/disable", Disable2FA(db))
 	auth.POST("/verify-password", VerifyPassword(db))
 	auth.POST("/password", ChangePassword(db))
 

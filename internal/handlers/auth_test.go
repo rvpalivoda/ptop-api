@@ -217,13 +217,26 @@ func TestProfileAndSettings(t *testing.T) {
 		t.Fatalf("enable2fa %d", w.Code)
 	}
 
+	// disable 2fa
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("POST", "/auth/2fa/disable", bytes.NewBufferString(body))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+log.AccessToken)
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("disable2fa %d", w.Code)
+	}
+
 	// check profile flags
 	var client models.Client
 	if err := db.Where("username = ?", "newname").First(&client).Error; err != nil {
 		t.Fatalf("db lookup: %v", err)
 	}
-	if !client.TwoFAEnabled || client.PinCode == nil {
-		t.Fatalf("settings not saved")
+	if client.TwoFAEnabled || client.TOTPSecret != nil {
+		t.Fatalf("2fa not disabled")
+	}
+	if client.PinCode == nil {
+		t.Fatalf("pincode missing")
 	}
 }
 
