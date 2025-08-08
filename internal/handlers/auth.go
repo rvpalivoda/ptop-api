@@ -96,6 +96,10 @@ type Enable2FAResponse struct {
 	URL    string `json:"url"`
 }
 
+type Disable2FARequest struct {
+	Password string `json:"password"`
+}
+
 type VerifyPasswordRequest struct {
 	Password string `json:"password"`
 }
@@ -689,5 +693,52 @@ func Enable2FA(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		c.JSON(http.StatusOK, Enable2FAResponse{Secret: secret, URL: key.URL()})
+	}
+}
+
+// Disable2FA godoc
+// @Summary Отключение двухфакторной аутентификации
+// @Tags auth
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param input body Disable2FARequest true "подтверждение пароля"
+// @Success 200 {object} StatusResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
+// @Router /auth/2fa/disable [post]
+func Disable2FA(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var r Disable2FARequest
+		if err := c.BindJSON(&r); err != nil {
+			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "invalid json"})
+			return
+		}
+		clientIDVal, ok := c.Get("client_id")
+		if !ok {
+			c.JSON(http.StatusUnauthorized, ErrorResponse{Error: "no client"})
+			return
+		}
+		clientID, _ := clientIDVal.(string)
+		var client models.Client
+		if err := db.Where("id = ?", clientID).First(&client).Error; err != nil {
+			c.JSON(http.StatusUnauthorized, ErrorResponse{Error: "invalid client"})
+			return
+		}
+		if client.Password == nil || bcrypt.CompareHashAndPassword([]byte(*client.Password), []byte(r.Password)) != nil {
+			c.JSON(http.StatusUnauthorized, ErrorResponse{Error: "invalid password"})
+			return
+		}
+		if !client.TwoFAEnabled {
+			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "2fa not enabled"})
+			return
+		}
+		client.TwoFAEnabled = false
+		client.TOTPSecret = nil
+		if err := db.Save(&client).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
+			return
+		}
+		c.JSON(http.StatusOK, StatusResponse{Status: "2fa disabled"})
 	}
 }

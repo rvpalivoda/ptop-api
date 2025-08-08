@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { enable2fa } from "./two_factor";
+import { enable2fa, disable2fa } from "./two_factor";
 
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
@@ -42,5 +42,19 @@ describe("two_factor api", () => {
     });
     expect(res).toEqual({ secret: "sec", url: "otp" });
   });
-});
 
+  it("disable2fa отправляет пароль", async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ status: "2fa disabled" }),
+    } as any);
+
+    await disable2fa("pass");
+    expect(mockFetch.mock.calls[0][0]).toContain("/auth/2fa/disable");
+    expect(mockFetch.mock.calls[0][1]).toMatchObject({
+      method: "POST",
+      body: JSON.stringify({ password: "pass" }),
+    });
+  });
+});

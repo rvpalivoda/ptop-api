@@ -39,6 +39,11 @@ definitions:
     - amount
     - wallet_id
     type: object
+  handlers.Disable2FARequest:
+    properties:
+      password:
+        type: string
+    type: object
   handlers.Enable2FARequest:
     properties:
       password:
@@ -491,6 +496,37 @@ paths:
       summary: Список активных активов
       tags:
       - reference
+  /auth/2fa/disable:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: подтверждение пароля
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.Disable2FARequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.StatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Отключение двухфакторной аутентификации
+      tags:
+      - auth
   /auth/2fa/enable:
     post:
       consumes:
@@ -1223,6 +1259,22 @@ paths:
       - description: ID актива к
         in: query
         name: to_asset
+        type: string
+      - description: минимальная сумма
+        in: query
+        name: min_amount
+        type: string
+      - description: максимальная сумма
+        in: query
+        name: max_amount
+        type: string
+      - description: ID способа оплаты
+        in: query
+        name: payment_method
+        type: string
+      - description: 'тип объявления: buy или sell'
+        in: query
+        name: type
         type: string
       produces:
       - application/json
