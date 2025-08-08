@@ -1,5 +1,17 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+
+vi.mock('@/api/dictionaries', () => ({
+  getAssets: vi.fn().mockResolvedValue([
+    { id: 'BTC', name: 'BTC' },
+    { id: 'ETH', name: 'ETH' },
+  ]),
+  getPaymentMethods: vi.fn().mockResolvedValue([
+    { id: 'pm1', name: 'Сбербанк' },
+    { id: 'pm2', name: 'Тинькофф' },
+  ]),
+}));
+
 import { FilterPanel } from './FilterPanel';
 
 describe('FilterPanel', () => {
@@ -11,7 +23,7 @@ describe('FilterPanel', () => {
     paymentMethod: 'all'
   };
 
-  it('вызывает onFiltersChange при смене актива', () => {
+  it('вызывает onFiltersChange при смене актива', async () => {
     const onFiltersChange = vi.fn();
     render(
       <FilterPanel
@@ -23,7 +35,8 @@ describe('FilterPanel', () => {
       />
     );
 
-    fireEvent.change(screen.getByTestId('from-asset'), {
+    const select = (await screen.findAllByTestId('from-asset'))[0];
+    fireEvent.change(select, {
       target: { value: 'BTC' }
     });
 
@@ -33,7 +46,7 @@ describe('FilterPanel', () => {
     });
   });
 
-  it('переключает тип сделки', () => {
+  it('переключает тип сделки', async () => {
     const onTabChange = vi.fn();
     render(
       <FilterPanel
@@ -45,6 +58,7 @@ describe('FilterPanel', () => {
       />
     );
 
+    await screen.findAllByTestId('from-asset');
     const sellBtn = screen.getAllByTestId('sell-tab').pop();
     if (sellBtn) {
       fireEvent.click(sellBtn);
