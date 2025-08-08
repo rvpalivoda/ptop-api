@@ -294,16 +294,53 @@ func DisableOffer(db *gorm.DB) gin.HandlerFunc {
 // @Produce json
 // @Param from_asset query string false "ID актива от"
 // @Param to_asset query string false "ID актива к"
+// @Param min_amount query string false "минимальная сумма"
+// @Param max_amount query string false "максимальная сумма"
+// @Param payment_method query string false "ID способа оплаты"
+// @Param type query string false "тип объявления: buy или sell"
 // @Success 200 {array} models.Offer
 // @Router /offers [get]
 func ListOffers(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		query := db.Where("is_enabled = ? AND ttl > ?", true, time.Now())
+		query := db.Model(&models.Offer{}).Where("is_enabled = ? AND ttl > ?", true, time.Now()).Distinct()
 		if fa := c.Query("from_asset"); fa != "" {
 			query = query.Where("from_asset_id = ?", fa)
 		}
 		if ta := c.Query("to_asset"); ta != "" {
 			query = query.Where("to_asset_id = ?", ta)
+		}
+		if min := c.Query("min_amount"); min != "" {
+			v, err := decimal.NewFromString(min)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, ErrorResponse{Error: "invalid min_amount"})
+				return
+			}
+			query = query.Where("max_amount >= ?", v)
+		}
+		if max := c.Query("max_amount"); max != "" {
+			v, err := decimal.NewFromString(max)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, ErrorResponse{Error: "invalid max_amount"})
+				return
+			}
+			query = query.Where("min_amount <= ?", v)
+		}
+		if pm := c.Query("payment_method"); pm != "" {
+			query = query.Joins("JOIN offer_client_payment_methods ocpm ON ocpm.offer_id = offers.id").
+				Joins("JOIN client_payment_methods cpm ON cpm.id = ocpm.client_payment_method_id").
+				Where("cpm.payment_method_id = ?", pm)
+		}
+		if t := c.Query("type"); t != "" {
+			switch t {
+			case "buy":
+				query = query.Joins("JOIN assets fa ON fa.id = offers.from_asset_id").
+					Joins("JOIN assets ta ON ta.id = offers.to_asset_id").
+					Where("fa.type = ? AND ta.type = ?", models.AssetTypeFiat, models.AssetTypeCrypto)
+			case "sell":
+				query = query.Joins("JOIN assets fa ON fa.id = offers.from_asset_id").
+					Joins("JOIN assets ta ON ta.id = offers.to_asset_id").
+					Where("fa.type = ? AND ta.type = ?", models.AssetTypeCrypto, models.AssetTypeFiat)
+			}
 		}
 		var offers []models.Offer
 		if err := query.Find(&offers).Error; err != nil {

@@ -213,3 +213,143 @@ func TestOfferLifecycle(t *testing.T) {
 		t.Fatalf("offer not disabled")
 	}
 }
+
+func TestListOffersFilters(t *testing.T) {
+	db, r, _ := setupTest(t)
+
+	// register and login first user
+	body := `{"username":"user1","password":"pass","password_confirm":"pass"}`
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/auth/register", bytes.NewBufferString(body))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+
+	w = httptest.NewRecorder()
+	body = `{"username":"user1","password":"pass"}`
+	req, _ = http.NewRequest("POST", "/auth/login", bytes.NewBufferString(body))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("login1 status %d", w.Code)
+	}
+	var tok1 struct {
+		AccessToken string `json:"access_token"`
+	}
+	json.Unmarshal(w.Body.Bytes(), &tok1)
+
+	// register and login second user
+	w = httptest.NewRecorder()
+	body = `{"username":"user2","password":"pass","password_confirm":"pass"}`
+	req, _ = http.NewRequest("POST", "/auth/register", bytes.NewBufferString(body))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+
+	w = httptest.NewRecorder()
+	body = `{"username":"user2","password":"pass"}`
+	req, _ = http.NewRequest("POST", "/auth/login", bytes.NewBufferString(body))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("login2 status %d", w.Code)
+	}
+	var tok2 struct {
+		AccessToken string `json:"access_token"`
+	}
+	json.Unmarshal(w.Body.Bytes(), &tok2)
+
+	// prepare assets and payment methods
+	usd := models.Asset{Name: "USD_f", Type: models.AssetTypeFiat, IsActive: true}
+	btc := models.Asset{Name: "BTC_c", Type: models.AssetTypeCrypto, IsActive: true}
+	country := models.Country{Name: "CountryF"}
+	pm1 := models.PaymentMethod{Name: "Bank1", MethodGroup: "bank", IsRealtime: false, FeeSide: models.FeeSideSender, KycLevelHint: models.KycLevelHintLow}
+	pm2 := models.PaymentMethod{Name: "Bank2", MethodGroup: "bank", IsRealtime: false, FeeSide: models.FeeSideSender, KycLevelHint: models.KycLevelHintLow}
+	if err := db.Create(&usd).Error; err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Create(&btc).Error; err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Create(&country).Error; err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Create(&pm1).Error; err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Create(&pm2).Error; err != nil {
+		t.Fatal(err)
+	}
+
+	// client payment methods for each user
+	var c1, c2 models.Client
+	db.Where("username = ?", "user1").First(&c1)
+	db.Where("username = ?", "user2").First(&c2)
+	cpm1 := models.ClientPaymentMethod{ClientID: c1.ID, CountryID: country.ID, PaymentMethodID: pm1.ID, Name: "pm1"}
+	cpm2 := models.ClientPaymentMethod{ClientID: c2.ID, CountryID: country.ID, PaymentMethodID: pm2.ID, Name: "pm2"}
+	if err := db.Create(&cpm1).Error; err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Create(&cpm2).Error; err != nil {
+		t.Fatal(err)
+	}
+
+	// offer1: buy crypto (USD -> BTC)
+	reqBody := OfferRequest{
+		MaxAmount:              "100",
+		MinAmount:              "10",
+		Amount:                 "50",
+		Price:                  "1",
+		FromAssetID:            usd.ID,
+		ToAssetID:              btc.ID,
+		ClientPaymentMethodIDs: []string{cpm1.ID},
+	}
+	b, _ := json.Marshal(reqBody)
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("POST", "/client/offers", bytes.NewReader(b))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+tok1.AccessToken)
+	r.ServeHTTP(w, req)
+	var off1 models.Offer
+	json.Unmarshal(w.Body.Bytes(), &off1)
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("POST", "/client/offers/"+off1.ID+"/enable", nil)
+	req.Header.Set("Authorization", "Bearer "+tok1.AccessToken)
+	r.ServeHTTP(w, req)
+
+	// offer2: sell crypto (BTC -> USD)
+	reqBody = OfferRequest{
+		MaxAmount:              "500",
+		MinAmount:              "200",
+		Amount:                 "300",
+		Price:                  "1",
+		FromAssetID:            btc.ID,
+		ToAssetID:              usd.ID,
+		ClientPaymentMethodIDs: []string{cpm2.ID},
+	}
+	b, _ = json.Marshal(reqBody)
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("POST", "/client/offers", bytes.NewReader(b))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+tok2.AccessToken)
+	r.ServeHTTP(w, req)
+	var off2 models.Offer
+	json.Unmarshal(w.Body.Bytes(), &off2)
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("POST", "/client/offers/"+off2.ID+"/enable", nil)
+	req.Header.Set("Authorization", "Bearer "+tok2.AccessToken)
+	r.ServeHTTP(w, req)
+
+	// filter: buy offers with amount range and payment method
+	w = httptest.NewRecorder()
+	url := "/offers?from_asset=" + usd.ID + "&to_asset=" + btc.ID + "&min_amount=20&max_amount=80&payment_method=" + pm1.ID + "&type=buy"
+	req, _ = http.NewRequest("GET", url, nil)
+	req.Header.Set("Authorization", "Bearer "+tok1.AccessToken)
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("list status %d", w.Code)
+	}
+	var list []models.Offer
+	json.Unmarshal(w.Body.Bytes(), &list)
+	if len(list) != 1 || list[0].ID != off1.ID {
+		t.Fatalf("unexpected filter result")
+	}
+}
