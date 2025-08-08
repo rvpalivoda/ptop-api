@@ -4,9 +4,11 @@ import { OrderCard } from './OrderCard';
 interface OrderListProps {
   type: 'buy' | 'sell';
   filters: {
-    currency: string;
+    fromAsset: string;
+    toAsset: string;
+    minAmount: string;
+    maxAmount: string;
     paymentMethod: string;
-    amount: string;
   };
 }
 

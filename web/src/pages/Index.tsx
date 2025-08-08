@@ -10,9 +10,11 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState<'buy' | 'sell'>('buy');
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [filters, setFilters] = useState({
-    currency: 'all',
-    paymentMethod: 'all',
-    amount: ''
+    fromAsset: 'all',
+    toAsset: 'all',
+    minAmount: '',
+    maxAmount: '',
+    paymentMethod: 'all'
   });
 
   return (
