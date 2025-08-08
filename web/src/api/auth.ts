@@ -131,3 +131,13 @@ export interface ProfileResponse {
 export async function profile() {
   return apiRequest<ProfileResponse>("/auth/profile");
 }
+
+export interface StatusResponse {
+  status: string;
+}
+
+export async function logout() {
+  return apiRequest<StatusResponse>("/auth/logout", {
+    method: "POST",
+  });
+}

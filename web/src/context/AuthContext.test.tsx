@@ -15,6 +15,7 @@ vi.mock("@/api/auth", () => ({
   regenerateWords: vi.fn(),
   changePassword: vi.fn(),
   profile: vi.fn(),
+  logout: vi.fn(),
 }));
 vi.mock("@/api/pin", () => ({ setPinCode: vi.fn() }));
 
@@ -195,5 +196,44 @@ describe("AuthContext", () => {
     });
 
     expect(setPinCode).toHaveBeenCalledWith("pwd", "1234");
+  });
+
+  it("logout вызывает API и очищает состояние", async () => {
+    const { logout: apiLogout } = await import("@/api/auth");
+    vi.mocked(apiLogout).mockResolvedValue({ status: "ok" } as any);
+
+    localStorage.setItem(
+      "peerex_tokens",
+      JSON.stringify({ access: "a", refresh: "r" }),
+    );
+    localStorage.setItem(
+      "peerex_user_info",
+      JSON.stringify({ username: "u", twofaEnabled: false, pinCodeSet: false }),
+    );
+
+    let ctx: ReturnType<typeof useAuth> | undefined;
+    const Consumer = () => {
+      ctx = useAuth();
+      return null;
+    };
+    const container = document.createElement("div");
+    const root = createRoot(container);
+    act(() => {
+      root.render(
+        <AuthProvider>
+          <Consumer />
+        </AuthProvider>,
+      );
+    });
+
+    await act(async () => {
+      await ctx!.logout();
+    });
+
+    expect(apiLogout).toHaveBeenCalled();
+    expect(ctx!.tokens).toBeNull();
+    expect(ctx!.userInfo).toBeNull();
+    expect(localStorage.getItem("peerex_tokens")).toBeNull();
+    expect(localStorage.getItem("peerex_user_info")).toBeNull();
   });
 });

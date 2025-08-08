@@ -7,6 +7,7 @@ import {
   regenerateWords as apiRegenerate,
   changePassword as apiChangePassword,
   profile as apiProfile,
+  logout as apiLogout,
   type RegisterResponse,
   type MnemonicResponse,
   type RecoverPhrase,
@@ -101,10 +102,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const logout = async (): Promise<void> => {
-    clearTokens();
-    setTokens(null);
-    clearUserInfo();
-    setUserInfo(null);
+    try {
+      await apiLogout();
+    } finally {
+      clearTokens();
+      setTokens(null);
+      clearUserInfo();
+      setUserInfo(null);
+    }
   };
 
   const refresh = async (): Promise<void> => {
