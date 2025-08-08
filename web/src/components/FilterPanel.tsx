@@ -1,4 +1,7 @@
 
+import { useEffect, useState } from 'react';
+import { getAssets, getPaymentMethods } from '@/api/dictionaries';
+
 interface FilterPanelProps {
   filters: {
     fromAsset: string;
@@ -19,23 +22,6 @@ interface FilterPanelProps {
   onCreate: () => void;
 }
 
-const assets = [
-  { value: 'all', label: 'Все' },
-  { value: 'BTC', label: 'BTC' },
-  { value: 'ETH', label: 'ETH' },
-  { value: 'USDT', label: 'USDT' },
-  { value: 'BNB', label: 'BNB' }
-];
-
-const paymentMethods = [
-  { value: 'all', label: 'Все способы' },
-  { value: 'sberbank', label: 'Сбербанк' },
-  { value: 'tinkoff', label: 'Тинькофф' },
-  { value: 'alfa', label: 'Альфа-Банк' },
-  { value: 'qiwi', label: 'QIWI' },
-  { value: 'yandex', label: 'ЮMoney' }
-];
-
 export const FilterPanel = ({
   filters,
   onFiltersChange,
@@ -43,6 +29,40 @@ export const FilterPanel = ({
   onTabChange,
   onCreate
 }: FilterPanelProps) => {
+  const [assets, setAssets] = useState<{ value: string; label: string }[]>([
+    { value: 'all', label: 'Все' }
+  ]);
+  const [paymentMethods, setPaymentMethods] = useState<{
+    value: string;
+    label: string;
+  }[]>([{ value: 'all', label: 'Все способы' }]);
+
+  useEffect(() => {
+    async function loadDictionaries() {
+      try {
+        const a = await getAssets();
+        setAssets((prev) => [
+          prev[0],
+          ...a.map((x: any) => ({
+            value: x.id ?? x.asset_code ?? x.name ?? x,
+            label: x.asset_code ?? x.name ?? x
+          }))
+        ]);
+        const pm = await getPaymentMethods();
+        setPaymentMethods((prev) => [
+          prev[0],
+          ...pm.map((x: any) => ({
+            value: x.id ?? x.name ?? x,
+            label: x.name ?? x
+          }))
+        ]);
+      } catch (err) {
+        console.error('load dictionaries error:', err);
+      }
+    }
+    loadDictionaries();
+  }, []);
+
   return (
     <div className="bg-gray-800 rounded-lg p-4 border border-gray-700 mb-3">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">

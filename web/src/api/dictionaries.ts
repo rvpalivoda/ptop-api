@@ -12,6 +12,9 @@ export async function getDurations() {
   return apiRequest<any[]>('/durations');
 }
 
-export async function getPaymentMethods(country: string) {
-  return apiRequest<any[]>(`/payment-methods?country=${encodeURIComponent(country)}`);
+export async function getPaymentMethods(country?: string) {
+  const endpoint = country
+    ? `/payment-methods?country=${encodeURIComponent(country)}`
+    : '/payment-methods';
+  return apiRequest<any[]>(endpoint);
 }
