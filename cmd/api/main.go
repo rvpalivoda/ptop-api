@@ -65,6 +65,9 @@ func main() {
 	}))
 	r.GET("/health", handlers.Health(gormDB))
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.GET("/countries", handlers.GetCountries(gormDB))
+	r.GET("/offers", handlers.ListOffers(gormDB))
+	r.GET("/assets", handlers.GetAssets(gormDB))
 
 	auth := r.Group("/auth")
 	auth.POST("/register", handlers.Register(gormDB, cfg.TokenTypeTTL))
@@ -84,16 +87,13 @@ func main() {
 
 	api := r.Group("/")
 	api.Use(handlers.AuthMiddleware(gormDB))
-	api.GET("/countries", handlers.GetCountries(gormDB))
 	api.GET("/payment-methods", handlers.GetPaymentMethods(gormDB))
-	api.GET("/assets", handlers.GetAssets(gormDB))
 	api.GET("/client/payment-methods", handlers.ListClientPaymentMethods(gormDB))
 	api.POST("/client/payment-methods", handlers.CreateClientPaymentMethod(gormDB))
 	api.DELETE("/client/payment-methods/:id", handlers.DeleteClientPaymentMethod(gormDB))
 	api.GET("/client/wallets", handlers.ListClientWallets(gormDB))
 	api.POST("/client/wallets", handlers.CreateWallet(gormDB))
 
-	api.GET("/offers", handlers.ListOffers(gormDB))
 	api.GET("/client/offers", handlers.ListClientOffers(gormDB))
 	api.POST("/client/offers", handlers.CreateOffer(gormDB))
 	api.PUT("/client/offers/:id", handlers.UpdateOffer(gormDB))
