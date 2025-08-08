@@ -60,7 +60,10 @@ describe("auth api", () => {
         json: async () => ({
           access_token: "a",
           refresh_token: "r",
-          mnemonic: "one two",
+          mnemonic: [
+            { position: 1, word: "one" },
+            { position: 2, word: "two" },
+          ],
         }),
       } as any);
 
@@ -71,7 +74,14 @@ describe("auth api", () => {
       password: "pass",
       password_confirm: "pass",
     });
-    expect(res).toEqual({ access: "a", refresh: "r", mnemonic: "one two" });
+    expect(res).toEqual({
+      access: "a",
+      refresh: "r",
+      mnemonic: [
+        { position: 1, word: "one" },
+        { position: 2, word: "two" },
+      ],
+    });
   });
 
   it("recover отправляет правильный payload", async () => {

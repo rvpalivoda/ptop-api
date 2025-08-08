@@ -33,7 +33,13 @@ const Register = () => {
                 formData.password,
                 formData.confirmPassword,
             );
-            setMnemonic(Array.isArray(mnemonic) ? mnemonic.join(' ') : mnemonic);
+            setMnemonic(
+                Array.isArray(mnemonic)
+                    ? mnemonic
+                        .map((w: any) => (typeof w === 'string' ? w : w.word))
+                        .join(' ')
+                    : mnemonic,
+            );
             toast('Успешная регистрация');
         } catch (err) {
             console.error('Registration error:', err);
