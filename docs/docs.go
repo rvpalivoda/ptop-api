@@ -688,7 +688,7 @@ const docTemplate = `{
                 "tags": [
                     "reference"
                 ],
-                "summary": "Список активных активов с адресами кошельков клиента",
+                "summary": "Список активных активов с адресами кошельков и балансами клиента",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1639,6 +1639,9 @@ const docTemplate = `{
         "handlers.AssetWithWallet": {
             "type": "object",
             "properties": {
+                "amount": {
+                    "type": "number"
+                },
                 "id": {
                     "type": "string"
                 },
