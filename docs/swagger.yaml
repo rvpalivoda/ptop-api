@@ -155,6 +155,18 @@ definitions:
       refresh_token:
         type: string
     type: object
+  handlers.RegenerateMnemonicRequest:
+    properties:
+      password:
+        type: string
+    type: object
+  handlers.RegenerateMnemonicResponse:
+    properties:
+      mnemonic:
+        items:
+          $ref: '#/definitions/handlers.MnemonicWord'
+        type: array
+    type: object
   handlers.RegisterRequest:
     properties:
       password:
@@ -605,6 +617,37 @@ paths:
       security:
       - BearerAuth: []
       summary: Выход клиента
+      tags:
+      - auth
+  /auth/mnemonic/regenerate:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: пароль
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.RegenerateMnemonicRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.RegenerateMnemonicResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Перегенерация мнемонической фразы
       tags:
       - auth
   /auth/password:

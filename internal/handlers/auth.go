@@ -108,6 +108,14 @@ type VerifyPasswordResponse struct {
 	Verified bool `json:"verified"`
 }
 
+type RegenerateMnemonicRequest struct {
+	Password string `json:"password"`
+}
+
+type RegenerateMnemonicResponse struct {
+	Mnemonic []MnemonicWord `json:"mnemonic"`
+}
+
 type ProfileResponse struct {
 	Username     string `json:"username"`
 	TwoFAEnabled bool   `json:"twofa_enabled"`
@@ -457,6 +465,67 @@ func VerifyPassword(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		c.JSON(http.StatusOK, VerifyPasswordResponse{Verified: true})
+	}
+}
+
+// RegenerateMnemonic godoc
+// @Summary Перегенерация мнемонической фразы
+// @Tags auth
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param input body RegenerateMnemonicRequest true "пароль"
+// @Success 200 {object} RegenerateMnemonicResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
+// @Router /auth/mnemonic/regenerate [post]
+func RegenerateMnemonic(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var r RegenerateMnemonicRequest
+		if err := c.BindJSON(&r); err != nil {
+			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "invalid json"})
+			return
+		}
+		clientIDVal, ok := c.Get("client_id")
+		if !ok {
+			c.JSON(http.StatusUnauthorized, ErrorResponse{Error: "no client"})
+			return
+		}
+		clientID, _ := clientIDVal.(string)
+		var client models.Client
+		if err := db.Where("id = ?", clientID).First(&client).Error; err != nil {
+			c.JSON(http.StatusUnauthorized, ErrorResponse{Error: "invalid client"})
+			return
+		}
+		if client.Password == nil || bcrypt.CompareHashAndPassword([]byte(*client.Password), []byte(r.Password)) != nil {
+			c.JSON(http.StatusUnauthorized, ErrorResponse{Error: "invalid password"})
+			return
+		}
+		entropy, err := bip39.NewEntropy(128)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "entropy error"})
+			return
+		}
+		mnemonic, err := bip39.NewMnemonic(entropy)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "mnemonic error"})
+			return
+		}
+		words := strings.Split(mnemonic, " ")
+		hashes := make([]string, len(words))
+		respMn := make([]MnemonicWord, len(words))
+		for i, w := range words {
+			h := sha256.Sum256([]byte(w))
+			hashes[i] = hex.EncodeToString(h[:])
+			respMn[i] = MnemonicWord{Position: i + 1, Word: w}
+		}
+		hashesJSON, _ := json.Marshal(hashes)
+		client.Bip39 = datatypes.JSON(hashesJSON)
+		if err := db.Save(&client).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
+			return
+		}
+		c.JSON(http.StatusOK, RegenerateMnemonicResponse{Mnemonic: respMn})
 	}
 }
 

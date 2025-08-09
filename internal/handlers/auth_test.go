@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"bytes"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -327,5 +329,73 @@ func TestVerifyPassword(t *testing.T) {
 	r.ServeHTTP(w, req)
 	if w.Code != http.StatusUnauthorized {
 		t.Fatalf("verify wrong status %d", w.Code)
+	}
+}
+
+func TestRegenerateMnemonic(t *testing.T) {
+	db, r, _ := setupTest(t)
+	// register user
+	body := `{"username":"regenuser","password":"pass","password_confirm":"pass"}`
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/auth/register", bytes.NewBufferString(body))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+	var reg registerResp
+	json.Unmarshal(w.Body.Bytes(), &reg)
+
+	// login to get token
+	body = `{"username":"regenuser","password":"pass"}`
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("POST", "/auth/login", bytes.NewBufferString(body))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+	var log tokenResp
+	json.Unmarshal(w.Body.Bytes(), &log)
+
+	// save old hash of first word
+	h := sha256.Sum256([]byte(reg.Mnemonic[0].Word))
+	oldHash := hex.EncodeToString(h[:])
+
+	// regenerate mnemonic
+	body = `{"password":"pass"}`
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("POST", "/auth/mnemonic/regenerate", bytes.NewBufferString(body))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+log.AccessToken)
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("regenerate status %d", w.Code)
+	}
+	var resp RegenerateMnemonicResponse
+	json.Unmarshal(w.Body.Bytes(), &resp)
+	if len(resp.Mnemonic) != 12 {
+		t.Fatalf("mnemonic length %d", len(resp.Mnemonic))
+	}
+
+	// check db hash updated
+	var client models.Client
+	if err := db.Where("username = ?", "regenuser").First(&client).Error; err != nil {
+		t.Fatalf("client lookup: %v", err)
+	}
+	var hashes []string
+	json.Unmarshal(client.Bip39, &hashes)
+	h2 := sha256.Sum256([]byte(resp.Mnemonic[0].Word))
+	newHash := hex.EncodeToString(h2[:])
+	if hashes[0] != newHash {
+		t.Fatalf("hash not updated")
+	}
+	if hashes[0] == oldHash {
+		t.Fatalf("hash not changed")
+	}
+
+	// wrong password
+	body = `{"password":"wrong"}`
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("POST", "/auth/mnemonic/regenerate", bytes.NewBufferString(body))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+log.AccessToken)
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusUnauthorized {
+		t.Fatalf("regenerate wrong status %d", w.Code)
 	}
 }
