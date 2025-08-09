@@ -1,14 +1,15 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 vi.mock('@/api/dictionaries', () => ({
   getAssets: vi.fn().mockResolvedValue([
-    { id: 'BTC', name: 'BTC' },
-    { id: 'ETH', name: 'ETH' },
+    { ID: 'BTC', Name: 'BTC' },
+    { ID: 'ETH', Name: 'ETH' },
   ]),
   getPaymentMethods: vi.fn().mockResolvedValue([
-    { id: 'pm1', name: 'Сбербанк' },
-    { id: 'pm2', name: 'Тинькофф' },
+    { ID: 'pm1', Name: 'Сбербанк' },
+    { ID: 'pm2', Name: 'Тинькофф' },
   ]),
 }));
 
@@ -43,6 +44,29 @@ describe('FilterPanel', () => {
     expect(onFiltersChange).toHaveBeenCalledWith({
       ...baseFilters,
       fromAsset: 'BTC'
+    });
+  });
+
+  it('вызывает onFiltersChange при смене метода оплаты', async () => {
+    const onFiltersChange = vi.fn();
+    render(
+      <FilterPanel
+        filters={baseFilters}
+        onFiltersChange={onFiltersChange}
+        activeTab="buy"
+        onTabChange={() => {}}
+        onCreate={() => {}}
+      />
+    );
+
+    await screen.findAllByText('Сбербанк');
+    const selects = await screen.findAllByTestId('payment-method');
+    const user = userEvent.setup();
+    await user.selectOptions(selects[selects.length - 1], 'pm1');
+
+    expect(onFiltersChange).toHaveBeenCalledWith({
+      ...baseFilters,
+      paymentMethod: 'pm1'
     });
   });
 

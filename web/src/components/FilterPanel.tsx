@@ -2,6 +2,21 @@
 import { useEffect, useState } from 'react';
 import { getAssets, getPaymentMethods } from '@/api/dictionaries';
 
+type AssetItem = {
+  id?: string;
+  ID?: string;
+  asset_code?: string;
+  name?: string;
+  Name?: string;
+};
+
+type PaymentMethodItem = {
+  id?: string;
+  ID?: string;
+  name?: string;
+  Name?: string;
+};
+
 interface FilterPanelProps {
   filters: {
     fromAsset: string;
@@ -43,17 +58,17 @@ export const FilterPanel = ({
         const a = await getAssets();
         setAssets((prev) => [
           prev[0],
-          ...a.map((x: any) => ({
-            value: x.id ?? x.asset_code ?? x.name ?? x,
-            label: x.asset_code ?? x.name ?? x
+          ...a.map((x: AssetItem) => ({
+            value: x.id ?? x.ID ?? x.asset_code ?? x.name ?? x.Name ?? x,
+            label: x.asset_code ?? x.name ?? x.Name ?? x
           }))
         ]);
         const pm = await getPaymentMethods();
         setPaymentMethods((prev) => [
           prev[0],
-          ...pm.map((x: any) => ({
-            value: x.id ?? x.name ?? x,
-            label: x.name ?? x
+          ...pm.map((x: PaymentMethodItem) => ({
+            value: x.id ?? x.ID ?? x.name ?? x.Name ?? x,
+            label: x.name ?? x.Name ?? x
           }))
         ]);
       } catch (err) {
