@@ -84,6 +84,7 @@ func main() {
 	auth.POST("/2fa/enable", handlers.Enable2FA(gormDB))
 	auth.POST("/2fa/disable", handlers.Disable2FA(gormDB))
 	auth.POST("/verify-password", handlers.VerifyPassword(gormDB))
+	auth.POST("/mnemonic/regenerate", handlers.RegenerateMnemonic(gormDB))
 	auth.POST("/password", handlers.ChangePassword(gormDB))
 
 	api := r.Group("/")

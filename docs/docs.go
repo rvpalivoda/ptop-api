@@ -218,6 +218,56 @@ const docTemplate = `{
                 }
             }
         },
+        "/auth/mnemonic/regenerate": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Перегенерация мнемонической фразы",
+                "parameters": [
+                    {
+                        "description": "пароль",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.RegenerateMnemonicRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.RegenerateMnemonicResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/password": {
             "post": {
                 "security": [
@@ -1802,6 +1852,25 @@ const docTemplate = `{
             "properties": {
                 "refresh_token": {
                     "type": "string"
+                }
+            }
+        },
+        "handlers.RegenerateMnemonicRequest": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.RegenerateMnemonicResponse": {
+            "type": "object",
+            "properties": {
+                "mnemonic": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handlers.MnemonicWord"
+                    }
                 }
             }
         },
