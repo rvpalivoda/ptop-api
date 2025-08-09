@@ -68,6 +68,7 @@ func main() {
 	r.GET("/countries", handlers.GetCountries(gormDB))
 	r.GET("/offers", handlers.ListOffers(gormDB))
 	r.GET("/assets", handlers.GetAssets(gormDB))
+	r.GET("/payment-methods", handlers.GetPaymentMethods(gormDB))
 
 	auth := r.Group("/auth")
 	auth.POST("/register", handlers.Register(gormDB, cfg.TokenTypeTTL))
@@ -87,7 +88,6 @@ func main() {
 
 	api := r.Group("/")
 	api.Use(handlers.AuthMiddleware(gormDB))
-	api.GET("/payment-methods", handlers.GetPaymentMethods(gormDB))
 	api.GET("/client/payment-methods", handlers.ListClientPaymentMethods(gormDB))
 	api.POST("/client/payment-methods", handlers.CreateClientPaymentMethod(gormDB))
 	api.DELETE("/client/payment-methods/:id", handlers.DeleteClientPaymentMethod(gormDB))
