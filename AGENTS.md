@@ -2,4 +2,3 @@
 - Всегда писать тесты для handlers
 - Всегда писать swagger docs для handlers
 - Всегда используй nanoid для идентификаторов базы данных
-- Папка web в корне проекта содержит web client на базе React c использованием Tailwindcss. Для web client пишем тесты всегда
