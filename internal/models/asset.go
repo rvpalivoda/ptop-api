@@ -1,8 +1,9 @@
 package models
 
 import (
-	"gorm.io/gorm"
 	"ptop/internal/utils"
+
+	"gorm.io/gorm"
 )
 
 const (
@@ -11,11 +12,11 @@ const (
 )
 
 type Asset struct {
-	ID            string `gorm:"primaryKey;size:21"`
-	Name          string `gorm:"type:varchar(255);unique;not null"`
-	Type          string `gorm:"type:varchar(10);not null"`
-	IsActive      bool   `gorm:"not null;default:false"`
-	IsConvertible bool   `gorm:"not null;default:false"`
+	ID            string `gorm:"primaryKey;size:21" json:"id"`
+	Name          string `gorm:"type:varchar(255);unique;not null" json:"name"`
+	Type          string `gorm:"type:varchar(10);not null" json:"type"`
+	IsActive      bool   `gorm:"not null;default:false" json:"isActive"`
+	IsConvertible bool   `gorm:"not null;default:false" json:"isConvertible"`
 	Xpub          string `gorm:"type:varchar(255)" json:"-"`
 }
 

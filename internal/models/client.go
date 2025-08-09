@@ -3,20 +3,21 @@ package models
 import (
 	"time"
 
+	"ptop/internal/utils"
+
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
-	"ptop/internal/utils"
 )
 
 type Client struct {
-        ID           string         `gorm:"primaryKey;size:21"`
-        Username     string         `gorm:"type:varchar(255);not null;unique"`
-        PinCode      *string        `gorm:"type:varchar(255)"`
-        TwoFAEnabled bool           `gorm:"not null;default:false"`
-        TOTPSecret   *string        `gorm:"type:varchar(255)"`
-        Bip39        datatypes.JSON `gorm:"type:json"`
-        Password     *string        `gorm:"type:varchar(255)"`
-        RegistredAt  time.Time      `gorm:"autoCreateTime"`
+	ID           string         `gorm:"primaryKey;size:21" json:"id"`
+	Username     string         `gorm:"type:varchar(255);not null;unique" json:"username"`
+	PinCode      *string        `gorm:"type:varchar(255)" json:"pinCode"`
+	TwoFAEnabled bool           `gorm:"not null;default:false" json:"twoFAEnabled"`
+	TOTPSecret   *string        `gorm:"type:varchar(255)" json:"TOTPSecret"`
+	Bip39        datatypes.JSON `gorm:"type:json" json:"bip39"`
+	Password     *string        `gorm:"type:varchar(255)"`
+	RegistredAt  time.Time      `gorm:"autoCreateTime"`
 }
 
 func (c *Client) BeforeCreate(tx *gorm.DB) (err error) {

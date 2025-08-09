@@ -40,16 +40,16 @@ func (KycLevelHintType) GormDBDataType(db *gorm.DB, field *schema.Field) string 
 }
 
 type PaymentMethod struct {
-	ID                    string    `gorm:"primaryKey;size:21"`
-	Name                  string    `gorm:"type:varchar(255);unique;not null"`
-	MethodGroup           string    `gorm:"type:varchar(100)"`
-	Provider              string    `gorm:"type:varchar(100)"`
-	TypicalFiatCCY        string    `gorm:"type:varchar(32)"`
-	Regions               []string  `gorm:"type:json;serializer:json"`
-	Countries             []Country `gorm:"many2many:payment_method_countries"`
-	IsRealtime            bool
-	IsReversible          bool
-	SettlementMinutes     uint
+	ID                    string    `gorm:"primaryKey;size:21" json:"id"`
+	Name                  string    `gorm:"type:varchar(255);unique;not null" json:"name"`
+	MethodGroup           string    `gorm:"type:varchar(100)" json:"methodGroup"`
+	Provider              string    `gorm:"type:varchar(100)" json:"provider"`
+	TypicalFiatCCY        string    `gorm:"type:varchar(32)" json:"typicalFiatCCY"`
+	Regions               []string  `gorm:"type:json;serializer:json" json:"regions"`
+	Countries             []Country `gorm:"many2many:payment_method_countries" json:"countries"`
+	IsRealtime            bool      `json:"isRealtime"`
+	IsReversible          bool      `json:"isReversible"`
+	SettlementMinutes     uint      ``
 	ChargebackWindowHours uint
 	FeeSide               FeeSideType
 	KycLevelHint          KycLevelHintType
