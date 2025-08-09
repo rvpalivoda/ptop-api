@@ -1,5 +1,20 @@
 basePath: /
 definitions:
+  handlers.AssetWithWallet:
+    properties:
+      id:
+        type: string
+      isActive:
+        type: boolean
+      isConvertible:
+        type: boolean
+      name:
+        type: string
+      type:
+        type: string
+      value:
+        type: string
+    type: object
   handlers.ChangePasswordRequest:
     properties:
       confirm_password:
@@ -503,8 +518,6 @@ paths:
             items:
               $ref: '#/definitions/models.Asset'
             type: array
-      security:
-      - BearerAuth: []
       summary: Список активных активов
       tags:
       - reference
@@ -911,6 +924,22 @@ paths:
       summary: Проверка текущего пароля
       tags:
       - auth
+  /client/assets:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handlers.AssetWithWallet'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Список активных активов с адресами кошельков клиента
+      tags:
+      - reference
   /client/balances:
     get:
       produces:

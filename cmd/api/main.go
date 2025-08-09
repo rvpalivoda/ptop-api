@@ -94,6 +94,7 @@ func main() {
 	api.DELETE("/client/payment-methods/:id", handlers.DeleteClientPaymentMethod(gormDB))
 	api.GET("/client/wallets", handlers.ListClientWallets(gormDB))
 	api.POST("/client/wallets", handlers.CreateWallet(gormDB))
+	api.GET("/client/assets", handlers.GetClientAssets(gormDB))
 
 	api.GET("/client/offers", handlers.ListClientOffers(gormDB))
 	api.POST("/client/offers", handlers.CreateOffer(gormDB))

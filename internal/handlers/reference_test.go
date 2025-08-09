@@ -22,10 +22,12 @@ func TestReferenceHandlers(t *testing.T) {
 		KycLevelHint: models.KycLevelHintLow,
 	}
 	activeAsset := models.Asset{Name: "Ruble", Type: models.AssetTypeFiat, IsActive: true}
+	cryptoAsset := models.Asset{Name: "BTC", Type: models.AssetTypeCrypto, IsActive: true}
 	inactiveAsset := models.Asset{Name: "Inactive", Type: models.AssetTypeFiat}
 	db.Create(&country)
 	db.Create(&method)
 	db.Create(&activeAsset)
+	db.Create(&cryptoAsset)
 	db.Create(&inactiveAsset)
 
 	// register user
@@ -42,6 +44,15 @@ func TestReferenceHandlers(t *testing.T) {
 		t.Fatalf("register parse: %v", err)
 	}
 	token := reg.AccessToken
+
+	var client models.Client
+	if err := db.Where("username = ?", "refuser").First(&client).Error; err != nil {
+		t.Fatalf("find client: %v", err)
+	}
+	wallet := models.Wallet{ClientID: client.ID, AssetID: cryptoAsset.ID, Value: "addr", DerivationIndex: 1, IsEnabled: true}
+	if err := db.Create(&wallet).Error; err != nil {
+		t.Fatalf("wallet: %v", err)
+	}
 
 	// countries
 	w = httptest.NewRecorder()
@@ -75,7 +86,7 @@ func TestReferenceHandlers(t *testing.T) {
 		t.Fatalf("methods data %+v", methods)
 	}
 
-	// assets
+	// assets without wallets
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/assets", nil)
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -87,7 +98,40 @@ func TestReferenceHandlers(t *testing.T) {
 	if err := json.Unmarshal(w.Body.Bytes(), &assets); err != nil {
 		t.Fatalf("assets parse: %v", err)
 	}
-	if len(assets) != 1 || assets[0].Name != "Ruble" {
-		t.Fatalf("assets data %+v", assets)
+	if len(assets) != 2 {
+		t.Fatalf("assets length %d", len(assets))
+	}
+	names := map[string]bool{}
+	for _, a := range assets {
+		if !a.IsActive {
+			t.Fatalf("inactive asset returned: %+v", a)
+		}
+		names[a.Name] = true
+	}
+	if !names["Ruble"] || !names["BTC"] {
+		t.Fatalf("assets names %+v", names)
+	}
+
+	// client assets with wallets
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("GET", "/client/assets", nil)
+	req.Header.Set("Authorization", "Bearer "+token)
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("client assets status %d", w.Code)
+	}
+	var clientAssets []AssetWithWallet
+	if err := json.Unmarshal(w.Body.Bytes(), &clientAssets); err != nil {
+		t.Fatalf("client assets parse: %v", err)
+	}
+	if len(clientAssets) != 2 {
+		t.Fatalf("client assets length %d", len(clientAssets))
+	}
+	m := map[string]string{}
+	for _, a := range clientAssets {
+		m[a.Name] = a.Value
+	}
+	if m["Ruble"] != "" || m["BTC"] != "addr" {
+		t.Fatalf("client assets data %+v", clientAssets)
 	}
 }
