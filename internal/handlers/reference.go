@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 
 	"ptop/internal/models"
@@ -48,7 +49,8 @@ func GetPaymentMethods(db *gorm.DB) gin.HandlerFunc {
 // AssetWithWallet включает актив и адрес кошелька клиента.
 type AssetWithWallet struct {
 	models.Asset
-	Value string `json:"value"`
+	Value  string          `json:"value"`
+	Amount decimal.Decimal `json:"amount" swaggertype:"number"`
 }
 
 // GetAssets godoc
@@ -69,7 +71,7 @@ func GetAssets(db *gorm.DB) gin.HandlerFunc {
 }
 
 // GetClientAssets godoc
-// @Summary Список активных активов с адресами кошельков клиента
+// @Summary Список активных активов с адресами кошельков и балансами клиента
 // @Tags reference
 // @Security BearerAuth
 // @Produce json
@@ -85,8 +87,9 @@ func GetClientAssets(db *gorm.DB) gin.HandlerFunc {
 		clientID := clientIDVal.(string)
 		var assets []AssetWithWallet
 		if err := db.Model(&models.Asset{}).
-			Select("assets.id, assets.name, assets.type, assets.is_active, assets.is_convertible, COALESCE(wallets.value, '') AS value").
+			Select("assets.id, assets.name, assets.type, assets.is_active, assets.is_convertible, COALESCE(wallets.value, '') AS value, COALESCE(balances.amount, 0) AS amount").
 			Joins("LEFT JOIN wallets ON wallets.asset_id = assets.id AND wallets.client_id = ? AND wallets.is_enabled = ?", clientID, true).
+			Joins("LEFT JOIN balances ON balances.asset_id = assets.id AND balances.client_id = ?", clientID).
 			Where("assets.is_active = ?", true).
 			Scan(&assets).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})

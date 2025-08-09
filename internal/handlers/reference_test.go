@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/shopspring/decimal"
 	"ptop/internal/models"
 )
 
@@ -52,6 +53,10 @@ func TestReferenceHandlers(t *testing.T) {
 	wallet := models.Wallet{ClientID: client.ID, AssetID: cryptoAsset.ID, Value: "addr", DerivationIndex: 1, IsEnabled: true}
 	if err := db.Create(&wallet).Error; err != nil {
 		t.Fatalf("wallet: %v", err)
+	}
+	balance := models.Balance{ClientID: client.ID, AssetID: cryptoAsset.ID, Amount: decimal.NewFromInt(10), AmountEscrow: decimal.Zero}
+	if err := db.Create(&balance).Error; err != nil {
+		t.Fatalf("balance: %v", err)
 	}
 
 	// countries
@@ -127,11 +132,14 @@ func TestReferenceHandlers(t *testing.T) {
 	if len(clientAssets) != 2 {
 		t.Fatalf("client assets length %d", len(clientAssets))
 	}
-	m := map[string]string{}
+	m := map[string]AssetWithWallet{}
 	for _, a := range clientAssets {
-		m[a.Name] = a.Value
+		m[a.Name] = a
 	}
-	if m["Ruble"] != "" || m["BTC"] != "addr" {
-		t.Fatalf("client assets data %+v", clientAssets)
+	if m["Ruble"].Value != "" || !m["Ruble"].Amount.IsZero() {
+		t.Fatalf("client assets ruble %+v", m["Ruble"])
+	}
+	if m["BTC"].Value != "addr" || !m["BTC"].Amount.Equal(decimal.NewFromInt(10)) {
+		t.Fatalf("client assets btc %+v", m["BTC"])
 	}
 }

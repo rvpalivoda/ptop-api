@@ -2,6 +2,8 @@ basePath: /
 definitions:
   handlers.AssetWithWallet:
     properties:
+      amount:
+        type: number
       id:
         type: string
       isActive:
@@ -937,7 +939,7 @@ paths:
             type: array
       security:
       - BearerAuth: []
-      summary: Список активных активов с адресами кошельков клиента
+      summary: Список активных активов с адресами кошельков и балансами клиента
       tags:
       - reference
   /client/balances:
