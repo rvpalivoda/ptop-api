@@ -136,4 +136,5 @@ func TestDebugDepositUSDC(t *testing.T) {
 	if !bal.Amount.Equal(decimal.RequireFromString("2")) {
 		t.Fatalf("balance amount %s", bal.Amount)
 	}
+
 }
