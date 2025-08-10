@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/shopspring/decimal"
 	"ptop/internal/models"
 )
 
@@ -146,10 +147,16 @@ func TestOfferLifecycle(t *testing.T) {
 	req, _ = http.NewRequest("GET", "/offers", nil)
 	req.Header.Set("Authorization", "Bearer "+tok.AccessToken)
 	r.ServeHTTP(w, req)
-	var list []models.Offer
+	var list []models.OfferFull
 	json.Unmarshal(w.Body.Bytes(), &list)
 	if len(list) != 1 || list[0].ID != offer1.ID {
 		t.Fatalf("active offers list unexpected")
+	}
+	if list[0].FromAsset.ID == "" || list[0].Client.ID == "" {
+		t.Fatalf("nested data not returned")
+	}
+	if list[0].Client.Rating.Cmp(decimal.Zero) != 0 || list[0].Client.OrdersCount != 0 {
+		t.Fatalf("client fields not default")
 	}
 
 	// list client disabled offers should include offer2
@@ -160,6 +167,12 @@ func TestOfferLifecycle(t *testing.T) {
 	json.Unmarshal(w.Body.Bytes(), &list)
 	if len(list) == 0 {
 		t.Fatalf("disabled offers not returned")
+	}
+	if list[0].Client.ID == "" || len(list[0].ClientPaymentMethods) == 0 {
+		t.Fatalf("client nested data missing")
+	}
+	if list[0].Client.Rating.Cmp(decimal.Zero) != 0 || list[0].Client.OrdersCount != 0 {
+		t.Fatalf("client fields not default in client offers")
 	}
 
 	// disable first offer
@@ -350,7 +363,7 @@ func TestListOffersFilters(t *testing.T) {
 	if w.Code != http.StatusOK {
 		t.Fatalf("list status %d", w.Code)
 	}
-	var list []models.Offer
+	var list []models.OfferFull
 	json.Unmarshal(w.Body.Bytes(), &list)
 	if len(list) != 1 || list[0].ID != off1.ID {
 		t.Fatalf("unexpected filter result")
