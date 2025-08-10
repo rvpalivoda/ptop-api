@@ -1642,6 +1642,9 @@ const docTemplate = `{
                 "amount": {
                     "type": "number"
                 },
+                "description": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
                 },
@@ -1658,9 +1661,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "value": {
-                    "type": "string"
-                },
- 				"description": {
                     "type": "string"
                 }
             }
@@ -1816,6 +1816,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "to_asset_id": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "string"
                 }
             }
@@ -2013,6 +2016,9 @@ const docTemplate = `{
         "models.Asset": {
             "type": "object",
             "properties": {
+                "description": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
                 },
@@ -2164,6 +2170,9 @@ const docTemplate = `{
         "models.Offer": {
             "type": "object",
             "properties": {
+                "TTL": {
+                    "type": "string"
+                },
                 "amount": {
                     "type": "number"
                 },
@@ -2206,7 +2215,7 @@ const docTemplate = `{
                 "toAssetID": {
                     "type": "string"
                 },
-                "ttl": {
+                "type": {
                     "type": "string"
                 },
                 "updatedAt": {
@@ -2280,8 +2289,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "fileSize": {
-                    "type": "integer",
-                    "format": "int64"
+                    "type": "integer"
                 },
                 "fileType": {
                     "type": "string"
@@ -2382,9 +2390,6 @@ const docTemplate = `{
                 "createdAt": {
                     "type": "string"
                 },
-                "disabledAt": {
-                    "type": "string"
-                },
                 "enabledAt": {
                     "type": "string"
                 },
@@ -2393,9 +2398,6 @@ const docTemplate = `{
                 },
                 "index": {
                     "type": "integer"
-                },
-                "isEnabled": {
-                    "type": "boolean"
                 },
                 "value": {
                     "type": "string"

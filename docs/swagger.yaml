@@ -4,6 +4,8 @@ definitions:
     properties:
       amount:
         type: number
+      description:
+        type: string
       id:
         type: string
       isActive:
@@ -115,6 +117,8 @@ definitions:
       price:
         type: string
       to_asset_id:
+        type: string
+      type:
         type: string
     type: object
   handlers.OrderMessageRequest:
@@ -240,6 +244,8 @@ definitions:
     type: object
   models.Asset:
     properties:
+      description:
+        type: string
       id:
         type: string
       isActive:
@@ -343,6 +349,8 @@ definitions:
     - MessageTypeFile
   models.Offer:
     properties:
+      TTL:
+        type: string
       amount:
         type: number
       clientID:
@@ -371,7 +379,7 @@ definitions:
         type: number
       toAssetID:
         type: string
-      ttl:
+      type:
         type: string
       updatedAt:
         type: string
@@ -420,7 +428,6 @@ definitions:
       createdAt:
         type: string
       fileSize:
-        format: int64
         type: integer
       fileType:
         type: string
@@ -490,16 +497,12 @@ definitions:
         type: string
       createdAt:
         type: string
-      disabledAt:
-        type: string
       enabledAt:
         type: string
       id:
         type: string
       index:
         type: integer
-      isEnabled:
-        type: boolean
       value:
         type: string
     type: object

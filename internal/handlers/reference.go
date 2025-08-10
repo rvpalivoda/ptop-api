@@ -90,7 +90,7 @@ func GetClientAssets(db *gorm.DB) gin.HandlerFunc {
 			Select("assets.id, assets.name, assets.description, assets.type, assets.is_active, assets.is_convertible, COALESCE(wallets.value, '') AS value, COALESCE(balances.amount, 0) AS amount").
 			Joins("LEFT JOIN wallets ON wallets.asset_id = assets.id AND wallets.client_id = ? AND wallets.is_enabled = ?", clientID, true).
 			Joins("LEFT JOIN balances ON balances.asset_id = assets.id AND balances.client_id = ?", clientID).
-			Where("assets.is_active = ? AND assets.type = ?", true, models.AssetTypeCrypto).
+			Where("assets.is_active = ?", true).
 			Scan(&assets).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
 			return
