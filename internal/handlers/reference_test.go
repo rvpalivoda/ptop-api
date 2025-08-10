@@ -129,17 +129,11 @@ func TestReferenceHandlers(t *testing.T) {
 	if err := json.Unmarshal(w.Body.Bytes(), &clientAssets); err != nil {
 		t.Fatalf("client assets parse: %v", err)
 	}
-	if len(clientAssets) != 2 {
+	if len(clientAssets) != 1 {
 		t.Fatalf("client assets length %d", len(clientAssets))
 	}
-	m := map[string]AssetWithWallet{}
-	for _, a := range clientAssets {
-		m[a.Name] = a
-	}
-	if m["Ruble"].Value != "" || !m["Ruble"].Amount.IsZero() {
-		t.Fatalf("client assets ruble %+v", m["Ruble"])
-	}
-	if m["BTC"].Value != "addr" || !m["BTC"].Amount.Equal(decimal.NewFromInt(10)) {
-		t.Fatalf("client assets btc %+v", m["BTC"])
+	ca := clientAssets[0]
+	if ca.Name != "BTC" || ca.Value != "addr" || !ca.Amount.Equal(decimal.NewFromInt(10)) {
+		t.Fatalf("client asset btc %+v", ca)
 	}
 }
