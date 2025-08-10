@@ -107,6 +107,12 @@ func (w *Watcher) createDebugDeposit(walletID string, amount decimal.Decimal) {
 	}
 	if err := w.db.Create(&dep).Error; err != nil {
 		log.Printf("не удалось сохранить депозит: %v", err)
+		return
+	}
+	if err := w.db.Model(&models.Balance{}).
+		Where("client_id = ? AND asset_id = ?", wallet.ClientID, wallet.AssetID).
+		Update("amount", gorm.Expr("amount + ?", amount)).Error; err != nil {
+		log.Printf("не удалось обновить баланс: %v", err)
 	}
 }
 
@@ -161,6 +167,12 @@ func (w *Watcher) processTx(tx *wire.MsgTx, blockHash string) {
 			}
 			if err := w.db.Create(&dep).Error; err != nil {
 				log.Printf("не удалось сохранить депозит: %v", err)
+				continue
+			}
+			if err := w.db.Model(&models.Balance{}).
+				Where("client_id = ? AND asset_id = ?", wallet.ClientID, wallet.AssetID).
+				Update("amount", gorm.Expr("amount + ?", amount)).Error; err != nil {
+				log.Printf("не удалось обновить баланс: %v", err)
 			}
 		}
 	}

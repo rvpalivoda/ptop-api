@@ -90,6 +90,12 @@ func (w *Watcher) createDebugDeposit(walletID string, amount decimal.Decimal) {
 	}
 	if err := w.db.Create(&dep).Error; err != nil {
 		log.Printf("не удалось сохранить депозит: %v", err)
+		return
+	}
+	if err := w.db.Model(&models.Balance{}).
+		Where("client_id = ? AND asset_id = ?", wal.ClientID, wal.AssetID).
+		Update("amount", gorm.Expr("amount + ?", amount)).Error; err != nil {
+		log.Printf("не удалось обновить баланс: %v", err)
 	}
 }
 
@@ -134,6 +140,7 @@ func (w *Watcher) handleTransfer(tr *wallet.Transfer, subMap map[uint64]models.W
 	if !ok {
 		return
 	}
+	amount := decimal.NewFromInt(int64(tr.Amount)).Div(decimal.NewFromInt(1e12))
 	var existing models.TransactionIn
 	err := w.db.Where("data ->> 'txid' = ? AND data ->> 'subaddr_index' = ?", tr.TxID, fmt.Sprintf("%d", tr.SubaddrIndex.Minor)).First(&existing).Error
 	if err == nil {
@@ -145,6 +152,12 @@ func (w *Watcher) handleTransfer(tr *wallet.Transfer, subMap map[uint64]models.W
 			})
 			if err := w.db.Model(&existing).Updates(map[string]any{"status": status, "data": datatypes.JSON(data)}).Error; err != nil {
 				log.Printf("не удалось обновить депозит: %v", err)
+				return
+			}
+			if err := w.db.Model(&models.Balance{}).
+				Where("client_id = ? AND asset_id = ?", wal.ClientID, wal.AssetID).
+				Update("amount", gorm.Expr("amount + ?", amount)).Error; err != nil {
+				log.Printf("не удалось обновить баланс: %v", err)
 			}
 		}
 		return
@@ -153,7 +166,6 @@ func (w *Watcher) handleTransfer(tr *wallet.Transfer, subMap map[uint64]models.W
 		log.Printf("ошибка проверки существующей транзакции: %v", err)
 		return
 	}
-	amount := decimal.NewFromInt(int64(tr.Amount)).Div(decimal.NewFromInt(1e12))
 	data, _ := json.Marshal(map[string]any{
 		"txid":          tr.TxID,
 		"subaddr_index": tr.SubaddrIndex.Minor,
@@ -169,5 +181,13 @@ func (w *Watcher) handleTransfer(tr *wallet.Transfer, subMap map[uint64]models.W
 	}
 	if err := w.db.Create(&dep).Error; err != nil {
 		log.Printf("не удалось сохранить депозит: %v", err)
+		return
+	}
+	if status == models.TransactionInStatusConfirmed {
+		if err := w.db.Model(&models.Balance{}).
+			Where("client_id = ? AND asset_id = ?", wal.ClientID, wal.AssetID).
+			Update("amount", gorm.Expr("amount + ?", amount)).Error; err != nil {
+			log.Printf("не удалось обновить баланс: %v", err)
+		}
 	}
 }
