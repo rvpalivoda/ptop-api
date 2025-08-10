@@ -310,10 +310,13 @@ func DisableOffer(db *gorm.DB) gin.HandlerFunc {
 // @Param max_amount query string false "максимальная сумма"
 // @Param payment_method query string false "ID способа оплаты"
 // @Param type query string false "тип объявления: buy или sell"
+// @Param limit query int false "лимит"
+// @Param offset query int false "смещение"
 // @Success 200 {array} models.OfferFull
 // @Router /offers [get]
 func ListOffers(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		limit, offset := parsePagination(c)
 		query := db.Model(&models.Offer{}).
 			Where("is_enabled = ? AND ttl > ?", true, time.Now()).
 			Distinct().
@@ -358,7 +361,7 @@ func ListOffers(db *gorm.DB) gin.HandlerFunc {
 			query = query.Where("type = ?", t)
 		}
 		var offers []models.Offer
-		if err := query.Find(&offers).Error; err != nil {
+		if err := query.Order("offers.created_at desc").Limit(limit).Offset(offset).Find(&offers).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
 			return
 		}

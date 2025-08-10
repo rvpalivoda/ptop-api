@@ -23,7 +23,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.Asset"
+                                "$ref": "#/definitions/models.Asset"
                             }
                         }
                     }
@@ -54,7 +54,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.Disable2FARequest"
+                            "$ref": "#/definitions/handlers.Disable2FARequest"
                         }
                     }
                 ],
@@ -62,19 +62,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.StatusResponse"
+                            "$ref": "#/definitions/handlers.StatusResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -104,7 +104,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.Enable2FARequest"
+                            "$ref": "#/definitions/handlers.Enable2FARequest"
                         }
                     }
                 ],
@@ -112,19 +112,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.Enable2FAResponse"
+                            "$ref": "#/definitions/handlers.Enable2FAResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -150,7 +150,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.LoginRequest"
+                            "$ref": "#/definitions/handlers.LoginRequest"
                         }
                     }
                 ],
@@ -158,19 +158,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.TokenResponse"
+                            "$ref": "#/definitions/handlers.TokenResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -194,13 +194,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.StatusResponse"
+                            "$ref": "#/definitions/handlers.StatusResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -230,7 +230,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.RegenerateMnemonicRequest"
+                            "$ref": "#/definitions/handlers.RegenerateMnemonicRequest"
                         }
                     }
                 ],
@@ -238,19 +238,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.RegenerateMnemonicResponse"
+                            "$ref": "#/definitions/handlers.RegenerateMnemonicResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -280,7 +280,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ChangePasswordRequest"
+                            "$ref": "#/definitions/handlers.ChangePasswordRequest"
                         }
                     }
                 ],
@@ -288,19 +288,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.StatusResponse"
+                            "$ref": "#/definitions/handlers.StatusResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -330,7 +330,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.SetPinCodeRequest"
+                            "$ref": "#/definitions/handlers.SetPinCodeRequest"
                         }
                     }
                 ],
@@ -338,19 +338,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.StatusResponse"
+                            "$ref": "#/definitions/handlers.StatusResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -374,13 +374,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ProfileResponse"
+                            "$ref": "#/definitions/handlers.ProfileResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -405,7 +405,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.RecoverRequest"
+                            "$ref": "#/definitions/handlers.RecoverRequest"
                         }
                     }
                 ],
@@ -413,25 +413,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.TokenResponse"
+                            "$ref": "#/definitions/handlers.TokenResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -459,13 +459,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.RecoverChallengeResponse"
+                            "$ref": "#/definitions/handlers.RecoverChallengeResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -490,7 +490,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.RefreshRequest"
+                            "$ref": "#/definitions/handlers.RefreshRequest"
                         }
                     }
                 ],
@@ -498,19 +498,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.TokenResponse"
+                            "$ref": "#/definitions/handlers.TokenResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -536,7 +536,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.RegisterRequest"
+                            "$ref": "#/definitions/handlers.RegisterRequest"
                         }
                     }
                 ],
@@ -544,19 +544,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.RegisterResponse"
+                            "$ref": "#/definitions/handlers.RegisterResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -586,7 +586,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ChangeUsernameRequest"
+                            "$ref": "#/definitions/handlers.ChangeUsernameRequest"
                         }
                     }
                 ],
@@ -594,25 +594,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.StatusResponse"
+                            "$ref": "#/definitions/handlers.StatusResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -642,7 +642,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.VerifyPasswordRequest"
+                            "$ref": "#/definitions/handlers.VerifyPasswordRequest"
                         }
                     }
                 ],
@@ -650,19 +650,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.VerifyPasswordResponse"
+                            "$ref": "#/definitions/handlers.VerifyPasswordResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -688,7 +688,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/internal_handlers.AssetWithWallet"
+                                "$ref": "#/definitions/handlers.AssetWithWallet"
                             }
                         }
                     }
@@ -715,7 +715,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.Balance"
+                                "$ref": "#/definitions/models.Balance"
                             }
                         }
                     }
@@ -742,7 +742,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.Escrow"
+                                "$ref": "#/definitions/models.Escrow"
                             }
                         }
                     }
@@ -782,13 +782,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.EscrowNavResponse"
+                            "$ref": "#/definitions/handlers.EscrowNavResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -822,7 +822,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.OfferFull"
+                                "$ref": "#/definitions/models.OfferFull"
                             }
                         }
                     }
@@ -851,7 +851,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.OfferRequest"
+                            "$ref": "#/definitions/handlers.OfferRequest"
                         }
                     }
                 ],
@@ -859,13 +859,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ptop_internal_models.Offer"
+                            "$ref": "#/definitions/models.Offer"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -902,7 +902,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.OfferRequest"
+                            "$ref": "#/definitions/handlers.OfferRequest"
                         }
                     }
                 ],
@@ -910,19 +910,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ptop_internal_models.Offer"
+                            "$ref": "#/definitions/models.Offer"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -952,13 +952,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ptop_internal_models.Offer"
+                            "$ref": "#/definitions/models.Offer"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -988,19 +988,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ptop_internal_models.Offer"
+                            "$ref": "#/definitions/models.Offer"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -1026,7 +1026,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.Order"
+                                "$ref": "#/definitions/models.Order"
                             }
                         }
                     }
@@ -1055,7 +1055,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.OrderRequest"
+                            "$ref": "#/definitions/handlers.OrderRequest"
                         }
                     }
                 ],
@@ -1063,13 +1063,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ptop_internal_models.Order"
+                            "$ref": "#/definitions/models.Order"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -1095,7 +1095,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.ClientPaymentMethod"
+                                "$ref": "#/definitions/models.ClientPaymentMethod"
                             }
                         }
                     }
@@ -1124,7 +1124,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.CreateClientPaymentMethodRequest"
+                            "$ref": "#/definitions/handlers.CreateClientPaymentMethodRequest"
                         }
                     }
                 ],
@@ -1132,19 +1132,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ptop_internal_models.ClientPaymentMethod"
+                            "$ref": "#/definitions/models.ClientPaymentMethod"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -1174,13 +1174,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.StatusResponse"
+                            "$ref": "#/definitions/handlers.StatusResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -1220,7 +1220,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.TransactionIn"
+                                "$ref": "#/definitions/models.TransactionIn"
                             }
                         }
                     }
@@ -1261,7 +1261,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.TransactionInternal"
+                                "$ref": "#/definitions/models.TransactionInternal"
                             }
                         }
                     }
@@ -1302,7 +1302,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.TransactionOut"
+                                "$ref": "#/definitions/models.TransactionOut"
                             }
                         }
                     }
@@ -1329,7 +1329,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.Wallet"
+                                "$ref": "#/definitions/models.Wallet"
                             }
                         }
                     }
@@ -1359,7 +1359,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.WalletRequest"
+                            "$ref": "#/definitions/handlers.WalletRequest"
                         }
                     }
                 ],
@@ -1367,13 +1367,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ptop_internal_models.Wallet"
+                            "$ref": "#/definitions/models.Wallet"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -1399,7 +1399,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.Country"
+                                "$ref": "#/definitions/models.Country"
                             }
                         }
                     }
@@ -1426,7 +1426,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.DebugDepositRequest"
+                            "$ref": "#/definitions/handlers.DebugDepositRequest"
                         }
                     }
                 ],
@@ -1468,13 +1468,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.StatusResponse"
+                            "$ref": "#/definitions/handlers.StatusResponse"
                         }
                     },
                     "503": {
                         "description": "Service Unavailable",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -1530,6 +1530,18 @@
                         "description": "тип объявления: buy или sell",
                         "name": "type",
                         "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "лимит",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "смещение",
+                        "name": "offset",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1538,7 +1550,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.OfferFull"
+                                "$ref": "#/definitions/models.OfferFull"
                             }
                         }
                     }
@@ -1586,20 +1598,20 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.OrderMessage"
+                                "$ref": "#/definitions/models.OrderMessage"
                             }
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -1635,7 +1647,7 @@
                         "name": "input",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.OrderMessageRequest"
+                            "$ref": "#/definitions/handlers.OrderMessageRequest"
                         }
                     },
                     {
@@ -1649,25 +1661,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ptop_internal_models.OrderMessage"
+                            "$ref": "#/definitions/models.OrderMessage"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -1707,19 +1719,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ptop_internal_models.OrderMessage"
+                            "$ref": "#/definitions/models.OrderMessage"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -1745,7 +1757,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.PaymentMethod"
+                                "$ref": "#/definitions/models.PaymentMethod"
                             }
                         }
                     }
@@ -1783,13 +1795,13 @@
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -1797,7 +1809,7 @@
         }
     },
     "definitions": {
-        "internal_handlers.AssetWithWallet": {
+        "handlers.AssetWithWallet": {
             "type": "object",
             "properties": {
                 "amount": {
@@ -1829,7 +1841,7 @@
                 }
             }
         },
-        "internal_handlers.ChangePasswordRequest": {
+        "handlers.ChangePasswordRequest": {
             "type": "object",
             "properties": {
                 "confirm_password": {
@@ -1843,7 +1855,7 @@
                 }
             }
         },
-        "internal_handlers.ChangeUsernameRequest": {
+        "handlers.ChangeUsernameRequest": {
             "type": "object",
             "properties": {
                 "new_username": {
@@ -1854,7 +1866,7 @@
                 }
             }
         },
-        "internal_handlers.CreateClientPaymentMethodRequest": {
+        "handlers.CreateClientPaymentMethodRequest": {
             "type": "object",
             "properties": {
                 "city": {
@@ -1874,7 +1886,7 @@
                 }
             }
         },
-        "internal_handlers.DebugDepositRequest": {
+        "handlers.DebugDepositRequest": {
             "type": "object",
             "required": [
                 "amount",
@@ -1889,7 +1901,7 @@
                 }
             }
         },
-        "internal_handlers.Disable2FARequest": {
+        "handlers.Disable2FARequest": {
             "type": "object",
             "properties": {
                 "password": {
@@ -1897,7 +1909,7 @@
                 }
             }
         },
-        "internal_handlers.Enable2FARequest": {
+        "handlers.Enable2FARequest": {
             "type": "object",
             "properties": {
                 "password": {
@@ -1905,7 +1917,7 @@
                 }
             }
         },
-        "internal_handlers.Enable2FAResponse": {
+        "handlers.Enable2FAResponse": {
             "type": "object",
             "properties": {
                 "secret": {
@@ -1916,7 +1928,7 @@
                 }
             }
         },
-        "internal_handlers.ErrorResponse": {
+        "handlers.ErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -1924,17 +1936,17 @@
                 }
             }
         },
-        "internal_handlers.EscrowDetail": {
+        "handlers.EscrowDetail": {
             "type": "object",
             "properties": {
                 "amount": {
                     "type": "number"
                 },
                 "asset": {
-                    "$ref": "#/definitions/ptop_internal_models.Asset"
+                    "$ref": "#/definitions/models.Asset"
                 },
                 "client": {
-                    "$ref": "#/definitions/ptop_internal_models.Client"
+                    "$ref": "#/definitions/models.Client"
                 },
                 "createdAt": {
                     "type": "string"
@@ -1943,21 +1955,21 @@
                     "type": "string"
                 },
                 "offer": {
-                    "$ref": "#/definitions/ptop_internal_models.Offer"
+                    "$ref": "#/definitions/models.Offer"
                 },
                 "order": {
-                    "$ref": "#/definitions/ptop_internal_models.Order"
+                    "$ref": "#/definitions/models.Order"
                 },
                 "updatedAt": {
                     "type": "string"
                 }
             }
         },
-        "internal_handlers.EscrowNavResponse": {
+        "handlers.EscrowNavResponse": {
             "type": "object",
             "properties": {
                 "escrow": {
-                    "$ref": "#/definitions/internal_handlers.EscrowDetail"
+                    "$ref": "#/definitions/handlers.EscrowDetail"
                 },
                 "nextId": {
                     "type": "string"
@@ -1967,7 +1979,7 @@
                 }
             }
         },
-        "internal_handlers.LoginRequest": {
+        "handlers.LoginRequest": {
             "type": "object",
             "properties": {
                 "code": {
@@ -1981,7 +1993,7 @@
                 }
             }
         },
-        "internal_handlers.MnemonicWord": {
+        "handlers.MnemonicWord": {
             "type": "object",
             "properties": {
                 "position": {
@@ -1992,7 +2004,7 @@
                 }
             }
         },
-        "internal_handlers.OfferRequest": {
+        "handlers.OfferRequest": {
             "type": "object",
             "properties": {
                 "amount": {
@@ -2030,7 +2042,7 @@
                 }
             }
         },
-        "internal_handlers.OrderMessageRequest": {
+        "handlers.OrderMessageRequest": {
             "type": "object",
             "properties": {
                 "content": {
@@ -2038,7 +2050,7 @@
                 }
             }
         },
-        "internal_handlers.OrderRequest": {
+        "handlers.OrderRequest": {
             "type": "object",
             "properties": {
                 "amount": {
@@ -2052,7 +2064,7 @@
                 }
             }
         },
-        "internal_handlers.ProfileResponse": {
+        "handlers.ProfileResponse": {
             "type": "object",
             "properties": {
                 "pincode_set": {
@@ -2066,7 +2078,7 @@
                 }
             }
         },
-        "internal_handlers.RecoverChallengeResponse": {
+        "handlers.RecoverChallengeResponse": {
             "type": "object",
             "properties": {
                 "positions": {
@@ -2077,7 +2089,7 @@
                 }
             }
         },
-        "internal_handlers.RecoverPhrase": {
+        "handlers.RecoverPhrase": {
             "type": "object",
             "properties": {
                 "position": {
@@ -2088,7 +2100,7 @@
                 }
             }
         },
-        "internal_handlers.RecoverRequest": {
+        "handlers.RecoverRequest": {
             "type": "object",
             "properties": {
                 "new_password": {
@@ -2100,7 +2112,7 @@
                 "phrases": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_handlers.RecoverPhrase"
+                        "$ref": "#/definitions/handlers.RecoverPhrase"
                     }
                 },
                 "username": {
@@ -2108,7 +2120,7 @@
                 }
             }
         },
-        "internal_handlers.RefreshRequest": {
+        "handlers.RefreshRequest": {
             "type": "object",
             "properties": {
                 "refresh_token": {
@@ -2116,7 +2128,7 @@
                 }
             }
         },
-        "internal_handlers.RegenerateMnemonicRequest": {
+        "handlers.RegenerateMnemonicRequest": {
             "type": "object",
             "properties": {
                 "password": {
@@ -2124,18 +2136,18 @@
                 }
             }
         },
-        "internal_handlers.RegenerateMnemonicResponse": {
+        "handlers.RegenerateMnemonicResponse": {
             "type": "object",
             "properties": {
                 "mnemonic": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_handlers.MnemonicWord"
+                        "$ref": "#/definitions/handlers.MnemonicWord"
                     }
                 }
             }
         },
-        "internal_handlers.RegisterRequest": {
+        "handlers.RegisterRequest": {
             "type": "object",
             "properties": {
                 "password": {
@@ -2149,7 +2161,7 @@
                 }
             }
         },
-        "internal_handlers.RegisterResponse": {
+        "handlers.RegisterResponse": {
             "type": "object",
             "properties": {
                 "access_token": {
@@ -2158,7 +2170,7 @@
                 "mnemonic": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_handlers.MnemonicWord"
+                        "$ref": "#/definitions/handlers.MnemonicWord"
                     }
                 },
                 "refresh_token": {
@@ -2166,7 +2178,7 @@
                 }
             }
         },
-        "internal_handlers.SetPinCodeRequest": {
+        "handlers.SetPinCodeRequest": {
             "type": "object",
             "properties": {
                 "password": {
@@ -2177,7 +2189,7 @@
                 }
             }
         },
-        "internal_handlers.StatusResponse": {
+        "handlers.StatusResponse": {
             "type": "object",
             "properties": {
                 "status": {
@@ -2185,7 +2197,7 @@
                 }
             }
         },
-        "internal_handlers.TokenResponse": {
+        "handlers.TokenResponse": {
             "type": "object",
             "properties": {
                 "access_token": {
@@ -2196,7 +2208,7 @@
                 }
             }
         },
-        "internal_handlers.VerifyPasswordRequest": {
+        "handlers.VerifyPasswordRequest": {
             "type": "object",
             "properties": {
                 "password": {
@@ -2204,7 +2216,7 @@
                 }
             }
         },
-        "internal_handlers.VerifyPasswordResponse": {
+        "handlers.VerifyPasswordResponse": {
             "type": "object",
             "properties": {
                 "verified": {
@@ -2212,7 +2224,7 @@
                 }
             }
         },
-        "internal_handlers.WalletRequest": {
+        "handlers.WalletRequest": {
             "type": "object",
             "properties": {
                 "asset_id": {
@@ -2220,7 +2232,7 @@
                 }
             }
         },
-        "ptop_internal_models.Asset": {
+        "models.Asset": {
             "type": "object",
             "properties": {
                 "description": {
@@ -2243,7 +2255,7 @@
                 }
             }
         },
-        "ptop_internal_models.Balance": {
+        "models.Balance": {
             "type": "object",
             "properties": {
                 "amount": {
@@ -2269,7 +2281,7 @@
                 }
             }
         },
-        "ptop_internal_models.Client": {
+        "models.Client": {
             "type": "object",
             "properties": {
                 "id": {
@@ -2292,7 +2304,7 @@
                 }
             }
         },
-        "ptop_internal_models.ClientPaymentMethod": {
+        "models.ClientPaymentMethod": {
             "type": "object",
             "properties": {
                 "city": {
@@ -2302,7 +2314,7 @@
                     "type": "string"
                 },
                 "country": {
-                    "$ref": "#/definitions/ptop_internal_models.Country"
+                    "$ref": "#/definitions/models.Country"
                 },
                 "countryID": {
                     "type": "string"
@@ -2314,7 +2326,7 @@
                     "type": "string"
                 },
                 "paymentMethod": {
-                    "$ref": "#/definitions/ptop_internal_models.PaymentMethod"
+                    "$ref": "#/definitions/models.PaymentMethod"
                 },
                 "paymentMethodID": {
                     "type": "string"
@@ -2324,7 +2336,7 @@
                 }
             }
         },
-        "ptop_internal_models.Country": {
+        "models.Country": {
             "type": "object",
             "properties": {
                 "id": {
@@ -2335,7 +2347,7 @@
                 }
             }
         },
-        "ptop_internal_models.Escrow": {
+        "models.Escrow": {
             "type": "object",
             "properties": {
                 "amount": {
@@ -2364,7 +2376,7 @@
                 }
             }
         },
-        "ptop_internal_models.FeeSideType": {
+        "models.FeeSideType": {
             "type": "string",
             "enum": [
                 "sender",
@@ -2377,7 +2389,7 @@
                 "FeeSideShared"
             ]
         },
-        "ptop_internal_models.KycLevelHintType": {
+        "models.KycLevelHintType": {
             "type": "string",
             "enum": [
                 "low",
@@ -2390,7 +2402,7 @@
                 "KycLevelHintHigh"
             ]
         },
-        "ptop_internal_models.MessageType": {
+        "models.MessageType": {
             "type": "string",
             "enum": [
                 "TEXT",
@@ -2403,7 +2415,7 @@
                 "MessageTypeFile"
             ]
         },
-        "ptop_internal_models.Offer": {
+        "models.Offer": {
             "type": "object",
             "properties": {
                 "TTL": {
@@ -2459,7 +2471,7 @@
                 }
             }
         },
-        "ptop_internal_models.OfferFull": {
+        "models.OfferFull": {
             "type": "object",
             "properties": {
                 "TTL": {
@@ -2469,7 +2481,7 @@
                     "type": "number"
                 },
                 "client": {
-                    "$ref": "#/definitions/ptop_internal_models.Client"
+                    "$ref": "#/definitions/models.Client"
                 },
                 "clientID": {
                     "type": "string"
@@ -2477,7 +2489,7 @@
                 "clientPaymentMethods": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/ptop_internal_models.ClientPaymentMethod"
+                        "$ref": "#/definitions/models.ClientPaymentMethod"
                     }
                 },
                 "conditions": {
@@ -2493,7 +2505,7 @@
                     "type": "string"
                 },
                 "fromAsset": {
-                    "$ref": "#/definitions/ptop_internal_models.Asset"
+                    "$ref": "#/definitions/models.Asset"
                 },
                 "fromAssetID": {
                     "type": "string"
@@ -2517,7 +2529,7 @@
                     "type": "number"
                 },
                 "toAsset": {
-                    "$ref": "#/definitions/ptop_internal_models.Asset"
+                    "$ref": "#/definitions/models.Asset"
                 },
                 "toAssetID": {
                     "type": "string"
@@ -2530,7 +2542,7 @@
                 }
             }
         },
-        "ptop_internal_models.Order": {
+        "models.Order": {
             "type": "object",
             "properties": {
                 "amount": {
@@ -2570,7 +2582,7 @@
                     "type": "string"
                 },
                 "status": {
-                    "$ref": "#/definitions/ptop_internal_models.OrderStatus"
+                    "$ref": "#/definitions/models.OrderStatus"
                 },
                 "toAssetID": {
                     "type": "string"
@@ -2580,7 +2592,7 @@
                 }
             }
         },
-        "ptop_internal_models.OrderMessage": {
+        "models.OrderMessage": {
             "type": "object",
             "properties": {
                 "chatID": {
@@ -2612,14 +2624,14 @@
                     "type": "string"
                 },
                 "type": {
-                    "$ref": "#/definitions/ptop_internal_models.MessageType"
+                    "$ref": "#/definitions/models.MessageType"
                 },
                 "updatedAt": {
                     "type": "string"
                 }
             }
         },
-        "ptop_internal_models.OrderStatus": {
+        "models.OrderStatus": {
             "type": "string",
             "enum": [
                 "WAIT_PAYMENT",
@@ -2636,7 +2648,7 @@
                 "OrderStatusDispute"
             ]
         },
-        "ptop_internal_models.PaymentMethod": {
+        "models.PaymentMethod": {
             "type": "object",
             "properties": {
                 "chargebackWindowHours": {
@@ -2645,11 +2657,11 @@
                 "countries": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/ptop_internal_models.Country"
+                        "$ref": "#/definitions/models.Country"
                     }
                 },
                 "feeSide": {
-                    "$ref": "#/definitions/ptop_internal_models.FeeSideType"
+                    "$ref": "#/definitions/models.FeeSideType"
                 },
                 "id": {
                     "type": "string"
@@ -2661,7 +2673,7 @@
                     "type": "boolean"
                 },
                 "kycLevelHint": {
-                    "$ref": "#/definitions/ptop_internal_models.KycLevelHintType"
+                    "$ref": "#/definitions/models.KycLevelHintType"
                 },
                 "methodGroup": {
                     "type": "string"
@@ -2686,7 +2698,7 @@
                 }
             }
         },
-        "ptop_internal_models.TransactionIn": {
+        "models.TransactionIn": {
             "type": "object",
             "properties": {
                 "amount": {
@@ -2711,7 +2723,7 @@
                     "type": "string"
                 },
                 "status": {
-                    "$ref": "#/definitions/ptop_internal_models.TransactionInStatus"
+                    "$ref": "#/definitions/models.TransactionInStatus"
                 },
                 "updatedAt": {
                     "type": "string"
@@ -2721,7 +2733,7 @@
                 }
             }
         },
-        "ptop_internal_models.TransactionInStatus": {
+        "models.TransactionInStatus": {
             "type": "string",
             "enum": [
                 "pending",
@@ -2736,7 +2748,7 @@
                 "TransactionInStatusFailed"
             ]
         },
-        "ptop_internal_models.TransactionInternal": {
+        "models.TransactionInternal": {
             "type": "object",
             "properties": {
                 "amount": {
@@ -2764,7 +2776,7 @@
                     "type": "string"
                 },
                 "status": {
-                    "$ref": "#/definitions/ptop_internal_models.TransactionInternalStatus"
+                    "$ref": "#/definitions/models.TransactionInternalStatus"
                 },
                 "toClientID": {
                     "type": "string"
@@ -2774,7 +2786,7 @@
                 }
             }
         },
-        "ptop_internal_models.TransactionInternalStatus": {
+        "models.TransactionInternalStatus": {
             "type": "string",
             "enum": [
                 "processing",
@@ -2787,7 +2799,7 @@
                 "TransactionInternalStatusFailed"
             ]
         },
-        "ptop_internal_models.TransactionOut": {
+        "models.TransactionOut": {
             "type": "object",
             "properties": {
                 "amount": {
@@ -2815,7 +2827,7 @@
                     "type": "string"
                 },
                 "status": {
-                    "$ref": "#/definitions/ptop_internal_models.TransactionOutStatus"
+                    "$ref": "#/definitions/models.TransactionOutStatus"
                 },
                 "toAddress": {
                     "type": "string"
@@ -2825,7 +2837,7 @@
                 }
             }
         },
-        "ptop_internal_models.TransactionOutStatus": {
+        "models.TransactionOutStatus": {
             "type": "string",
             "enum": [
                 "pending",
@@ -2842,7 +2854,7 @@
                 "TransactionOutStatusCancelled"
             ]
         },
-        "ptop_internal_models.Wallet": {
+        "models.Wallet": {
             "type": "object",
             "properties": {
                 "assetID": {
