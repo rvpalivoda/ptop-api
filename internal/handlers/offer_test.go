@@ -78,6 +78,7 @@ func TestOfferLifecycle(t *testing.T) {
 		MinAmount:              "10",
 		Amount:                 "50",
 		Price:                  "0.12345678",
+		Type:                   models.OfferTypeBuy,
 		FromAssetID:            asset1.ID,
 		ToAssetID:              asset2.ID,
 		OrderExpirationTimeout: 20,
@@ -298,6 +299,7 @@ func TestListOffersFilters(t *testing.T) {
 		MinAmount:              "10",
 		Amount:                 "50",
 		Price:                  "1",
+		Type:                   models.OfferTypeBuy,
 		FromAssetID:            usd.ID,
 		ToAssetID:              btc.ID,
 		ClientPaymentMethodIDs: []string{cpm1.ID},
@@ -321,6 +323,7 @@ func TestListOffersFilters(t *testing.T) {
 		MinAmount:              "200",
 		Amount:                 "300",
 		Price:                  "1",
+		Type:                   models.OfferTypeSell,
 		FromAssetID:            btc.ID,
 		ToAssetID:              usd.ID,
 		ClientPaymentMethodIDs: []string{cpm2.ID},
@@ -340,7 +343,7 @@ func TestListOffersFilters(t *testing.T) {
 
 	// filter: buy offers with amount range and payment method
 	w = httptest.NewRecorder()
-	url := "/offers?from_asset=" + usd.ID + "&to_asset=" + btc.ID + "&min_amount=20&max_amount=80&payment_method=" + pm1.ID + "&type=buy"
+	url := "/offers?from_asset=" + usd.ID + "&to_asset=" + btc.ID + "&min_amount=20&max_amount=80&payment_method=" + pm1.ID + "&type=" + models.OfferTypeBuy
 	req, _ = http.NewRequest("GET", url, nil)
 	req.Header.Set("Authorization", "Bearer "+tok1.AccessToken)
 	r.ServeHTTP(w, req)

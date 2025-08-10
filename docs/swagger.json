@@ -1635,6 +1635,9 @@
                 "amount": {
                     "type": "number"
                 },
+                "description": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
                 },
@@ -1806,6 +1809,9 @@
                     "type": "string"
                 },
                 "to_asset_id": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "string"
                 }
             }
@@ -2003,6 +2009,9 @@
         "models.Asset": {
             "type": "object",
             "properties": {
+                "description": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
                 },
@@ -2154,6 +2163,9 @@
         "models.Offer": {
             "type": "object",
             "properties": {
+                "TTL": {
+                    "type": "string"
+                },
                 "amount": {
                     "type": "number"
                 },
@@ -2196,7 +2208,7 @@
                 "toAssetID": {
                     "type": "string"
                 },
-                "ttl": {
+                "type": {
                     "type": "string"
                 },
                 "updatedAt": {
@@ -2270,8 +2282,7 @@
                     "type": "string"
                 },
                 "fileSize": {
-                    "type": "integer",
-                    "format": "int64"
+                    "type": "integer"
                 },
                 "fileType": {
                     "type": "string"
@@ -2372,9 +2383,6 @@
                 "createdAt": {
                     "type": "string"
                 },
-                "disabledAt": {
-                    "type": "string"
-                },
                 "enabledAt": {
                     "type": "string"
                 },
@@ -2383,9 +2391,6 @@
                 },
                 "index": {
                     "type": "integer"
-                },
-                "isEnabled": {
-                    "type": "boolean"
                 },
                 "value": {
                     "type": "string"

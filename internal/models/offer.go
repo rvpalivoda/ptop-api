@@ -9,12 +9,18 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	OfferTypeBuy  = "buy"
+	OfferTypeSell = "sell"
+)
+
 type Offer struct {
 	ID                     string                `gorm:"primaryKey;size:21" json:"id"`
 	MaxAmount              decimal.Decimal       `gorm:"type:decimal(32,8);not null" json:"maxAmount"`
 	MinAmount              decimal.Decimal       `gorm:"type:decimal(32,8);not null" json:"minAmount"`
 	Amount                 decimal.Decimal       `gorm:"type:decimal(32,8);not null" json:"amount"`
 	Price                  decimal.Decimal       `gorm:"type:decimal(32,8);not null" json:"price"`
+	Type                   string                `gorm:"size:4;not null" json:"type"`
 	FromAssetID            string                `gorm:"size:21;not null" json:"fromAssetID"`
 	FromAsset              Asset                 `gorm:"foreignKey:FromAssetID" json:"-"`
 	ToAssetID              string                `gorm:"size:21;not null" json:"toAssetID"`
