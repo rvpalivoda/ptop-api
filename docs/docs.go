@@ -1659,6 +1659,9 @@ const docTemplate = `{
                 },
                 "value": {
                     "type": "string"
+                },
+ 				"description": {
+                    "type": "string"
                 }
             }
         },
