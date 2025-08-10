@@ -16,7 +16,7 @@ func TestWatcherDebugDeposit(t *testing.T) {
 	if err != nil {
 		t.Fatalf("db open: %v", err)
 	}
-	if err := db.AutoMigrate(&models.Client{}, &models.Asset{}, &models.Wallet{}, &models.TransactionIn{}); err != nil {
+	if err := db.AutoMigrate(&models.Client{}, &models.Asset{}, &models.Wallet{}, &models.TransactionIn{}, &models.Balance{}); err != nil {
 		t.Fatalf("migrate: %v", err)
 	}
 	client := models.Client{Username: "u"}
@@ -25,6 +25,8 @@ func TestWatcherDebugDeposit(t *testing.T) {
 	db.Create(&asset)
 	wallet := models.Wallet{ClientID: client.ID, AssetID: asset.ID, Value: "subaddr", DerivationIndex: 2}
 	db.Create(&wallet)
+	bal := models.Balance{ClientID: client.ID, AssetID: asset.ID, Amount: decimal.Zero, AmountEscrow: decimal.Zero}
+	db.Create(&bal)
 
 	w, err := New(db, "", time.Second, true)
 	if err != nil {
@@ -39,5 +41,11 @@ func TestWatcherDebugDeposit(t *testing.T) {
 	}
 	if !tx.Amount.Equal(decimal.RequireFromString("4")) {
 		t.Fatalf("amount %s", tx.Amount)
+	}
+	if err := db.First(&bal).Error; err != nil {
+		t.Fatalf("balance: %v", err)
+	}
+	if !bal.Amount.Equal(decimal.RequireFromString("4")) {
+		t.Fatalf("balance amount %s", bal.Amount)
 	}
 }

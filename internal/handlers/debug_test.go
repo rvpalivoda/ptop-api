@@ -23,7 +23,7 @@ func TestDebugDeposit(t *testing.T) {
 	if err != nil {
 		t.Fatalf("db open: %v", err)
 	}
-	if err := db.AutoMigrate(&models.Client{}, &models.Asset{}, &models.Wallet{}, &models.TransactionIn{}); err != nil {
+	if err := db.AutoMigrate(&models.Client{}, &models.Asset{}, &models.Wallet{}, &models.TransactionIn{}, &models.Balance{}); err != nil {
 		t.Fatalf("migrate: %v", err)
 	}
 	client := models.Client{Username: "u"}
@@ -37,6 +37,10 @@ func TestDebugDeposit(t *testing.T) {
 	wallet := models.Wallet{ClientID: client.ID, AssetID: asset.ID, Value: "addr", DerivationIndex: 1}
 	if err := db.Create(&wallet).Error; err != nil {
 		t.Fatalf("create wallet: %v", err)
+	}
+	bal := models.Balance{ClientID: client.ID, AssetID: asset.ID, Amount: decimal.Zero, AmountEscrow: decimal.Zero}
+	if err := db.Create(&bal).Error; err != nil {
+		t.Fatalf("create balance: %v", err)
 	}
 	w, err := btcwatcher.New(db, "", "", "", nil, true)
 	if err != nil {
@@ -64,5 +68,11 @@ func TestDebugDeposit(t *testing.T) {
 	}
 	if !tx.Amount.Equal(decimal.RequireFromString("1")) {
 		t.Fatalf("amount %s", tx.Amount)
+	}
+	if err := db.First(&bal).Error; err != nil {
+		t.Fatalf("balance: %v", err)
+	}
+	if !bal.Amount.Equal(decimal.RequireFromString("1")) {
+		t.Fatalf("balance amount %s", bal.Amount)
 	}
 }
