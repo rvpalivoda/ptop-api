@@ -3,15 +3,16 @@ package models
 import (
 	"time"
 
-	"gorm.io/gorm"
 	"ptop/internal/utils"
+
+	"gorm.io/gorm"
 )
 
 type Wallet struct {
-	ID              string    `gorm:"primaryKey;size:21"`
-	ClientID        string    `gorm:"size:21;not null;uniqueIndex:idx_wallet_client_asset_active"`
+	ID              string    `gorm:"primaryKey;size:21" json:"id"`
+	ClientID        string    `gorm:"size:21;not null;uniqueIndex:idx_wallet_client_asset_active" json:"clientID"`
 	Client          Client    `gorm:"foreignKey:ClientID" json:"-"`
-	AssetID         string    `gorm:"size:21;not null;uniqueIndex:idx_wallet_client_asset_active"`
+	AssetID         string    `gorm:"size:21;not null;uniqueIndex:idx_wallet_client_asset_active" json:"assetID"`
 	Asset           Asset     `gorm:"foreignKey:AssetID" json:"-"`
 	Value           string    `gorm:"type:varchar(255);not null"`
 	DerivationIndex uint32    `gorm:"not null" json:"index"`
