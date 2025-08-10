@@ -114,18 +114,30 @@ func TestTransactionHandlers(t *testing.T) {
 		t.Fatalf("pagination failed")
 	}
 
-	w = httptest.NewRecorder()
-	req, _ = http.NewRequest("GET", "/client/transactions/out?limit=2", nil)
-	req.Header.Set("Authorization", "Bearer "+tok.AccessToken)
-	r.ServeHTTP(w, req)
-	if w.Code != http.StatusOK {
-		t.Fatalf("out list status %d", w.Code)
-	}
-	var outList []models.TransactionOut
-	json.Unmarshal(w.Body.Bytes(), &outList)
-	if len(outList) != 2 {
-		t.Fatalf("expected 2, got %d", len(outList))
-	}
+        w = httptest.NewRecorder()
+        req, _ = http.NewRequest("GET", "/client/transactions/out?limit=2", nil)
+        req.Header.Set("Authorization", "Bearer "+tok.AccessToken)
+        r.ServeHTTP(w, req)
+        if w.Code != http.StatusOK {
+                t.Fatalf("out list status %d", w.Code)
+        }
+        var outList []models.TransactionOut
+        json.Unmarshal(w.Body.Bytes(), &outList)
+        if len(outList) != 2 {
+                t.Fatalf("expected 2, got %d", len(outList))
+        }
+
+        w = httptest.NewRecorder()
+        req, _ = http.NewRequest("GET", "/client/transactions/out?limit=1&offset=1", nil)
+        req.Header.Set("Authorization", "Bearer "+tok.AccessToken)
+        r.ServeHTTP(w, req)
+        if w.Code != http.StatusOK {
+                t.Fatalf("out list offset status %d", w.Code)
+        }
+        json.Unmarshal(w.Body.Bytes(), &outList)
+        if len(outList) != 1 || outList[0].ID != tOutOld.ID {
+                t.Fatalf("out pagination failed")
+        }
 
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/client/transactions/internal?limit=10", nil)

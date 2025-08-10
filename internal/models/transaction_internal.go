@@ -28,7 +28,7 @@ type TransactionInternal struct {
 	ToClientID   string                    `gorm:"size:21"`
 	ToClient     Client                    `gorm:"foreignKey:ToClientID" json:"-"`
 	Status       TransactionInternalStatus `gorm:"type:varchar(20);not null"`
-	Data         datatypes.JSON            `gorm:"type:json"`
+        Data         datatypes.JSON            `gorm:"type:json" swaggertype:"object"`
 	CreatedAt    time.Time                 `gorm:"autoCreateTime"`
 	UpdatedAt    time.Time                 `gorm:"autoUpdateTime"`
 }
