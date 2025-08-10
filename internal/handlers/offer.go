@@ -16,6 +16,7 @@ type OfferRequest struct {
 	MinAmount              string   `json:"min_amount"`
 	Amount                 string   `json:"amount"`
 	Price                  string   `json:"price"`
+	Type                   string   `json:"type"`
 	FromAssetID            string   `json:"from_asset_id"`
 	ToAssetID              string   `json:"to_asset_id"`
 	Conditions             string   `json:"conditions"`
@@ -46,6 +47,11 @@ func CreateOffer(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		clientID := clientIDVal.(string)
+
+		if r.Type != models.OfferTypeBuy && r.Type != models.OfferTypeSell {
+			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "invalid type"})
+			return
+		}
 
 		maxAmount, err := decimal.NewFromString(r.MaxAmount)
 		if err != nil {
@@ -94,6 +100,7 @@ func CreateOffer(db *gorm.DB) gin.HandlerFunc {
 			MinAmount:              minAmount,
 			Amount:                 amount,
 			Price:                  price,
+			Type:                   r.Type,
 			FromAssetID:            r.FromAssetID,
 			ToAssetID:              r.ToAssetID,
 			Conditions:             r.Conditions,
@@ -146,6 +153,10 @@ func UpdateOffer(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "invalid json"})
 			return
 		}
+		if r.Type != models.OfferTypeBuy && r.Type != models.OfferTypeSell {
+			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "invalid type"})
+			return
+		}
 		maxAmount, err := decimal.NewFromString(r.MaxAmount)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "invalid max_amount"})
@@ -190,6 +201,7 @@ func UpdateOffer(db *gorm.DB) gin.HandlerFunc {
 		offer.MinAmount = minAmount
 		offer.Amount = amount
 		offer.Price = price
+		offer.Type = r.Type
 		offer.FromAssetID = r.FromAssetID
 		offer.ToAssetID = r.ToAssetID
 		offer.Conditions = r.Conditions
@@ -331,16 +343,11 @@ func ListOffers(db *gorm.DB) gin.HandlerFunc {
 				Where("cpm.payment_method_id = ?", pm)
 		}
 		if t := c.Query("type"); t != "" {
-			switch t {
-			case "buy":
-				query = query.Joins("JOIN assets fa ON fa.id = offers.from_asset_id").
-					Joins("JOIN assets ta ON ta.id = offers.to_asset_id").
-					Where("fa.type = ? AND ta.type = ?", models.AssetTypeFiat, models.AssetTypeCrypto)
-			case "sell":
-				query = query.Joins("JOIN assets fa ON fa.id = offers.from_asset_id").
-					Joins("JOIN assets ta ON ta.id = offers.to_asset_id").
-					Where("fa.type = ? AND ta.type = ?", models.AssetTypeCrypto, models.AssetTypeFiat)
+			if t != models.OfferTypeBuy && t != models.OfferTypeSell {
+				c.JSON(http.StatusBadRequest, ErrorResponse{Error: "invalid type"})
+				return
 			}
+			query = query.Where("type = ?", t)
 		}
 		var offers []models.Offer
 		if err := query.Find(&offers).Error; err != nil {

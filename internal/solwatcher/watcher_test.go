@@ -60,4 +60,5 @@ func TestWatcherMintRequiredInProd(t *testing.T) {
 	if _, err := New(db, "", "", false); err == nil {
 		t.Fatalf("expected error")
 	}
+
 }
