@@ -28,7 +28,7 @@ type TransactionIn struct {
 	Asset     Asset               `gorm:"foreignKey:AssetID" json:"-"`
 	Amount    decimal.Decimal     `gorm:"type:decimal(32,8);not null"`
 	Status    TransactionInStatus `gorm:"type:varchar(20);not null"`
-	Data      datatypes.JSON      `gorm:"type:json"`
+        Data      datatypes.JSON      `gorm:"type:json" swaggertype:"object"`
 	CreatedAt time.Time           `gorm:"autoCreateTime"`
 	UpdatedAt time.Time           `gorm:"autoUpdateTime"`
 }

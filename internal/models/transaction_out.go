@@ -29,7 +29,7 @@ type TransactionOut struct {
 	FromAddress string               `gorm:"type:varchar(255)"`
 	ToAddress   string               `gorm:"type:varchar(255)"`
 	Status      TransactionOutStatus `gorm:"type:varchar(20);not null"`
-	Data        datatypes.JSON       `gorm:"type:json"`
+        Data        datatypes.JSON       `gorm:"type:json" swaggertype:"object"`
 	CreatedAt   time.Time            `gorm:"autoCreateTime"`
 	UpdatedAt   time.Time            `gorm:"autoUpdateTime"`
 }
