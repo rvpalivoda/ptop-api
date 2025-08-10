@@ -30,7 +30,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.Asset"
+                                "$ref": "#/definitions/models.Asset"
                             }
                         }
                     }
@@ -61,7 +61,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.Disable2FARequest"
+                            "$ref": "#/definitions/handlers.Disable2FARequest"
                         }
                     }
                 ],
@@ -69,19 +69,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.StatusResponse"
+                            "$ref": "#/definitions/handlers.StatusResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -111,7 +111,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.Enable2FARequest"
+                            "$ref": "#/definitions/handlers.Enable2FARequest"
                         }
                     }
                 ],
@@ -119,19 +119,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.Enable2FAResponse"
+                            "$ref": "#/definitions/handlers.Enable2FAResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -157,7 +157,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.LoginRequest"
+                            "$ref": "#/definitions/handlers.LoginRequest"
                         }
                     }
                 ],
@@ -165,19 +165,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.TokenResponse"
+                            "$ref": "#/definitions/handlers.TokenResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -201,13 +201,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.StatusResponse"
+                            "$ref": "#/definitions/handlers.StatusResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -237,7 +237,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.RegenerateMnemonicRequest"
+                            "$ref": "#/definitions/handlers.RegenerateMnemonicRequest"
                         }
                     }
                 ],
@@ -245,19 +245,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.RegenerateMnemonicResponse"
+                            "$ref": "#/definitions/handlers.RegenerateMnemonicResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -287,7 +287,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ChangePasswordRequest"
+                            "$ref": "#/definitions/handlers.ChangePasswordRequest"
                         }
                     }
                 ],
@@ -295,19 +295,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.StatusResponse"
+                            "$ref": "#/definitions/handlers.StatusResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -337,7 +337,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.SetPinCodeRequest"
+                            "$ref": "#/definitions/handlers.SetPinCodeRequest"
                         }
                     }
                 ],
@@ -345,19 +345,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.StatusResponse"
+                            "$ref": "#/definitions/handlers.StatusResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -381,13 +381,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ProfileResponse"
+                            "$ref": "#/definitions/handlers.ProfileResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -412,7 +412,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.RecoverRequest"
+                            "$ref": "#/definitions/handlers.RecoverRequest"
                         }
                     }
                 ],
@@ -420,25 +420,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.TokenResponse"
+                            "$ref": "#/definitions/handlers.TokenResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -466,13 +466,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.RecoverChallengeResponse"
+                            "$ref": "#/definitions/handlers.RecoverChallengeResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -497,7 +497,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.RefreshRequest"
+                            "$ref": "#/definitions/handlers.RefreshRequest"
                         }
                     }
                 ],
@@ -505,19 +505,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.TokenResponse"
+                            "$ref": "#/definitions/handlers.TokenResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -543,7 +543,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.RegisterRequest"
+                            "$ref": "#/definitions/handlers.RegisterRequest"
                         }
                     }
                 ],
@@ -551,19 +551,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.RegisterResponse"
+                            "$ref": "#/definitions/handlers.RegisterResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -593,7 +593,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ChangeUsernameRequest"
+                            "$ref": "#/definitions/handlers.ChangeUsernameRequest"
                         }
                     }
                 ],
@@ -601,25 +601,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.StatusResponse"
+                            "$ref": "#/definitions/handlers.StatusResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -649,7 +649,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.VerifyPasswordRequest"
+                            "$ref": "#/definitions/handlers.VerifyPasswordRequest"
                         }
                     }
                 ],
@@ -657,19 +657,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.VerifyPasswordResponse"
+                            "$ref": "#/definitions/handlers.VerifyPasswordResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -695,7 +695,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/internal_handlers.AssetWithWallet"
+                                "$ref": "#/definitions/handlers.AssetWithWallet"
                             }
                         }
                     }
@@ -722,7 +722,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.Balance"
+                                "$ref": "#/definitions/models.Balance"
                             }
                         }
                     }
@@ -749,7 +749,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.Escrow"
+                                "$ref": "#/definitions/models.Escrow"
                             }
                         }
                     }
@@ -789,13 +789,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.EscrowNavResponse"
+                            "$ref": "#/definitions/handlers.EscrowNavResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -829,7 +829,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.OfferFull"
+                                "$ref": "#/definitions/models.OfferFull"
                             }
                         }
                     }
@@ -858,7 +858,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.OfferRequest"
+                            "$ref": "#/definitions/handlers.OfferRequest"
                         }
                     }
                 ],
@@ -866,13 +866,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ptop_internal_models.Offer"
+                            "$ref": "#/definitions/models.Offer"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -909,7 +909,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.OfferRequest"
+                            "$ref": "#/definitions/handlers.OfferRequest"
                         }
                     }
                 ],
@@ -917,19 +917,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ptop_internal_models.Offer"
+                            "$ref": "#/definitions/models.Offer"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -959,13 +959,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ptop_internal_models.Offer"
+                            "$ref": "#/definitions/models.Offer"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -995,19 +995,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ptop_internal_models.Offer"
+                            "$ref": "#/definitions/models.Offer"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -1033,7 +1033,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.Order"
+                                "$ref": "#/definitions/models.Order"
                             }
                         }
                     }
@@ -1062,7 +1062,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.OrderRequest"
+                            "$ref": "#/definitions/handlers.OrderRequest"
                         }
                     }
                 ],
@@ -1070,13 +1070,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ptop_internal_models.Order"
+                            "$ref": "#/definitions/models.Order"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -1102,7 +1102,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.ClientPaymentMethod"
+                                "$ref": "#/definitions/models.ClientPaymentMethod"
                             }
                         }
                     }
@@ -1131,7 +1131,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.CreateClientPaymentMethodRequest"
+                            "$ref": "#/definitions/handlers.CreateClientPaymentMethodRequest"
                         }
                     }
                 ],
@@ -1139,19 +1139,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ptop_internal_models.ClientPaymentMethod"
+                            "$ref": "#/definitions/models.ClientPaymentMethod"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -1181,13 +1181,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.StatusResponse"
+                            "$ref": "#/definitions/handlers.StatusResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -1227,7 +1227,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.TransactionIn"
+                                "$ref": "#/definitions/models.TransactionIn"
                             }
                         }
                     }
@@ -1268,7 +1268,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.TransactionInternal"
+                                "$ref": "#/definitions/models.TransactionInternal"
                             }
                         }
                     }
@@ -1309,7 +1309,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.TransactionOut"
+                                "$ref": "#/definitions/models.TransactionOut"
                             }
                         }
                     }
@@ -1336,7 +1336,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.Wallet"
+                                "$ref": "#/definitions/models.Wallet"
                             }
                         }
                     }
@@ -1366,7 +1366,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.WalletRequest"
+                            "$ref": "#/definitions/handlers.WalletRequest"
                         }
                     }
                 ],
@@ -1374,13 +1374,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ptop_internal_models.Wallet"
+                            "$ref": "#/definitions/models.Wallet"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -1406,7 +1406,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.Country"
+                                "$ref": "#/definitions/models.Country"
                             }
                         }
                     }
@@ -1433,7 +1433,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.DebugDepositRequest"
+                            "$ref": "#/definitions/handlers.DebugDepositRequest"
                         }
                     }
                 ],
@@ -1475,13 +1475,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.StatusResponse"
+                            "$ref": "#/definitions/handlers.StatusResponse"
                         }
                     },
                     "503": {
                         "description": "Service Unavailable",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -1537,6 +1537,18 @@ const docTemplate = `{
                         "description": "тип объявления: buy или sell",
                         "name": "type",
                         "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "лимит",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "смещение",
+                        "name": "offset",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1545,7 +1557,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.OfferFull"
+                                "$ref": "#/definitions/models.OfferFull"
                             }
                         }
                     }
@@ -1593,20 +1605,20 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.OrderMessage"
+                                "$ref": "#/definitions/models.OrderMessage"
                             }
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -1642,7 +1654,7 @@ const docTemplate = `{
                         "name": "input",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.OrderMessageRequest"
+                            "$ref": "#/definitions/handlers.OrderMessageRequest"
                         }
                     },
                     {
@@ -1656,25 +1668,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ptop_internal_models.OrderMessage"
+                            "$ref": "#/definitions/models.OrderMessage"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -1714,19 +1726,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ptop_internal_models.OrderMessage"
+                            "$ref": "#/definitions/models.OrderMessage"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -1752,7 +1764,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.PaymentMethod"
+                                "$ref": "#/definitions/models.PaymentMethod"
                             }
                         }
                     }
@@ -1790,13 +1802,13 @@ const docTemplate = `{
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -1804,7 +1816,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "internal_handlers.AssetWithWallet": {
+        "handlers.AssetWithWallet": {
             "type": "object",
             "properties": {
                 "amount": {
@@ -1836,7 +1848,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_handlers.ChangePasswordRequest": {
+        "handlers.ChangePasswordRequest": {
             "type": "object",
             "properties": {
                 "confirm_password": {
@@ -1850,7 +1862,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_handlers.ChangeUsernameRequest": {
+        "handlers.ChangeUsernameRequest": {
             "type": "object",
             "properties": {
                 "new_username": {
@@ -1861,7 +1873,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_handlers.CreateClientPaymentMethodRequest": {
+        "handlers.CreateClientPaymentMethodRequest": {
             "type": "object",
             "properties": {
                 "city": {
@@ -1881,7 +1893,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_handlers.DebugDepositRequest": {
+        "handlers.DebugDepositRequest": {
             "type": "object",
             "required": [
                 "amount",
@@ -1896,7 +1908,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_handlers.Disable2FARequest": {
+        "handlers.Disable2FARequest": {
             "type": "object",
             "properties": {
                 "password": {
@@ -1904,7 +1916,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_handlers.Enable2FARequest": {
+        "handlers.Enable2FARequest": {
             "type": "object",
             "properties": {
                 "password": {
@@ -1912,7 +1924,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_handlers.Enable2FAResponse": {
+        "handlers.Enable2FAResponse": {
             "type": "object",
             "properties": {
                 "secret": {
@@ -1923,7 +1935,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_handlers.ErrorResponse": {
+        "handlers.ErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -1931,17 +1943,17 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_handlers.EscrowDetail": {
+        "handlers.EscrowDetail": {
             "type": "object",
             "properties": {
                 "amount": {
                     "type": "number"
                 },
                 "asset": {
-                    "$ref": "#/definitions/ptop_internal_models.Asset"
+                    "$ref": "#/definitions/models.Asset"
                 },
                 "client": {
-                    "$ref": "#/definitions/ptop_internal_models.Client"
+                    "$ref": "#/definitions/models.Client"
                 },
                 "createdAt": {
                     "type": "string"
@@ -1950,21 +1962,21 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "offer": {
-                    "$ref": "#/definitions/ptop_internal_models.Offer"
+                    "$ref": "#/definitions/models.Offer"
                 },
                 "order": {
-                    "$ref": "#/definitions/ptop_internal_models.Order"
+                    "$ref": "#/definitions/models.Order"
                 },
                 "updatedAt": {
                     "type": "string"
                 }
             }
         },
-        "internal_handlers.EscrowNavResponse": {
+        "handlers.EscrowNavResponse": {
             "type": "object",
             "properties": {
                 "escrow": {
-                    "$ref": "#/definitions/internal_handlers.EscrowDetail"
+                    "$ref": "#/definitions/handlers.EscrowDetail"
                 },
                 "nextId": {
                     "type": "string"
@@ -1974,7 +1986,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_handlers.LoginRequest": {
+        "handlers.LoginRequest": {
             "type": "object",
             "properties": {
                 "code": {
@@ -1988,7 +2000,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_handlers.MnemonicWord": {
+        "handlers.MnemonicWord": {
             "type": "object",
             "properties": {
                 "position": {
@@ -1999,7 +2011,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_handlers.OfferRequest": {
+        "handlers.OfferRequest": {
             "type": "object",
             "properties": {
                 "amount": {
@@ -2037,7 +2049,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_handlers.OrderMessageRequest": {
+        "handlers.OrderMessageRequest": {
             "type": "object",
             "properties": {
                 "content": {
@@ -2045,7 +2057,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_handlers.OrderRequest": {
+        "handlers.OrderRequest": {
             "type": "object",
             "properties": {
                 "amount": {
@@ -2059,7 +2071,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_handlers.ProfileResponse": {
+        "handlers.ProfileResponse": {
             "type": "object",
             "properties": {
                 "pincode_set": {
@@ -2073,7 +2085,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_handlers.RecoverChallengeResponse": {
+        "handlers.RecoverChallengeResponse": {
             "type": "object",
             "properties": {
                 "positions": {
@@ -2084,7 +2096,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_handlers.RecoverPhrase": {
+        "handlers.RecoverPhrase": {
             "type": "object",
             "properties": {
                 "position": {
@@ -2095,7 +2107,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_handlers.RecoverRequest": {
+        "handlers.RecoverRequest": {
             "type": "object",
             "properties": {
                 "new_password": {
@@ -2107,7 +2119,7 @@ const docTemplate = `{
                 "phrases": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_handlers.RecoverPhrase"
+                        "$ref": "#/definitions/handlers.RecoverPhrase"
                     }
                 },
                 "username": {
@@ -2115,7 +2127,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_handlers.RefreshRequest": {
+        "handlers.RefreshRequest": {
             "type": "object",
             "properties": {
                 "refresh_token": {
@@ -2123,7 +2135,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_handlers.RegenerateMnemonicRequest": {
+        "handlers.RegenerateMnemonicRequest": {
             "type": "object",
             "properties": {
                 "password": {
@@ -2131,18 +2143,18 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_handlers.RegenerateMnemonicResponse": {
+        "handlers.RegenerateMnemonicResponse": {
             "type": "object",
             "properties": {
                 "mnemonic": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_handlers.MnemonicWord"
+                        "$ref": "#/definitions/handlers.MnemonicWord"
                     }
                 }
             }
         },
-        "internal_handlers.RegisterRequest": {
+        "handlers.RegisterRequest": {
             "type": "object",
             "properties": {
                 "password": {
@@ -2156,7 +2168,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_handlers.RegisterResponse": {
+        "handlers.RegisterResponse": {
             "type": "object",
             "properties": {
                 "access_token": {
@@ -2165,7 +2177,7 @@ const docTemplate = `{
                 "mnemonic": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_handlers.MnemonicWord"
+                        "$ref": "#/definitions/handlers.MnemonicWord"
                     }
                 },
                 "refresh_token": {
@@ -2173,7 +2185,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_handlers.SetPinCodeRequest": {
+        "handlers.SetPinCodeRequest": {
             "type": "object",
             "properties": {
                 "password": {
@@ -2184,7 +2196,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_handlers.StatusResponse": {
+        "handlers.StatusResponse": {
             "type": "object",
             "properties": {
                 "status": {
@@ -2192,7 +2204,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_handlers.TokenResponse": {
+        "handlers.TokenResponse": {
             "type": "object",
             "properties": {
                 "access_token": {
@@ -2203,7 +2215,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_handlers.VerifyPasswordRequest": {
+        "handlers.VerifyPasswordRequest": {
             "type": "object",
             "properties": {
                 "password": {
@@ -2211,7 +2223,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_handlers.VerifyPasswordResponse": {
+        "handlers.VerifyPasswordResponse": {
             "type": "object",
             "properties": {
                 "verified": {
@@ -2219,7 +2231,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_handlers.WalletRequest": {
+        "handlers.WalletRequest": {
             "type": "object",
             "properties": {
                 "asset_id": {
@@ -2227,7 +2239,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ptop_internal_models.Asset": {
+        "models.Asset": {
             "type": "object",
             "properties": {
                 "description": {
@@ -2250,7 +2262,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ptop_internal_models.Balance": {
+        "models.Balance": {
             "type": "object",
             "properties": {
                 "amount": {
@@ -2276,7 +2288,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ptop_internal_models.Client": {
+        "models.Client": {
             "type": "object",
             "properties": {
                 "id": {
@@ -2299,7 +2311,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ptop_internal_models.ClientPaymentMethod": {
+        "models.ClientPaymentMethod": {
             "type": "object",
             "properties": {
                 "city": {
@@ -2309,7 +2321,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "country": {
-                    "$ref": "#/definitions/ptop_internal_models.Country"
+                    "$ref": "#/definitions/models.Country"
                 },
                 "countryID": {
                     "type": "string"
@@ -2321,7 +2333,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "paymentMethod": {
-                    "$ref": "#/definitions/ptop_internal_models.PaymentMethod"
+                    "$ref": "#/definitions/models.PaymentMethod"
                 },
                 "paymentMethodID": {
                     "type": "string"
@@ -2331,7 +2343,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ptop_internal_models.Country": {
+        "models.Country": {
             "type": "object",
             "properties": {
                 "id": {
@@ -2342,7 +2354,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ptop_internal_models.Escrow": {
+        "models.Escrow": {
             "type": "object",
             "properties": {
                 "amount": {
@@ -2371,7 +2383,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ptop_internal_models.FeeSideType": {
+        "models.FeeSideType": {
             "type": "string",
             "enum": [
                 "sender",
@@ -2384,7 +2396,7 @@ const docTemplate = `{
                 "FeeSideShared"
             ]
         },
-        "ptop_internal_models.KycLevelHintType": {
+        "models.KycLevelHintType": {
             "type": "string",
             "enum": [
                 "low",
@@ -2397,7 +2409,7 @@ const docTemplate = `{
                 "KycLevelHintHigh"
             ]
         },
-        "ptop_internal_models.MessageType": {
+        "models.MessageType": {
             "type": "string",
             "enum": [
                 "TEXT",
@@ -2410,7 +2422,7 @@ const docTemplate = `{
                 "MessageTypeFile"
             ]
         },
-        "ptop_internal_models.Offer": {
+        "models.Offer": {
             "type": "object",
             "properties": {
                 "TTL": {
@@ -2466,7 +2478,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ptop_internal_models.OfferFull": {
+        "models.OfferFull": {
             "type": "object",
             "properties": {
                 "TTL": {
@@ -2476,7 +2488,7 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "client": {
-                    "$ref": "#/definitions/ptop_internal_models.Client"
+                    "$ref": "#/definitions/models.Client"
                 },
                 "clientID": {
                     "type": "string"
@@ -2484,7 +2496,7 @@ const docTemplate = `{
                 "clientPaymentMethods": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/ptop_internal_models.ClientPaymentMethod"
+                        "$ref": "#/definitions/models.ClientPaymentMethod"
                     }
                 },
                 "conditions": {
@@ -2500,7 +2512,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "fromAsset": {
-                    "$ref": "#/definitions/ptop_internal_models.Asset"
+                    "$ref": "#/definitions/models.Asset"
                 },
                 "fromAssetID": {
                     "type": "string"
@@ -2524,7 +2536,7 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "toAsset": {
-                    "$ref": "#/definitions/ptop_internal_models.Asset"
+                    "$ref": "#/definitions/models.Asset"
                 },
                 "toAssetID": {
                     "type": "string"
@@ -2537,7 +2549,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ptop_internal_models.Order": {
+        "models.Order": {
             "type": "object",
             "properties": {
                 "amount": {
@@ -2577,7 +2589,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "$ref": "#/definitions/ptop_internal_models.OrderStatus"
+                    "$ref": "#/definitions/models.OrderStatus"
                 },
                 "toAssetID": {
                     "type": "string"
@@ -2587,7 +2599,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ptop_internal_models.OrderMessage": {
+        "models.OrderMessage": {
             "type": "object",
             "properties": {
                 "chatID": {
@@ -2619,14 +2631,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "type": {
-                    "$ref": "#/definitions/ptop_internal_models.MessageType"
+                    "$ref": "#/definitions/models.MessageType"
                 },
                 "updatedAt": {
                     "type": "string"
                 }
             }
         },
-        "ptop_internal_models.OrderStatus": {
+        "models.OrderStatus": {
             "type": "string",
             "enum": [
                 "WAIT_PAYMENT",
@@ -2643,7 +2655,7 @@ const docTemplate = `{
                 "OrderStatusDispute"
             ]
         },
-        "ptop_internal_models.PaymentMethod": {
+        "models.PaymentMethod": {
             "type": "object",
             "properties": {
                 "chargebackWindowHours": {
@@ -2652,11 +2664,11 @@ const docTemplate = `{
                 "countries": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/ptop_internal_models.Country"
+                        "$ref": "#/definitions/models.Country"
                     }
                 },
                 "feeSide": {
-                    "$ref": "#/definitions/ptop_internal_models.FeeSideType"
+                    "$ref": "#/definitions/models.FeeSideType"
                 },
                 "id": {
                     "type": "string"
@@ -2668,7 +2680,7 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "kycLevelHint": {
-                    "$ref": "#/definitions/ptop_internal_models.KycLevelHintType"
+                    "$ref": "#/definitions/models.KycLevelHintType"
                 },
                 "methodGroup": {
                     "type": "string"
@@ -2693,7 +2705,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ptop_internal_models.TransactionIn": {
+        "models.TransactionIn": {
             "type": "object",
             "properties": {
                 "amount": {
@@ -2718,7 +2730,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "$ref": "#/definitions/ptop_internal_models.TransactionInStatus"
+                    "$ref": "#/definitions/models.TransactionInStatus"
                 },
                 "updatedAt": {
                     "type": "string"
@@ -2728,7 +2740,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ptop_internal_models.TransactionInStatus": {
+        "models.TransactionInStatus": {
             "type": "string",
             "enum": [
                 "pending",
@@ -2743,7 +2755,7 @@ const docTemplate = `{
                 "TransactionInStatusFailed"
             ]
         },
-        "ptop_internal_models.TransactionInternal": {
+        "models.TransactionInternal": {
             "type": "object",
             "properties": {
                 "amount": {
@@ -2771,7 +2783,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "$ref": "#/definitions/ptop_internal_models.TransactionInternalStatus"
+                    "$ref": "#/definitions/models.TransactionInternalStatus"
                 },
                 "toClientID": {
                     "type": "string"
@@ -2781,7 +2793,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ptop_internal_models.TransactionInternalStatus": {
+        "models.TransactionInternalStatus": {
             "type": "string",
             "enum": [
                 "processing",
@@ -2794,7 +2806,7 @@ const docTemplate = `{
                 "TransactionInternalStatusFailed"
             ]
         },
-        "ptop_internal_models.TransactionOut": {
+        "models.TransactionOut": {
             "type": "object",
             "properties": {
                 "amount": {
@@ -2822,7 +2834,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "$ref": "#/definitions/ptop_internal_models.TransactionOutStatus"
+                    "$ref": "#/definitions/models.TransactionOutStatus"
                 },
                 "toAddress": {
                     "type": "string"
@@ -2832,7 +2844,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ptop_internal_models.TransactionOutStatus": {
+        "models.TransactionOutStatus": {
             "type": "string",
             "enum": [
                 "pending",
@@ -2849,7 +2861,7 @@ const docTemplate = `{
                 "TransactionOutStatusCancelled"
             ]
         },
-        "ptop_internal_models.Wallet": {
+        "models.Wallet": {
             "type": "object",
             "properties": {
                 "assetID": {

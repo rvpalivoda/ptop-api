@@ -1,6 +1,6 @@
 basePath: /
 definitions:
-  internal_handlers.AssetWithWallet:
+  handlers.AssetWithWallet:
     properties:
       amount:
         type: number
@@ -21,7 +21,7 @@ definitions:
       value:
         type: string
     type: object
-  internal_handlers.ChangePasswordRequest:
+  handlers.ChangePasswordRequest:
     properties:
       confirm_password:
         type: string
@@ -30,14 +30,14 @@ definitions:
       old_password:
         type: string
     type: object
-  internal_handlers.ChangeUsernameRequest:
+  handlers.ChangeUsernameRequest:
     properties:
       new_username:
         type: string
       password:
         type: string
     type: object
-  internal_handlers.CreateClientPaymentMethodRequest:
+  handlers.CreateClientPaymentMethodRequest:
     properties:
       city:
         type: string
@@ -50,7 +50,7 @@ definitions:
       post_code:
         type: string
     type: object
-  internal_handlers.DebugDepositRequest:
+  handlers.DebugDepositRequest:
     properties:
       amount:
         type: string
@@ -60,57 +60,57 @@ definitions:
     - amount
     - wallet_id
     type: object
-  internal_handlers.Disable2FARequest:
+  handlers.Disable2FARequest:
     properties:
       password:
         type: string
     type: object
-  internal_handlers.Enable2FARequest:
+  handlers.Enable2FARequest:
     properties:
       password:
         type: string
     type: object
-  internal_handlers.Enable2FAResponse:
+  handlers.Enable2FAResponse:
     properties:
       secret:
         type: string
       url:
         type: string
     type: object
-  internal_handlers.ErrorResponse:
+  handlers.ErrorResponse:
     properties:
       error:
         type: string
     type: object
-  internal_handlers.EscrowDetail:
+  handlers.EscrowDetail:
     properties:
       amount:
         type: number
       asset:
-        $ref: '#/definitions/ptop_internal_models.Asset'
+        $ref: '#/definitions/models.Asset'
       client:
-        $ref: '#/definitions/ptop_internal_models.Client'
+        $ref: '#/definitions/models.Client'
       createdAt:
         type: string
       id:
         type: string
       offer:
-        $ref: '#/definitions/ptop_internal_models.Offer'
+        $ref: '#/definitions/models.Offer'
       order:
-        $ref: '#/definitions/ptop_internal_models.Order'
+        $ref: '#/definitions/models.Order'
       updatedAt:
         type: string
     type: object
-  internal_handlers.EscrowNavResponse:
+  handlers.EscrowNavResponse:
     properties:
       escrow:
-        $ref: '#/definitions/internal_handlers.EscrowDetail'
+        $ref: '#/definitions/handlers.EscrowDetail'
       nextId:
         type: string
       prevId:
         type: string
     type: object
-  internal_handlers.LoginRequest:
+  handlers.LoginRequest:
     properties:
       code:
         type: string
@@ -119,14 +119,14 @@ definitions:
       username:
         type: string
     type: object
-  internal_handlers.MnemonicWord:
+  handlers.MnemonicWord:
     properties:
       position:
         type: integer
       word:
         type: string
     type: object
-  internal_handlers.OfferRequest:
+  handlers.OfferRequest:
     properties:
       amount:
         type: string
@@ -151,12 +151,12 @@ definitions:
       type:
         type: string
     type: object
-  internal_handlers.OrderMessageRequest:
+  handlers.OrderMessageRequest:
     properties:
       content:
         type: string
     type: object
-  internal_handlers.OrderRequest:
+  handlers.OrderRequest:
     properties:
       amount:
         type: string
@@ -165,7 +165,7 @@ definitions:
       offer_id:
         type: string
     type: object
-  internal_handlers.ProfileResponse:
+  handlers.ProfileResponse:
     properties:
       pincode_set:
         type: boolean
@@ -174,21 +174,21 @@ definitions:
       username:
         type: string
     type: object
-  internal_handlers.RecoverChallengeResponse:
+  handlers.RecoverChallengeResponse:
     properties:
       positions:
         items:
           type: integer
         type: array
     type: object
-  internal_handlers.RecoverPhrase:
+  handlers.RecoverPhrase:
     properties:
       position:
         type: integer
       word:
         type: string
     type: object
-  internal_handlers.RecoverRequest:
+  handlers.RecoverRequest:
     properties:
       new_password:
         type: string
@@ -196,29 +196,29 @@ definitions:
         type: string
       phrases:
         items:
-          $ref: '#/definitions/internal_handlers.RecoverPhrase'
+          $ref: '#/definitions/handlers.RecoverPhrase'
         type: array
       username:
         type: string
     type: object
-  internal_handlers.RefreshRequest:
+  handlers.RefreshRequest:
     properties:
       refresh_token:
         type: string
     type: object
-  internal_handlers.RegenerateMnemonicRequest:
+  handlers.RegenerateMnemonicRequest:
     properties:
       password:
         type: string
     type: object
-  internal_handlers.RegenerateMnemonicResponse:
+  handlers.RegenerateMnemonicResponse:
     properties:
       mnemonic:
         items:
-          $ref: '#/definitions/internal_handlers.MnemonicWord'
+          $ref: '#/definitions/handlers.MnemonicWord'
         type: array
     type: object
-  internal_handlers.RegisterRequest:
+  handlers.RegisterRequest:
     properties:
       password:
         type: string
@@ -227,52 +227,52 @@ definitions:
       username:
         type: string
     type: object
-  internal_handlers.RegisterResponse:
+  handlers.RegisterResponse:
     properties:
       access_token:
         type: string
       mnemonic:
         items:
-          $ref: '#/definitions/internal_handlers.MnemonicWord'
+          $ref: '#/definitions/handlers.MnemonicWord'
         type: array
       refresh_token:
         type: string
     type: object
-  internal_handlers.SetPinCodeRequest:
+  handlers.SetPinCodeRequest:
     properties:
       password:
         type: string
       pincode:
         type: string
     type: object
-  internal_handlers.StatusResponse:
+  handlers.StatusResponse:
     properties:
       status:
         type: string
     type: object
-  internal_handlers.TokenResponse:
+  handlers.TokenResponse:
     properties:
       access_token:
         type: string
       refresh_token:
         type: string
     type: object
-  internal_handlers.VerifyPasswordRequest:
+  handlers.VerifyPasswordRequest:
     properties:
       password:
         type: string
     type: object
-  internal_handlers.VerifyPasswordResponse:
+  handlers.VerifyPasswordResponse:
     properties:
       verified:
         type: boolean
     type: object
-  internal_handlers.WalletRequest:
+  handlers.WalletRequest:
     properties:
       asset_id:
         type: string
     type: object
-  ptop_internal_models.Asset:
+  models.Asset:
     properties:
       description:
         type: string
@@ -287,7 +287,7 @@ definitions:
       type:
         type: string
     type: object
-  ptop_internal_models.Balance:
+  models.Balance:
     properties:
       amount:
         type: number
@@ -304,7 +304,7 @@ definitions:
       updatedAt:
         type: string
     type: object
-  ptop_internal_models.Client:
+  models.Client:
     properties:
       id:
         type: string
@@ -319,14 +319,14 @@ definitions:
       username:
         type: string
     type: object
-  ptop_internal_models.ClientPaymentMethod:
+  models.ClientPaymentMethod:
     properties:
       city:
         type: string
       clientID:
         type: string
       country:
-        $ref: '#/definitions/ptop_internal_models.Country'
+        $ref: '#/definitions/models.Country'
       countryID:
         type: string
       id:
@@ -334,20 +334,20 @@ definitions:
       name:
         type: string
       paymentMethod:
-        $ref: '#/definitions/ptop_internal_models.PaymentMethod'
+        $ref: '#/definitions/models.PaymentMethod'
       paymentMethodID:
         type: string
       postCode:
         type: string
     type: object
-  ptop_internal_models.Country:
+  models.Country:
     properties:
       id:
         type: string
       name:
         type: string
     type: object
-  ptop_internal_models.Escrow:
+  models.Escrow:
     properties:
       amount:
         type: number
@@ -366,7 +366,7 @@ definitions:
       updatedAt:
         type: string
     type: object
-  ptop_internal_models.FeeSideType:
+  models.FeeSideType:
     enum:
     - sender
     - receiver
@@ -376,7 +376,7 @@ definitions:
     - FeeSideSender
     - FeeSideReceiver
     - FeeSideShared
-  ptop_internal_models.KycLevelHintType:
+  models.KycLevelHintType:
     enum:
     - low
     - medium
@@ -386,7 +386,7 @@ definitions:
     - KycLevelHintLow
     - KycLevelHintMedium
     - KycLevelHintHigh
-  ptop_internal_models.MessageType:
+  models.MessageType:
     enum:
     - TEXT
     - SYSTEM
@@ -396,7 +396,7 @@ definitions:
     - MessageTypeText
     - MessageTypeSystem
     - MessageTypeFile
-  ptop_internal_models.Offer:
+  models.Offer:
     properties:
       TTL:
         type: string
@@ -433,19 +433,19 @@ definitions:
       updatedAt:
         type: string
     type: object
-  ptop_internal_models.OfferFull:
+  models.OfferFull:
     properties:
       TTL:
         type: string
       amount:
         type: number
       client:
-        $ref: '#/definitions/ptop_internal_models.Client'
+        $ref: '#/definitions/models.Client'
       clientID:
         type: string
       clientPaymentMethods:
         items:
-          $ref: '#/definitions/ptop_internal_models.ClientPaymentMethod'
+          $ref: '#/definitions/models.ClientPaymentMethod'
         type: array
       conditions:
         type: string
@@ -456,7 +456,7 @@ definitions:
       enabledAt:
         type: string
       fromAsset:
-        $ref: '#/definitions/ptop_internal_models.Asset'
+        $ref: '#/definitions/models.Asset'
       fromAssetID:
         type: string
       id:
@@ -472,7 +472,7 @@ definitions:
       price:
         type: number
       toAsset:
-        $ref: '#/definitions/ptop_internal_models.Asset'
+        $ref: '#/definitions/models.Asset'
       toAssetID:
         type: string
       type:
@@ -480,7 +480,7 @@ definitions:
       updatedAt:
         type: string
     type: object
-  ptop_internal_models.Order:
+  models.Order:
     properties:
       amount:
         type: number
@@ -507,13 +507,13 @@ definitions:
       sellerID:
         type: string
       status:
-        $ref: '#/definitions/ptop_internal_models.OrderStatus'
+        $ref: '#/definitions/models.OrderStatus'
       toAssetID:
         type: string
       updatedAt:
         type: string
     type: object
-  ptop_internal_models.OrderMessage:
+  models.OrderMessage:
     properties:
       chatID:
         type: string
@@ -535,11 +535,11 @@ definitions:
       readAt:
         type: string
       type:
-        $ref: '#/definitions/ptop_internal_models.MessageType'
+        $ref: '#/definitions/models.MessageType'
       updatedAt:
         type: string
     type: object
-  ptop_internal_models.OrderStatus:
+  models.OrderStatus:
     enum:
     - WAIT_PAYMENT
     - PAID
@@ -553,16 +553,16 @@ definitions:
     - OrderStatusReleased
     - OrderStatusCancelled
     - OrderStatusDispute
-  ptop_internal_models.PaymentMethod:
+  models.PaymentMethod:
     properties:
       chargebackWindowHours:
         type: integer
       countries:
         items:
-          $ref: '#/definitions/ptop_internal_models.Country'
+          $ref: '#/definitions/models.Country'
         type: array
       feeSide:
-        $ref: '#/definitions/ptop_internal_models.FeeSideType'
+        $ref: '#/definitions/models.FeeSideType'
       id:
         type: string
       isRealtime:
@@ -570,7 +570,7 @@ definitions:
       isReversible:
         type: boolean
       kycLevelHint:
-        $ref: '#/definitions/ptop_internal_models.KycLevelHintType'
+        $ref: '#/definitions/models.KycLevelHintType'
       methodGroup:
         type: string
       name:
@@ -586,7 +586,7 @@ definitions:
       typicalFiatCCY:
         type: string
     type: object
-  ptop_internal_models.TransactionIn:
+  models.TransactionIn:
     properties:
       amount:
         type: number
@@ -603,13 +603,13 @@ definitions:
       id:
         type: string
       status:
-        $ref: '#/definitions/ptop_internal_models.TransactionInStatus'
+        $ref: '#/definitions/models.TransactionInStatus'
       updatedAt:
         type: string
       walletID:
         type: string
     type: object
-  ptop_internal_models.TransactionInStatus:
+  models.TransactionInStatus:
     enum:
     - pending
     - processing
@@ -621,7 +621,7 @@ definitions:
     - TransactionInStatusProcessing
     - TransactionInStatusConfirmed
     - TransactionInStatusFailed
-  ptop_internal_models.TransactionInternal:
+  models.TransactionInternal:
     properties:
       amount:
         type: number
@@ -640,13 +640,13 @@ definitions:
       orderInfo:
         type: string
       status:
-        $ref: '#/definitions/ptop_internal_models.TransactionInternalStatus'
+        $ref: '#/definitions/models.TransactionInternalStatus'
       toClientID:
         type: string
       updatedAt:
         type: string
     type: object
-  ptop_internal_models.TransactionInternalStatus:
+  models.TransactionInternalStatus:
     enum:
     - processing
     - confirmed
@@ -656,7 +656,7 @@ definitions:
     - TransactionInternalStatusProcessing
     - TransactionInternalStatusConfirmed
     - TransactionInternalStatusFailed
-  ptop_internal_models.TransactionOut:
+  models.TransactionOut:
     properties:
       amount:
         type: number
@@ -675,13 +675,13 @@ definitions:
       id:
         type: string
       status:
-        $ref: '#/definitions/ptop_internal_models.TransactionOutStatus'
+        $ref: '#/definitions/models.TransactionOutStatus'
       toAddress:
         type: string
       updatedAt:
         type: string
     type: object
-  ptop_internal_models.TransactionOutStatus:
+  models.TransactionOutStatus:
     enum:
     - pending
     - processing
@@ -695,7 +695,7 @@ definitions:
     - TransactionOutStatusConfirmed
     - TransactionOutStatusFailed
     - TransactionOutStatusCancelled
-  ptop_internal_models.Wallet:
+  models.Wallet:
     properties:
       assetID:
         type: string
@@ -727,7 +727,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/ptop_internal_models.Asset'
+              $ref: '#/definitions/models.Asset'
             type: array
       summary: Список активных активов
       tags:
@@ -742,22 +742,22 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers.Disable2FARequest'
+          $ref: '#/definitions/handlers.Disable2FARequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/internal_handlers.StatusResponse'
+            $ref: '#/definitions/handlers.StatusResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Отключение двухфакторной аутентификации
@@ -773,22 +773,22 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers.Enable2FARequest'
+          $ref: '#/definitions/handlers.Enable2FARequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/internal_handlers.Enable2FAResponse'
+            $ref: '#/definitions/handlers.Enable2FAResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Включение двухфакторной аутентификации
@@ -806,22 +806,22 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers.LoginRequest'
+          $ref: '#/definitions/handlers.LoginRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/internal_handlers.TokenResponse'
+            $ref: '#/definitions/handlers.TokenResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       summary: Вход клиента
       tags:
       - auth
@@ -833,11 +833,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/internal_handlers.StatusResponse'
+            $ref: '#/definitions/handlers.StatusResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Выход клиента
@@ -853,22 +853,22 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers.RegenerateMnemonicRequest'
+          $ref: '#/definitions/handlers.RegenerateMnemonicRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/internal_handlers.RegenerateMnemonicResponse'
+            $ref: '#/definitions/handlers.RegenerateMnemonicResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Перегенерация мнемонической фразы
@@ -884,22 +884,22 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers.ChangePasswordRequest'
+          $ref: '#/definitions/handlers.ChangePasswordRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/internal_handlers.StatusResponse'
+            $ref: '#/definitions/handlers.StatusResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Смена пароля
@@ -915,22 +915,22 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers.SetPinCodeRequest'
+          $ref: '#/definitions/handlers.SetPinCodeRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/internal_handlers.StatusResponse'
+            $ref: '#/definitions/handlers.StatusResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Установка PIN-кода
@@ -944,11 +944,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/internal_handlers.ProfileResponse'
+            $ref: '#/definitions/handlers.ProfileResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Профиль клиента
@@ -964,26 +964,26 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers.RecoverRequest'
+          $ref: '#/definitions/handlers.RecoverRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/internal_handlers.TokenResponse'
+            $ref: '#/definitions/handlers.TokenResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       summary: Восстановление доступа
       tags:
       - auth
@@ -1001,11 +1001,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/internal_handlers.RecoverChallengeResponse'
+            $ref: '#/definitions/handlers.RecoverChallengeResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       summary: Запрос позиций для восстановления
       tags:
       - auth
@@ -1019,22 +1019,22 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers.RefreshRequest'
+          $ref: '#/definitions/handlers.RefreshRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/internal_handlers.TokenResponse'
+            $ref: '#/definitions/handlers.TokenResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       summary: Обновление access токена
       tags:
       - auth
@@ -1050,22 +1050,22 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers.RegisterRequest'
+          $ref: '#/definitions/handlers.RegisterRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/internal_handlers.RegisterResponse'
+            $ref: '#/definitions/handlers.RegisterResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       summary: Регистрация клиента
       tags:
       - auth
@@ -1079,26 +1079,26 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers.ChangeUsernameRequest'
+          $ref: '#/definitions/handlers.ChangeUsernameRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/internal_handlers.StatusResponse'
+            $ref: '#/definitions/handlers.StatusResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Смена имени пользователя
@@ -1114,22 +1114,22 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers.VerifyPasswordRequest'
+          $ref: '#/definitions/handlers.VerifyPasswordRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/internal_handlers.VerifyPasswordResponse'
+            $ref: '#/definitions/handlers.VerifyPasswordResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Проверка текущего пароля
@@ -1144,7 +1144,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/internal_handlers.AssetWithWallet'
+              $ref: '#/definitions/handlers.AssetWithWallet'
             type: array
       security:
       - BearerAuth: []
@@ -1160,7 +1160,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/ptop_internal_models.Balance'
+              $ref: '#/definitions/models.Balance'
             type: array
       security:
       - BearerAuth: []
@@ -1176,7 +1176,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/ptop_internal_models.Escrow'
+              $ref: '#/definitions/models.Escrow'
             type: array
       security:
       - BearerAuth: []
@@ -1201,11 +1201,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/internal_handlers.EscrowNavResponse'
+            $ref: '#/definitions/handlers.EscrowNavResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Просмотр эскроу клиента
@@ -1225,7 +1225,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/ptop_internal_models.OfferFull'
+              $ref: '#/definitions/models.OfferFull'
             type: array
       security:
       - BearerAuth: []
@@ -1241,18 +1241,18 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers.OfferRequest'
+          $ref: '#/definitions/handlers.OfferRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/ptop_internal_models.Offer'
+            $ref: '#/definitions/models.Offer'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Создать объявление
@@ -1273,22 +1273,22 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers.OfferRequest'
+          $ref: '#/definitions/handlers.OfferRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/ptop_internal_models.Offer'
+            $ref: '#/definitions/models.Offer'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Изменить объявление
@@ -1306,11 +1306,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/ptop_internal_models.Offer'
+            $ref: '#/definitions/models.Offer'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Отключить объявление
@@ -1328,15 +1328,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/ptop_internal_models.Offer'
+            $ref: '#/definitions/models.Offer'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Включить объявление
@@ -1351,7 +1351,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/ptop_internal_models.Order'
+              $ref: '#/definitions/models.Order'
             type: array
       security:
       - BearerAuth: []
@@ -1367,18 +1367,18 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers.OrderRequest'
+          $ref: '#/definitions/handlers.OrderRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/ptop_internal_models.Order'
+            $ref: '#/definitions/models.Order'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Создать ордер
@@ -1393,7 +1393,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/ptop_internal_models.ClientPaymentMethod'
+              $ref: '#/definitions/models.ClientPaymentMethod'
             type: array
       security:
       - BearerAuth: []
@@ -1409,22 +1409,22 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers.CreateClientPaymentMethodRequest'
+          $ref: '#/definitions/handlers.CreateClientPaymentMethodRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/ptop_internal_models.ClientPaymentMethod'
+            $ref: '#/definitions/models.ClientPaymentMethod'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Создать платёжный метод клиента
@@ -1442,11 +1442,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/internal_handlers.StatusResponse'
+            $ref: '#/definitions/handlers.StatusResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Удалить платёжный метод клиента
@@ -1470,7 +1470,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/ptop_internal_models.TransactionIn'
+              $ref: '#/definitions/models.TransactionIn'
             type: array
       security:
       - BearerAuth: []
@@ -1495,7 +1495,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/ptop_internal_models.TransactionInternal'
+              $ref: '#/definitions/models.TransactionInternal'
             type: array
       security:
       - BearerAuth: []
@@ -1520,7 +1520,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/ptop_internal_models.TransactionOut'
+              $ref: '#/definitions/models.TransactionOut'
             type: array
       security:
       - BearerAuth: []
@@ -1536,7 +1536,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/ptop_internal_models.Wallet'
+              $ref: '#/definitions/models.Wallet'
             type: array
       security:
       - BearerAuth: []
@@ -1554,18 +1554,18 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers.WalletRequest'
+          $ref: '#/definitions/handlers.WalletRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/ptop_internal_models.Wallet'
+            $ref: '#/definitions/models.Wallet'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Создать кошелёк
@@ -1580,7 +1580,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/ptop_internal_models.Country'
+              $ref: '#/definitions/models.Country'
             type: array
       security:
       - BearerAuth: []
@@ -1598,7 +1598,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers.DebugDepositRequest'
+          $ref: '#/definitions/handlers.DebugDepositRequest'
       produces:
       - application/json
       responses:
@@ -1627,11 +1627,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/internal_handlers.StatusResponse'
+            $ref: '#/definitions/handlers.StatusResponse'
         "503":
           description: Service Unavailable
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       summary: Проверка состояния сервиса
       tags:
       - health
@@ -1662,6 +1662,14 @@ paths:
         in: query
         name: type
         type: string
+      - description: лимит
+        in: query
+        name: limit
+        type: integer
+      - description: смещение
+        in: query
+        name: offset
+        type: integer
       produces:
       - application/json
       responses:
@@ -1669,7 +1677,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/ptop_internal_models.OfferFull'
+              $ref: '#/definitions/models.OfferFull'
             type: array
       security:
       - BearerAuth: []
@@ -1699,16 +1707,16 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/ptop_internal_models.OrderMessage'
+              $ref: '#/definitions/models.OrderMessage'
             type: array
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Список сообщений ордера
@@ -1729,7 +1737,7 @@ paths:
         in: body
         name: input
         schema:
-          $ref: '#/definitions/internal_handlers.OrderMessageRequest'
+          $ref: '#/definitions/handlers.OrderMessageRequest'
       - description: файл (image/jpeg, image/png, application/pdf)
         in: formData
         name: file
@@ -1740,19 +1748,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/ptop_internal_models.OrderMessage'
+            $ref: '#/definitions/models.OrderMessage'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Отправить сообщение в ордер
@@ -1777,15 +1785,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/ptop_internal_models.OrderMessage'
+            $ref: '#/definitions/models.OrderMessage'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Отметить сообщение прочитанным
@@ -1800,7 +1808,7 @@ paths:
           description: Расширенная структура платёжных методов
           schema:
             items:
-              $ref: '#/definitions/ptop_internal_models.PaymentMethod'
+              $ref: '#/definitions/models.PaymentMethod'
             type: array
       security:
       - BearerAuth: []
@@ -1824,11 +1832,11 @@ paths:
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Websocket чат ордера

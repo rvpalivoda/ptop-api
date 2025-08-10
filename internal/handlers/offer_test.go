@@ -3,6 +3,7 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -367,5 +368,104 @@ func TestListOffersFilters(t *testing.T) {
 	json.Unmarshal(w.Body.Bytes(), &list)
 	if len(list) != 1 || list[0].ID != off1.ID {
 		t.Fatalf("unexpected filter result")
+	}
+}
+
+func TestListOffersPagination(t *testing.T) {
+	db, r, _ := setupTest(t)
+
+	tokens := make([]string, 3)
+	for i := 1; i <= 3; i++ {
+		// register
+		body := fmt.Sprintf(`{"username":"u%d","password":"pass","password_confirm":"pass"}`, i)
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("POST", "/auth/register", bytes.NewBufferString(body))
+		req.Header.Set("Content-Type", "application/json")
+		r.ServeHTTP(w, req)
+
+		// login
+		body = fmt.Sprintf(`{"username":"u%d","password":"pass"}`, i)
+		w = httptest.NewRecorder()
+		req, _ = http.NewRequest("POST", "/auth/login", bytes.NewBufferString(body))
+		req.Header.Set("Content-Type", "application/json")
+		r.ServeHTTP(w, req)
+		if w.Code != http.StatusOK {
+			t.Fatalf("login%d status %d", i, w.Code)
+		}
+		var tok struct {
+			AccessToken string `json:"access_token"`
+		}
+		json.Unmarshal(w.Body.Bytes(), &tok)
+		tokens[i-1] = tok.AccessToken
+	}
+
+	usd := models.Asset{Name: "USDp", Type: models.AssetTypeFiat, IsActive: true}
+	btc := models.Asset{Name: "BTCp", Type: models.AssetTypeCrypto, IsActive: true}
+	country := models.Country{Name: "CountryP"}
+	pm := models.PaymentMethod{Name: "BankP", MethodGroup: "bank", IsRealtime: false, FeeSide: models.FeeSideSender, KycLevelHint: models.KycLevelHintLow}
+	if err := db.Create(&usd).Error; err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Create(&btc).Error; err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Create(&country).Error; err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Create(&pm).Error; err != nil {
+		t.Fatal(err)
+	}
+
+	var offers []models.Offer
+	for i := 1; i <= 3; i++ {
+		var c models.Client
+		db.Where("username = ?", fmt.Sprintf("u%d", i)).First(&c)
+		cpm := models.ClientPaymentMethod{ClientID: c.ID, CountryID: country.ID, PaymentMethodID: pm.ID, Name: fmt.Sprintf("pm%d", i)}
+		if err := db.Create(&cpm).Error; err != nil {
+			t.Fatal(err)
+		}
+
+		reqBody := OfferRequest{
+			MaxAmount:              "100",
+			MinAmount:              "10",
+			Amount:                 "50",
+			Price:                  "1",
+			Type:                   models.OfferTypeBuy,
+			FromAssetID:            usd.ID,
+			ToAssetID:              btc.ID,
+			ClientPaymentMethodIDs: []string{cpm.ID},
+		}
+		b, _ := json.Marshal(reqBody)
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("POST", "/client/offers", bytes.NewReader(b))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", "Bearer "+tokens[i-1])
+		r.ServeHTTP(w, req)
+		if w.Code != http.StatusOK {
+			t.Fatalf("create offer%d status %d", i, w.Code)
+		}
+		var off models.Offer
+		json.Unmarshal(w.Body.Bytes(), &off)
+		offers = append(offers, off)
+		w = httptest.NewRecorder()
+		req, _ = http.NewRequest("POST", "/client/offers/"+off.ID+"/enable", nil)
+		req.Header.Set("Authorization", "Bearer "+tokens[i-1])
+		r.ServeHTTP(w, req)
+		if w.Code != http.StatusOK {
+			t.Fatalf("enable offer%d status %d", i, w.Code)
+		}
+	}
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/offers?limit=2&offset=1", nil)
+	req.Header.Set("Authorization", "Bearer "+tokens[0])
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("list status %d", w.Code)
+	}
+	var list []models.OfferFull
+	json.Unmarshal(w.Body.Bytes(), &list)
+	if len(list) != 2 || list[0].ID != offers[1].ID || list[1].ID != offers[0].ID {
+		t.Fatalf("unexpected pagination result")
 	}
 }

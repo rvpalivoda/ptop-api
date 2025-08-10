@@ -2,29 +2,12 @@ package handlers
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
 	"ptop/internal/models"
 )
-
-func parsePagination(c *gin.Context) (limit, offset int) {
-	limit = 50
-	offset = 0
-	if lStr := c.Query("limit"); lStr != "" {
-		if l, err := strconv.Atoi(lStr); err == nil && l > 0 && l <= 100 {
-			limit = l
-		}
-	}
-	if oStr := c.Query("offset"); oStr != "" {
-		if o, err := strconv.Atoi(oStr); err == nil && o >= 0 {
-			offset = o
-		}
-	}
-	return
-}
 
 // ListClientTransactionsIn godoc
 // @Summary Список входящих транзакций клиента
@@ -44,13 +27,13 @@ func ListClientTransactionsIn(db *gorm.DB) gin.HandlerFunc {
 		}
 		clientID := clientIDVal.(string)
 		limit, offset := parsePagination(c)
-                var txs []models.TransactionIn
-                if err := db.Model(&models.TransactionIn{}).
-                        Select("transaction_ins.*, assets.name as asset_name").
-                        Joins("LEFT JOIN assets ON assets.id = transaction_ins.asset_id").
-                        Where("transaction_ins.client_id = ?", clientID).
-                        Order("transaction_ins.created_at desc").
-                        Limit(limit).Offset(offset).Find(&txs).Error; err != nil {
+		var txs []models.TransactionIn
+		if err := db.Model(&models.TransactionIn{}).
+			Select("transaction_ins.*, assets.name as asset_name").
+			Joins("LEFT JOIN assets ON assets.id = transaction_ins.asset_id").
+			Where("transaction_ins.client_id = ?", clientID).
+			Order("transaction_ins.created_at desc").
+			Limit(limit).Offset(offset).Find(&txs).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
 			return
 		}
@@ -76,13 +59,13 @@ func ListClientTransactionsOut(db *gorm.DB) gin.HandlerFunc {
 		}
 		clientID := clientIDVal.(string)
 		limit, offset := parsePagination(c)
-                var txs []models.TransactionOut
-                if err := db.Model(&models.TransactionOut{}).
-                        Select("transaction_outs.*, assets.name as asset_name").
-                        Joins("LEFT JOIN assets ON assets.id = transaction_outs.asset_id").
-                        Where("transaction_outs.client_id = ?", clientID).
-                        Order("transaction_outs.created_at desc").
-                        Limit(limit).Offset(offset).Find(&txs).Error; err != nil {
+		var txs []models.TransactionOut
+		if err := db.Model(&models.TransactionOut{}).
+			Select("transaction_outs.*, assets.name as asset_name").
+			Joins("LEFT JOIN assets ON assets.id = transaction_outs.asset_id").
+			Where("transaction_outs.client_id = ?", clientID).
+			Order("transaction_outs.created_at desc").
+			Limit(limit).Offset(offset).Find(&txs).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
 			return
 		}
@@ -108,13 +91,13 @@ func ListClientTransactionsInternal(db *gorm.DB) gin.HandlerFunc {
 		}
 		clientID := clientIDVal.(string)
 		limit, offset := parsePagination(c)
-                var txs []models.TransactionInternal
-                if err := db.Model(&models.TransactionInternal{}).
-                        Select("transaction_internals.*, assets.name as asset_name").
-                        Joins("LEFT JOIN assets ON assets.id = transaction_internals.asset_id").
-                        Where("transaction_internals.from_client_id = ? OR transaction_internals.to_client_id = ?", clientID, clientID).
-                        Order("transaction_internals.created_at desc").
-                        Limit(limit).Offset(offset).Find(&txs).Error; err != nil {
+		var txs []models.TransactionInternal
+		if err := db.Model(&models.TransactionInternal{}).
+			Select("transaction_internals.*, assets.name as asset_name").
+			Joins("LEFT JOIN assets ON assets.id = transaction_internals.asset_id").
+			Where("transaction_internals.from_client_id = ? OR transaction_internals.to_client_id = ?", clientID, clientID).
+			Order("transaction_internals.created_at desc").
+			Limit(limit).Offset(offset).Find(&txs).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
 			return
 		}
