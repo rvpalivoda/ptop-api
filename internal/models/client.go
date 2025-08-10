@@ -16,9 +16,9 @@ type Client struct {
 	PinCode      *string         `gorm:"type:varchar(255)" json:"-"`
 	TwoFAEnabled bool            `gorm:"not null;default:false" json:"twoFAEnabled"`
 	TOTPSecret   *string         `gorm:"type:varchar(255)" json:"-"`
-	Bip39        datatypes.JSON  `gorm:"type:json" json:"bip39" swaggertype:"object" json:"-"`
+	Bip39        datatypes.JSON  `gorm:"type:json"  json:"-"`
 	Password     *string         `gorm:"type:varchar(255)" json:"-"`
-	RegistredAt  time.Time       `gorm:"autoCreateTime"`
+	RegistredAt  time.Time       `gorm:"autoCreateTime" json:"registredAt"`
 	Rating       decimal.Decimal `gorm:"type:decimal(3,2);not null;default:0" json:"rating"`
 	OrdersCount  int             `gorm:"not null;default:0" json:"ordersCount"`
 }
