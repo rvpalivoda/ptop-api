@@ -1,6 +1,1188 @@
+swagger: '2.0'
+info:
+  description: "API \u0441\u0435\u0440\u0432\u0438\u0441\u0430 PTOP"
+  title: PTOP API
+  contact: {}
+  version: '1.0'
 basePath: /
+paths:
+  /assets:
+    get:
+      produces:
+      - application/json
+      tags:
+      - reference
+      summary: "\u0421\u043F\u0438\u0441\u043E\u043A \u0430\u043A\u0442\u0438\u0432\
+        \u043D\u044B\u0445 \u0430\u043A\u0442\u0438\u0432\u043E\u0432"
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ptop_internal_models.Asset'
+  /auth/2fa/disable:
+    post:
+      security:
+      - BearerAuth: []
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      tags:
+      - auth
+      summary: "\u041E\u0442\u043A\u043B\u044E\u0447\u0435\u043D\u0438\u0435 \u0434\
+        \u0432\u0443\u0445\u0444\u0430\u043A\u0442\u043E\u0440\u043D\u043E\u0439 \u0430\
+        \u0443\u0442\u0435\u043D\u0442\u0438\u0444\u0438\u043A\u0430\u0446\u0438\u0438"
+      parameters:
+      - description: "\u043F\u043E\u0434\u0442\u0432\u0435\u0440\u0436\u0434\u0435\
+          \u043D\u0438\u0435 \u043F\u0430\u0440\u043E\u043B\u044F"
+        name: input
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.Disable2FARequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handlers.StatusResponse'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+  /auth/2fa/enable:
+    post:
+      security:
+      - BearerAuth: []
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      tags:
+      - auth
+      summary: "\u0412\u043A\u043B\u044E\u0447\u0435\u043D\u0438\u0435 \u0434\u0432\
+        \u0443\u0445\u0444\u0430\u043A\u0442\u043E\u0440\u043D\u043E\u0439 \u0430\u0443\
+        \u0442\u0435\u043D\u0442\u0438\u0444\u0438\u043A\u0430\u0446\u0438\u0438"
+      parameters:
+      - description: "\u043F\u043E\u0434\u0442\u0432\u0435\u0440\u0436\u0434\u0435\
+          \u043D\u0438\u0435 \u043F\u0430\u0440\u043E\u043B\u044F"
+        name: input
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.Enable2FARequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handlers.Enable2FAResponse'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+  /auth/login:
+    post:
+      description: "\u0410\u0443\u0442\u0435\u043D\u0442\u0438\u0444\u0438\u0446\u0438\
+        \u0440\u0443\u0435\u0442 \u043A\u043B\u0438\u0435\u043D\u0442\u0430 \u0438\
+        \ \u0432\u044B\u0434\u0430\u0451\u0442 \u043F\u0430\u0440\u0443 \u0442\u043E\
+        \u043A\u0435\u043D\u043E\u0432. \u041F\u0440\u0438 \u0432\u043A\u043B\u044E\
+        \u0447\u0451\u043D\u043D\u043E\u0439 2FA \u0442\u0440\u0435\u0431\u0443\u0435\
+        \u0442\u0441\u044F \u043A\u043E\u0434."
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      tags:
+      - auth
+      summary: "\u0412\u0445\u043E\u0434 \u043A\u043B\u0438\u0435\u043D\u0442\u0430"
+      parameters:
+      - description: "\u0443\u0447\u0451\u0442\u043D\u044B\u0435 \u0434\u0430\u043D\
+          \u043D\u044B\u0435"
+        name: input
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.LoginRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handlers.TokenResponse'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+  /auth/logout:
+    post:
+      security:
+      - BearerAuth: []
+      produces:
+      - application/json
+      tags:
+      - auth
+      summary: "\u0412\u044B\u0445\u043E\u0434 \u043A\u043B\u0438\u0435\u043D\u0442\
+        \u0430"
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handlers.StatusResponse'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+  /auth/mnemonic/regenerate:
+    post:
+      security:
+      - BearerAuth: []
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      tags:
+      - auth
+      summary: "\u041F\u0435\u0440\u0435\u0433\u0435\u043D\u0435\u0440\u0430\u0446\
+        \u0438\u044F \u043C\u043D\u0435\u043C\u043E\u043D\u0438\u0447\u0435\u0441\u043A\
+        \u043E\u0439 \u0444\u0440\u0430\u0437\u044B"
+      parameters:
+      - description: "\u043F\u0430\u0440\u043E\u043B\u044C"
+        name: input
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.RegenerateMnemonicRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handlers.RegenerateMnemonicResponse'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+  /auth/password:
+    post:
+      security:
+      - BearerAuth: []
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      tags:
+      - auth
+      summary: "\u0421\u043C\u0435\u043D\u0430 \u043F\u0430\u0440\u043E\u043B\u044F"
+      parameters:
+      - description: "\u043F\u0430\u0440\u043E\u043B\u0438"
+        name: input
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.ChangePasswordRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handlers.StatusResponse'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+  /auth/pincode:
+    post:
+      security:
+      - BearerAuth: []
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      tags:
+      - auth
+      summary: "\u0423\u0441\u0442\u0430\u043D\u043E\u0432\u043A\u0430 PIN-\u043A\u043E\
+        \u0434\u0430"
+      parameters:
+      - description: "\u043F\u0438\u043D-\u043A\u043E\u0434"
+        name: input
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.SetPinCodeRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handlers.StatusResponse'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+  /auth/profile:
+    get:
+      security:
+      - BearerAuth: []
+      produces:
+      - application/json
+      tags:
+      - auth
+      summary: "\u041F\u0440\u043E\u0444\u0438\u043B\u044C \u043A\u043B\u0438\u0435\
+        \u043D\u0442\u0430"
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handlers.ProfileResponse'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+  /auth/recover:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      tags:
+      - auth
+      summary: "\u0412\u043E\u0441\u0441\u0442\u0430\u043D\u043E\u0432\u043B\u0435\
+        \u043D\u0438\u0435 \u0434\u043E\u0441\u0442\u0443\u043F\u0430"
+      parameters:
+      - description: "\u0444\u0440\u0430\u0437\u044B \u0438 \u043D\u043E\u0432\u044B\
+          \u0439 \u043F\u0430\u0440\u043E\u043B\u044C"
+        name: input
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.RecoverRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handlers.TokenResponse'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+  /auth/recover/{username}:
+    get:
+      produces:
+      - application/json
+      tags:
+      - auth
+      summary: "\u0417\u0430\u043F\u0440\u043E\u0441 \u043F\u043E\u0437\u0438\u0446\
+        \u0438\u0439 \u0434\u043B\u044F \u0432\u043E\u0441\u0441\u0442\u0430\u043D\
+        \u043E\u0432\u043B\u0435\u043D\u0438\u044F"
+      parameters:
+      - type: string
+        description: "\u0438\u043C\u044F \u043F\u043E\u043B\u044C\u0437\u043E\u0432\
+          \u0430\u0442\u0435\u043B\u044F"
+        name: username
+        in: path
+        required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handlers.RecoverChallengeResponse'
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      tags:
+      - auth
+      summary: "\u041E\u0431\u043D\u043E\u0432\u043B\u0435\u043D\u0438\u0435 access\
+        \ \u0442\u043E\u043A\u0435\u043D\u0430"
+      parameters:
+      - description: "refresh \u0442\u043E\u043A\u0435\u043D"
+        name: input
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.RefreshRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handlers.TokenResponse'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+  /auth/register:
+    post:
+      description: "\u0421\u043E\u0437\u0434\u0430\u0451\u0442 \u043D\u043E\u0432\u043E\
+        \u0433\u043E \u043A\u043B\u0438\u0435\u043D\u0442\u0430 \u0441 \u0443\u043D\
+        \u0438\u043A\u0430\u043B\u044C\u043D\u044B\u043C \u0438\u043C\u0435\u043D\u0435\
+        \u043C, \u0445\u0435\u0448\u0435\u043C \u043F\u0430\u0440\u043E\u043B\u044F\
+        \ \u0438 \u043C\u043D\u0435\u043C\u043E\u043D\u0438\u0447\u0435\u0441\u043A\
+        \u043E\u0439 \u0444\u0440\u0430\u0437\u043E\u0439"
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      tags:
+      - auth
+      summary: "\u0420\u0435\u0433\u0438\u0441\u0442\u0440\u0430\u0446\u0438\u044F\
+        \ \u043A\u043B\u0438\u0435\u043D\u0442\u0430"
+      parameters:
+      - description: "\u0434\u0430\u043D\u043D\u044B\u0435 \u0440\u0435\u0433\u0438\
+          \u0441\u0442\u0440\u0430\u0446\u0438\u0438"
+        name: input
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.RegisterRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handlers.RegisterResponse'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        '409':
+          description: Conflict
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+  /auth/username:
+    post:
+      security:
+      - BearerAuth: []
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      tags:
+      - auth
+      summary: "\u0421\u043C\u0435\u043D\u0430 \u0438\u043C\u0435\u043D\u0438 \u043F\
+        \u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044F"
+      parameters:
+      - description: "\u043D\u043E\u0432\u043E\u0435 \u0438\u043C\u044F"
+        name: input
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.ChangeUsernameRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handlers.StatusResponse'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        '409':
+          description: Conflict
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+  /auth/verify-password:
+    post:
+      security:
+      - BearerAuth: []
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      tags:
+      - auth
+      summary: "\u041F\u0440\u043E\u0432\u0435\u0440\u043A\u0430 \u0442\u0435\u043A\
+        \u0443\u0449\u0435\u0433\u043E \u043F\u0430\u0440\u043E\u043B\u044F"
+      parameters:
+      - description: "\u043F\u0430\u0440\u043E\u043B\u044C"
+        name: input
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.VerifyPasswordRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handlers.VerifyPasswordResponse'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+  /client/assets:
+    get:
+      security:
+      - BearerAuth: []
+      produces:
+      - application/json
+      tags:
+      - reference
+      summary: "\u0421\u043F\u0438\u0441\u043E\u043A \u0430\u043A\u0442\u0438\u0432\
+        \u043D\u044B\u0445 \u0430\u043A\u0442\u0438\u0432\u043E\u0432 \u0441 \u0430\
+        \u0434\u0440\u0435\u0441\u0430\u043C\u0438 \u043A\u043E\u0448\u0435\u043B\u044C\
+        \u043A\u043E\u0432 \u0438 \u0431\u0430\u043B\u0430\u043D\u0441\u0430\u043C\
+        \u0438 \u043A\u043B\u0438\u0435\u043D\u0442\u0430"
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/internal_handlers.AssetWithWallet'
+  /client/balances:
+    get:
+      security:
+      - BearerAuth: []
+      produces:
+      - application/json
+      tags:
+      - balances
+      summary: "\u0421\u043F\u0438\u0441\u043E\u043A \u0431\u0430\u043B\u0430\u043D\
+        \u0441\u043E\u0432 \u043A\u043B\u0438\u0435\u043D\u0442\u0430"
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ptop_internal_models.Balance'
+  /client/escrows:
+    get:
+      security:
+      - BearerAuth: []
+      produces:
+      - application/json
+      tags:
+      - escrows
+      summary: "\u0421\u043F\u0438\u0441\u043E\u043A \u044D\u0441\u043A\u0440\u043E\
+        \u0443 \u043A\u043B\u0438\u0435\u043D\u0442\u0430"
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ptop_internal_models.Escrow'
+  /client/offers:
+    get:
+      security:
+      - BearerAuth: []
+      produces:
+      - application/json
+      tags:
+      - offers
+      summary: "\u0421\u043F\u0438\u0441\u043E\u043A \u043E\u0431\u044A\u044F\u0432\
+        \u043B\u0435\u043D\u0438\u0439 \u043A\u043B\u0438\u0435\u043D\u0442\u0430"
+      parameters:
+      - type: boolean
+        description: "\u0444\u0438\u043B\u044C\u0442\u0440 \u043F\u043E \u0430\u043A\
+          \u0442\u0438\u0432\u043D\u044B\u043C"
+        name: enabled
+        in: query
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ptop_internal_models.Offer'
+    post:
+      security:
+      - BearerAuth: []
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      tags:
+      - offers
+      summary: "\u0421\u043E\u0437\u0434\u0430\u0442\u044C \u043E\u0431\u044A\u044F\
+        \u0432\u043B\u0435\u043D\u0438\u0435"
+      parameters:
+      - description: "\u0434\u0430\u043D\u043D\u044B\u0435"
+        name: input
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.OfferRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/ptop_internal_models.Offer'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+  /client/offers/{id}:
+    put:
+      security:
+      - BearerAuth: []
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      tags:
+      - offers
+      summary: "\u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C \u043E\u0431\u044A\
+        \u044F\u0432\u043B\u0435\u043D\u0438\u0435"
+      parameters:
+      - type: string
+        description: ID
+        name: id
+        in: path
+        required: true
+      - description: "\u0434\u0430\u043D\u043D\u044B\u0435"
+        name: input
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.OfferRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/ptop_internal_models.Offer'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+  /client/offers/{id}/disable:
+    post:
+      security:
+      - BearerAuth: []
+      tags:
+      - offers
+      summary: "\u041E\u0442\u043A\u043B\u044E\u0447\u0438\u0442\u044C \u043E\u0431\
+        \u044A\u044F\u0432\u043B\u0435\u043D\u0438\u0435"
+      parameters:
+      - type: string
+        description: ID
+        name: id
+        in: path
+        required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/ptop_internal_models.Offer'
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+  /client/offers/{id}/enable:
+    post:
+      security:
+      - BearerAuth: []
+      tags:
+      - offers
+      summary: "\u0412\u043A\u043B\u044E\u0447\u0438\u0442\u044C \u043E\u0431\u044A\
+        \u044F\u0432\u043B\u0435\u043D\u0438\u0435"
+      parameters:
+      - type: string
+        description: ID
+        name: id
+        in: path
+        required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/ptop_internal_models.Offer'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+  /client/orders:
+    get:
+      security:
+      - BearerAuth: []
+      produces:
+      - application/json
+      tags:
+      - orders
+      summary: "\u0421\u043F\u0438\u0441\u043E\u043A \u043E\u0440\u0434\u0435\u0440\
+        \u043E\u0432 \u043A\u043B\u0438\u0435\u043D\u0442\u0430"
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ptop_internal_models.Order'
+    post:
+      security:
+      - BearerAuth: []
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      tags:
+      - orders
+      summary: "\u0421\u043E\u0437\u0434\u0430\u0442\u044C \u043E\u0440\u0434\u0435\
+        \u0440"
+      parameters:
+      - description: "\u0434\u0430\u043D\u043D\u044B\u0435"
+        name: input
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.OrderRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/ptop_internal_models.Order'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+  /client/payment-methods:
+    get:
+      security:
+      - BearerAuth: []
+      produces:
+      - application/json
+      tags:
+      - client-payment-methods
+      summary: "\u0421\u043F\u0438\u0441\u043E\u043A \u043F\u043B\u0430\u0442\u0451\
+        \u0436\u043D\u044B\u0445 \u043C\u0435\u0442\u043E\u0434\u043E\u0432 \u043A\
+        \u043B\u0438\u0435\u043D\u0442\u0430"
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ptop_internal_models.ClientPaymentMethod'
+    post:
+      security:
+      - BearerAuth: []
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      tags:
+      - client-payment-methods
+      summary: "\u0421\u043E\u0437\u0434\u0430\u0442\u044C \u043F\u043B\u0430\u0442\
+        \u0451\u0436\u043D\u044B\u0439 \u043C\u0435\u0442\u043E\u0434 \u043A\u043B\
+        \u0438\u0435\u043D\u0442\u0430"
+      parameters:
+      - description: "\u0434\u0430\u043D\u043D\u044B\u0435"
+        name: input
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.CreateClientPaymentMethodRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/ptop_internal_models.ClientPaymentMethod'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        '409':
+          description: Conflict
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+  /client/payment-methods/{id}:
+    delete:
+      security:
+      - BearerAuth: []
+      tags:
+      - client-payment-methods
+      summary: "\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u043F\u043B\u0430\u0442\
+        \u0451\u0436\u043D\u044B\u0439 \u043C\u0435\u0442\u043E\u0434 \u043A\u043B\
+        \u0438\u0435\u043D\u0442\u0430"
+      parameters:
+      - type: string
+        description: ID
+        name: id
+        in: path
+        required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handlers.StatusResponse'
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+  /client/transactions/in:
+    get:
+      security:
+      - BearerAuth: []
+      produces:
+      - application/json
+      tags:
+      - transactions
+      summary: "\u0421\u043F\u0438\u0441\u043E\u043A \u0432\u0445\u043E\u0434\u044F\
+        \u0449\u0438\u0445 \u0442\u0440\u0430\u043D\u0437\u0430\u043A\u0446\u0438\u0439\
+        \ \u043A\u043B\u0438\u0435\u043D\u0442\u0430"
+      parameters:
+      - type: integer
+        description: "\u043B\u0438\u043C\u0438\u0442"
+        name: limit
+        in: query
+      - type: integer
+        description: "\u0441\u043C\u0435\u0449\u0435\u043D\u0438\u0435"
+        name: offset
+        in: query
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/models.TransactionIn'
+  /client/transactions/internal:
+    get:
+      security:
+      - BearerAuth: []
+      produces:
+      - application/json
+      tags:
+      - transactions
+      summary: "\u0421\u043F\u0438\u0441\u043E\u043A \u0432\u043D\u0443\u0442\u0440\
+        \u0435\u043D\u043D\u0438\u0445 \u0442\u0440\u0430\u043D\u0437\u0430\u043A\u0446\
+        \u0438\u0439 \u043A\u043B\u0438\u0435\u043D\u0442\u0430"
+      parameters:
+      - type: integer
+        description: "\u043B\u0438\u043C\u0438\u0442"
+        name: limit
+        in: query
+      - type: integer
+        description: "\u0441\u043C\u0435\u0449\u0435\u043D\u0438\u0435"
+        name: offset
+        in: query
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/models.TransactionInternal'
+  /client/transactions/out:
+    get:
+      security:
+      - BearerAuth: []
+      produces:
+      - application/json
+      tags:
+      - transactions
+      summary: "\u0421\u043F\u0438\u0441\u043E\u043A \u0438\u0441\u0445\u043E\u0434\
+        \u044F\u0449\u0438\u0445 \u0442\u0440\u0430\u043D\u0437\u0430\u043A\u0446\u0438\
+        \u0439 \u043A\u043B\u0438\u0435\u043D\u0442\u0430"
+      parameters:
+      - type: integer
+        description: "\u043B\u0438\u043C\u0438\u0442"
+        name: limit
+        in: query
+      - type: integer
+        description: "\u0441\u043C\u0435\u0449\u0435\u043D\u0438\u0435"
+        name: offset
+        in: query
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/models.TransactionOut'
+  /client/wallets:
+    get:
+      security:
+      - BearerAuth: []
+      produces:
+      - application/json
+      tags:
+      - wallets
+      summary: "\u0421\u043F\u0438\u0441\u043E\u043A \u043A\u043E\u0448\u0435\u043B\
+        \u044C\u043A\u043E\u0432 \u043A\u043B\u0438\u0435\u043D\u0442\u0430"
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ptop_internal_models.Wallet'
+    post:
+      security:
+      - BearerAuth: []
+      description: "\u041F\u0440\u0438 DEBUG_FAKE_NETWORK=true \u0430\u0434\u0440\u0435\
+        \u0441 \u0433\u0435\u043D\u0435\u0440\u0438\u0440\u0443\u0435\u0442\u0441\u044F\
+        \ \u0431\u0435\u0437 \u043E\u0431\u0440\u0430\u0449\u0435\u043D\u0438\u044F\
+        \ \u043A \u0441\u0435\u0442\u0438 \u0432 \u0444\u043E\u0440\u043C\u0430\u0442\
+        \u0435 fake:{asset}:{client}:{index}"
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      tags:
+      - wallets
+      summary: "\u0421\u043E\u0437\u0434\u0430\u0442\u044C \u043A\u043E\u0448\u0435\
+        \u043B\u0451\u043A"
+      parameters:
+      - description: "\u0434\u0430\u043D\u043D\u044B\u0435"
+        name: input
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.WalletRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/ptop_internal_models.Wallet'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+  /countries:
+    get:
+      security:
+      - BearerAuth: []
+      produces:
+      - application/json
+      tags:
+      - reference
+      summary: "\u0421\u043F\u0438\u0441\u043E\u043A \u0441\u0442\u0440\u0430\u043D"
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ptop_internal_models.Country'
+  /debug/deposit:
+    post:
+      description: "\u0421\u043E\u0437\u0434\u0430\u0451\u0442 \u0444\u0435\u0439\u043A\
+        \u043E\u0432\u044B\u0439 \u0434\u0435\u043F\u043E\u0437\u0438\u0442 \u043D\
+        \u0430 \u0443\u043A\u0430\u0437\u0430\u043D\u043D\u044B\u0439 \u043A\u043E\
+        \u0448\u0435\u043B\u0451\u043A"
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      tags:
+      - debug
+      summary: "\u0422\u0435\u0441\u0442\u043E\u0432\u044B\u0439 \u0434\u0435\u043F\
+        \u043E\u0437\u0438\u0442"
+      parameters:
+      - description: "\u0417\u0430\u043F\u0440\u043E\u0441"
+        name: request
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.DebugDepositRequest'
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          schema:
+            type: object
+            additionalProperties:
+              type: string
+        '404':
+          description: Not Found
+          schema:
+            type: object
+            additionalProperties:
+              type: string
+  /health:
+    get:
+      produces:
+      - application/json
+      tags:
+      - health
+      summary: "\u041F\u0440\u043E\u0432\u0435\u0440\u043A\u0430 \u0441\u043E\u0441\
+        \u0442\u043E\u044F\u043D\u0438\u044F \u0441\u0435\u0440\u0432\u0438\u0441\u0430"
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handlers.StatusResponse'
+        '503':
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+  /offers:
+    get:
+      security:
+      - BearerAuth: []
+      produces:
+      - application/json
+      tags:
+      - offers
+      summary: "\u0421\u043F\u0438\u0441\u043E\u043A \u0430\u043A\u0442\u0438\u0432\
+        \u043D\u044B\u0445 \u043E\u0431\u044A\u044F\u0432\u043B\u0435\u043D\u0438\u0439"
+      parameters:
+      - type: string
+        description: "ID \u0430\u043A\u0442\u0438\u0432\u0430 \u043E\u0442"
+        name: from_asset
+        in: query
+      - type: string
+        description: "ID \u0430\u043A\u0442\u0438\u0432\u0430 \u043A"
+        name: to_asset
+        in: query
+      - type: string
+        description: "\u043C\u0438\u043D\u0438\u043C\u0430\u043B\u044C\u043D\u0430\
+          \u044F \u0441\u0443\u043C\u043C\u0430"
+        name: min_amount
+        in: query
+      - type: string
+        description: "\u043C\u0430\u043A\u0441\u0438\u043C\u0430\u043B\u044C\u043D\
+          \u0430\u044F \u0441\u0443\u043C\u043C\u0430"
+        name: max_amount
+        in: query
+      - type: string
+        description: "ID \u0441\u043F\u043E\u0441\u043E\u0431\u0430 \u043E\u043F\u043B\
+          \u0430\u0442\u044B"
+        name: payment_method
+        in: query
+      - type: string
+        description: "\u0442\u0438\u043F \u043E\u0431\u044A\u044F\u0432\u043B\u0435\
+          \u043D\u0438\u044F: buy \u0438\u043B\u0438 sell"
+        name: type
+        in: query
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ptop_internal_models.Offer'
+  /orders/{id}/messages:
+    get:
+      security:
+      - BearerAuth: []
+      produces:
+      - application/json
+      tags:
+      - orders
+      summary: "\u0421\u043F\u0438\u0441\u043E\u043A \u0441\u043E\u043E\u0431\u0449\
+        \u0435\u043D\u0438\u0439 \u043E\u0440\u0434\u0435\u0440\u0430"
+      parameters:
+      - type: string
+        description: "ID \u043E\u0440\u0434\u0435\u0440\u0430"
+        name: id
+        in: path
+        required: true
+      - type: string
+        description: cursor
+        name: cursor
+        in: query
+      - type: string
+        description: after
+        name: after
+        in: query
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ptop_internal_models.OrderMessage'
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+    post:
+      security:
+      - BearerAuth: []
+      description: "\u041F\u043E\u0434\u0434\u0435\u0440\u0436\u0438\u0432\u0430\u044E\
+        \u0442\u0441\u044F \u0442\u0438\u043F\u044B \u0444\u0430\u0439\u043B\u043E\
+        \u0432: image/jpeg, image/png, application/pdf"
+      consumes:
+      - application/json
+      - multipart/form-data
+      produces:
+      - application/json
+      tags:
+      - orders
+      summary: "\u041E\u0442\u043F\u0440\u0430\u0432\u0438\u0442\u044C \u0441\u043E\
+        \u043E\u0431\u0449\u0435\u043D\u0438\u0435 \u0432 \u043E\u0440\u0434\u0435\
+        \u0440"
+      parameters:
+      - type: string
+        description: "ID \u043E\u0440\u0434\u0435\u0440\u0430"
+        name: id
+        in: path
+        required: true
+      - description: "\u0434\u0430\u043D\u043D\u044B\u0435"
+        name: input
+        in: body
+        schema:
+          $ref: '#/definitions/internal_handlers.OrderMessageRequest'
+      - type: file
+        description: "\u0444\u0430\u0439\u043B (image/jpeg, image/png, application/pdf)"
+        name: file
+        in: formData
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/ptop_internal_models.OrderMessage'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+  /orders/{id}/messages/{msgId}/read:
+    patch:
+      security:
+      - BearerAuth: []
+      produces:
+      - application/json
+      tags:
+      - orders
+      summary: "\u041E\u0442\u043C\u0435\u0442\u0438\u0442\u044C \u0441\u043E\u043E\
+        \u0431\u0449\u0435\u043D\u0438\u0435 \u043F\u0440\u043E\u0447\u0438\u0442\u0430\
+        \u043D\u043D\u044B\u043C"
+      parameters:
+      - type: string
+        description: "ID \u043E\u0440\u0434\u0435\u0440\u0430"
+        name: id
+        in: path
+        required: true
+      - type: string
+        description: "ID \u0441\u043E\u043E\u0431\u0449\u0435\u043D\u0438\u044F"
+        name: msgId
+        in: path
+        required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/ptop_internal_models.OrderMessage'
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+  /payment-methods:
+    get:
+      security:
+      - BearerAuth: []
+      produces:
+      - application/json
+      tags:
+      - reference
+      summary: "\u0421\u043F\u0438\u0441\u043E\u043A \u043F\u043B\u0430\u0442\u0451\
+        \u0436\u043D\u044B\u0445 \u043C\u0435\u0442\u043E\u0434\u043E\u0432"
+      responses:
+        '200':
+          description: "\u0420\u0430\u0441\u0448\u0438\u0440\u0435\u043D\u043D\u0430\
+            \u044F \u0441\u0442\u0440\u0443\u043A\u0442\u0443\u0440\u0430 \u043F\u043B\
+            \u0430\u0442\u0451\u0436\u043D\u044B\u0445 \u043C\u0435\u0442\u043E\u0434\
+            \u043E\u0432"
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ptop_internal_models.PaymentMethod'
+  /ws/orders/{id}/chat:
+    get:
+      security:
+      - BearerAuth: []
+      description: "\u041F\u0440\u0438 \u043F\u043E\u0434\u043A\u043B\u044E\u0447\u0435\
+        \u043D\u0438\u0438 \u043E\u0442\u043F\u0440\u0430\u0432\u043B\u044F\u0435\u0442\
+        \ \u0438\u0441\u0442\u043E\u0440\u0438\u044E \u0441\u043E\u043E\u0431\u0449\
+        \u0435\u043D\u0438\u0439 \u0438\u0437 \u043A\u0435\u0448\u0430 Redis"
+      tags:
+      - orders
+      summary: "Websocket \u0447\u0430\u0442 \u043E\u0440\u0434\u0435\u0440\u0430"
+      parameters:
+      - type: string
+        description: "ID \u043E\u0440\u0434\u0435\u0440\u0430"
+        name: id
+        in: path
+        required: true
+      responses:
+        '101':
+          description: Switching Protocols
+          schema:
+            type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
 definitions:
   internal_handlers.AssetWithWallet:
+    type: object
     properties:
       amount:
         type: number
@@ -20,8 +1202,8 @@ definitions:
         type: string
       value:
         type: string
-    type: object
   internal_handlers.ChangePasswordRequest:
+    type: object
     properties:
       confirm_password:
         type: string
@@ -29,15 +1211,15 @@ definitions:
         type: string
       old_password:
         type: string
-    type: object
   internal_handlers.ChangeUsernameRequest:
+    type: object
     properties:
       new_username:
         type: string
       password:
         type: string
-    type: object
   internal_handlers.CreateClientPaymentMethodRequest:
+    type: object
     properties:
       city:
         type: string
@@ -49,40 +1231,40 @@ definitions:
         type: string
       post_code:
         type: string
-    type: object
   internal_handlers.DebugDepositRequest:
+    type: object
+    required:
+    - amount
+    - wallet_id
     properties:
       amount:
         type: string
       wallet_id:
         type: string
-    required:
-    - amount
-    - wallet_id
-    type: object
   internal_handlers.Disable2FARequest:
+    type: object
     properties:
       password:
         type: string
-    type: object
   internal_handlers.Enable2FARequest:
+    type: object
     properties:
       password:
         type: string
-    type: object
   internal_handlers.Enable2FAResponse:
+    type: object
     properties:
       secret:
         type: string
       url:
         type: string
-    type: object
   internal_handlers.ErrorResponse:
+    type: object
     properties:
       error:
         type: string
-    type: object
   internal_handlers.LoginRequest:
+    type: object
     properties:
       code:
         type: string
@@ -90,22 +1272,22 @@ definitions:
         type: string
       username:
         type: string
-    type: object
   internal_handlers.MnemonicWord:
+    type: object
     properties:
       position:
         type: integer
       word:
         type: string
-    type: object
   internal_handlers.OfferRequest:
+    type: object
     properties:
       amount:
         type: string
       client_payment_method_ids:
+        type: array
         items:
           type: string
-        type: array
       conditions:
         type: string
       from_asset_id:
@@ -122,13 +1304,13 @@ definitions:
         type: string
       type:
         type: string
-    type: object
   internal_handlers.OrderMessageRequest:
+    type: object
     properties:
       content:
         type: string
-    type: object
   internal_handlers.OrderRequest:
+    type: object
     properties:
       amount:
         type: string
@@ -136,8 +1318,8 @@ definitions:
         type: string
       offer_id:
         type: string
-    type: object
   internal_handlers.ProfileResponse:
+    type: object
     properties:
       pincode_set:
         type: boolean
@@ -145,52 +1327,52 @@ definitions:
         type: boolean
       username:
         type: string
-    type: object
   internal_handlers.RecoverChallengeResponse:
+    type: object
     properties:
       positions:
+        type: array
         items:
           type: integer
-        type: array
-    type: object
   internal_handlers.RecoverPhrase:
+    type: object
     properties:
       position:
         type: integer
       word:
         type: string
-    type: object
   internal_handlers.RecoverRequest:
+    type: object
     properties:
       new_password:
         type: string
       password_confirm:
         type: string
       phrases:
+        type: array
         items:
           $ref: '#/definitions/internal_handlers.RecoverPhrase'
-        type: array
       username:
         type: string
-    type: object
   internal_handlers.RefreshRequest:
+    type: object
     properties:
       refresh_token:
         type: string
-    type: object
   internal_handlers.RegenerateMnemonicRequest:
+    type: object
     properties:
       password:
         type: string
-    type: object
   internal_handlers.RegenerateMnemonicResponse:
+    type: object
     properties:
       mnemonic:
+        type: array
         items:
           $ref: '#/definitions/internal_handlers.MnemonicWord'
-        type: array
-    type: object
   internal_handlers.RegisterRequest:
+    type: object
     properties:
       password:
         type: string
@@ -198,53 +1380,53 @@ definitions:
         type: string
       username:
         type: string
-    type: object
   internal_handlers.RegisterResponse:
+    type: object
     properties:
       access_token:
         type: string
       mnemonic:
+        type: array
         items:
           $ref: '#/definitions/internal_handlers.MnemonicWord'
-        type: array
       refresh_token:
         type: string
-    type: object
   internal_handlers.SetPinCodeRequest:
+    type: object
     properties:
       password:
         type: string
       pincode:
         type: string
-    type: object
   internal_handlers.StatusResponse:
+    type: object
     properties:
       status:
         type: string
-    type: object
   internal_handlers.TokenResponse:
+    type: object
     properties:
       access_token:
         type: string
       refresh_token:
         type: string
-    type: object
   internal_handlers.VerifyPasswordRequest:
+    type: object
     properties:
       password:
         type: string
-    type: object
   internal_handlers.VerifyPasswordResponse:
+    type: object
     properties:
       verified:
         type: boolean
-    type: object
   internal_handlers.WalletRequest:
+    type: object
     properties:
       asset_id:
         type: string
-    type: object
   ptop_internal_models.Asset:
+    type: object
     properties:
       description:
         type: string
@@ -258,8 +1440,8 @@ definitions:
         type: string
       type:
         type: string
-    type: object
   ptop_internal_models.Balance:
+    type: object
     properties:
       amount:
         type: number
@@ -275,8 +1457,8 @@ definitions:
         type: string
       updatedAt:
         type: string
-    type: object
   ptop_internal_models.ClientPaymentMethod:
+    type: object
     properties:
       city:
         type: string
@@ -292,15 +1474,15 @@ definitions:
         type: string
       postCode:
         type: string
-    type: object
   ptop_internal_models.Country:
+    type: object
     properties:
       id:
         type: string
       name:
         type: string
-    type: object
   ptop_internal_models.Escrow:
+    type: object
     properties:
       amount:
         type: number
@@ -318,38 +1500,38 @@ definitions:
         type: string
       updatedAt:
         type: string
-    type: object
   ptop_internal_models.FeeSideType:
+    type: string
     enum:
     - sender
     - receiver
     - shared
-    type: string
     x-enum-varnames:
     - FeeSideSender
     - FeeSideReceiver
     - FeeSideShared
   ptop_internal_models.KycLevelHintType:
+    type: string
     enum:
     - low
     - medium
     - high
-    type: string
     x-enum-varnames:
     - KycLevelHintLow
     - KycLevelHintMedium
     - KycLevelHintHigh
   ptop_internal_models.MessageType:
+    type: string
     enum:
     - TEXT
     - SYSTEM
     - FILE
-    type: string
     x-enum-varnames:
     - MessageTypeText
     - MessageTypeSystem
     - MessageTypeFile
   ptop_internal_models.Offer:
+    type: object
     properties:
       TTL:
         type: string
@@ -385,8 +1567,8 @@ definitions:
         type: string
       updatedAt:
         type: string
-    type: object
   ptop_internal_models.Order:
+    type: object
     properties:
       amount:
         type: number
@@ -418,8 +1600,8 @@ definitions:
         type: string
       updatedAt:
         type: string
-    type: object
   ptop_internal_models.OrderMessage:
+    type: object
     properties:
       chatID:
         type: string
@@ -430,8 +1612,8 @@ definitions:
       createdAt:
         type: string
       fileSize:
-        format: int64
         type: integer
+        format: int64
       fileType:
         type: string
       fileURL:
@@ -444,15 +1626,14 @@ definitions:
         $ref: '#/definitions/ptop_internal_models.MessageType'
       updatedAt:
         type: string
-    type: object
   ptop_internal_models.OrderStatus:
+    type: string
     enum:
     - WAIT_PAYMENT
     - PAID
     - RELEASED
     - CANCELLED
     - DISPUTE
-    type: string
     x-enum-varnames:
     - OrderStatusWaitPayment
     - OrderStatusPaid
@@ -460,13 +1641,14 @@ definitions:
     - OrderStatusCancelled
     - OrderStatusDispute
   ptop_internal_models.PaymentMethod:
+    type: object
     properties:
       chargebackWindowHours:
         type: integer
       countries:
+        type: array
         items:
           $ref: '#/definitions/ptop_internal_models.Country'
-        type: array
       feeSide:
         $ref: '#/definitions/ptop_internal_models.FeeSideType'
       id:
@@ -484,15 +1666,15 @@ definitions:
       provider:
         type: string
       regions:
+        type: array
         items:
           type: string
-        type: array
       settlementMinutes:
         type: integer
       typicalFiatCCY:
         type: string
-    type: object
   models.TransactionIn:
+    type: object
     properties:
       amount:
         type: number
@@ -514,20 +1696,20 @@ definitions:
         type: string
       walletID:
         type: string
-    type: object
   models.TransactionInStatus:
+    type: string
     enum:
     - pending
     - processing
     - confirmed
     - failed
-    type: string
     x-enum-varnames:
     - TransactionInStatusPending
     - TransactionInStatusProcessing
     - TransactionInStatusConfirmed
     - TransactionInStatusFailed
   models.TransactionInternal:
+    type: object
     properties:
       amount:
         type: number
@@ -551,18 +1733,18 @@ definitions:
         type: string
       updatedAt:
         type: string
-    type: object
   models.TransactionInternalStatus:
+    type: string
     enum:
     - processing
     - confirmed
     - failed
-    type: string
     x-enum-varnames:
     - TransactionInternalStatusProcessing
     - TransactionInternalStatusConfirmed
     - TransactionInternalStatusFailed
   models.TransactionOut:
+    type: object
     properties:
       amount:
         type: number
@@ -586,15 +1768,14 @@ definitions:
         type: string
       updatedAt:
         type: string
-    type: object
   models.TransactionOutStatus:
+    type: string
     enum:
     - pending
     - processing
     - confirmed
     - failed
     - cancelled
-    type: string
     x-enum-varnames:
     - TransactionOutStatusPending
     - TransactionOutStatusProcessing
@@ -602,6 +1783,7 @@ definitions:
     - TransactionOutStatusFailed
     - TransactionOutStatusCancelled
   models.Wallet:
+    type: object
     properties:
       assetID:
         type: string
@@ -617,1104 +1799,8 @@ definitions:
         type: integer
       value:
         type: string
-    type: object
-info:
-  contact: {}
-  description: API сервиса PTOP
-  title: PTOP API
-  version: "1.0"
-paths:
-  /assets:
-    get:
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/ptop_internal_models.Asset'
-            type: array
-      summary: Список активных активов
-      tags:
-      - reference
-  /auth/2fa/disable:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: подтверждение пароля
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/internal_handlers.Disable2FARequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/internal_handlers.StatusResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Отключение двухфакторной аутентификации
-      tags:
-      - auth
-  /auth/2fa/enable:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: подтверждение пароля
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/internal_handlers.Enable2FARequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/internal_handlers.Enable2FAResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Включение двухфакторной аутентификации
-      tags:
-      - auth
-  /auth/login:
-    post:
-      consumes:
-      - application/json
-      description: Аутентифицирует клиента и выдаёт пару токенов. При включённой 2FA
-        требуется код.
-      parameters:
-      - description: учётные данные
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/internal_handlers.LoginRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/internal_handlers.TokenResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-      summary: Вход клиента
-      tags:
-      - auth
-  /auth/logout:
-    post:
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/internal_handlers.StatusResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Выход клиента
-      tags:
-      - auth
-  /auth/mnemonic/regenerate:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: пароль
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/internal_handlers.RegenerateMnemonicRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/internal_handlers.RegenerateMnemonicResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Перегенерация мнемонической фразы
-      tags:
-      - auth
-  /auth/password:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: пароли
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/internal_handlers.ChangePasswordRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/internal_handlers.StatusResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Смена пароля
-      tags:
-      - auth
-  /auth/pincode:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: пин-код
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/internal_handlers.SetPinCodeRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/internal_handlers.StatusResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Установка PIN-кода
-      tags:
-      - auth
-  /auth/profile:
-    get:
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/internal_handlers.ProfileResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Профиль клиента
-      tags:
-      - auth
-  /auth/recover:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: фразы и новый пароль
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/internal_handlers.RecoverRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/internal_handlers.TokenResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-      summary: Восстановление доступа
-      tags:
-      - auth
-  /auth/recover/{username}:
-    get:
-      parameters:
-      - description: имя пользователя
-        in: path
-        name: username
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/internal_handlers.RecoverChallengeResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-      summary: Запрос позиций для восстановления
-      tags:
-      - auth
-  /auth/refresh:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: refresh токен
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/internal_handlers.RefreshRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/internal_handlers.TokenResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-      summary: Обновление access токена
-      tags:
-      - auth
-  /auth/register:
-    post:
-      consumes:
-      - application/json
-      description: Создаёт нового клиента с уникальным именем, хешем пароля и мнемонической
-        фразой
-      parameters:
-      - description: данные регистрации
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/internal_handlers.RegisterRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/internal_handlers.RegisterResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-        "409":
-          description: Conflict
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-      summary: Регистрация клиента
-      tags:
-      - auth
-  /auth/username:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: новое имя
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/internal_handlers.ChangeUsernameRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/internal_handlers.StatusResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-        "409":
-          description: Conflict
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Смена имени пользователя
-      tags:
-      - auth
-  /auth/verify-password:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: пароль
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/internal_handlers.VerifyPasswordRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/internal_handlers.VerifyPasswordResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Проверка текущего пароля
-      tags:
-      - auth
-  /client/assets:
-    get:
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/internal_handlers.AssetWithWallet'
-            type: array
-      security:
-      - BearerAuth: []
-      summary: Список активных активов с адресами кошельков и балансами клиента
-      tags:
-      - reference
-  /client/balances:
-    get:
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/ptop_internal_models.Balance'
-            type: array
-      security:
-      - BearerAuth: []
-      summary: Список балансов клиента
-      tags:
-      - balances
-  /client/escrows:
-    get:
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/ptop_internal_models.Escrow'
-            type: array
-      security:
-      - BearerAuth: []
-      summary: Список эскроу клиента
-      tags:
-      - escrows
-  /client/offers:
-    get:
-      parameters:
-      - description: фильтр по активным
-        in: query
-        name: enabled
-        type: boolean
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/ptop_internal_models.Offer'
-            type: array
-      security:
-      - BearerAuth: []
-      summary: Список объявлений клиента
-      tags:
-      - offers
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: данные
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/internal_handlers.OfferRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/ptop_internal_models.Offer'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Создать объявление
-      tags:
-      - offers
-  /client/offers/{id}:
-    put:
-      consumes:
-      - application/json
-      parameters:
-      - description: ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: данные
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/internal_handlers.OfferRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/ptop_internal_models.Offer'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Изменить объявление
-      tags:
-      - offers
-  /client/offers/{id}/disable:
-    post:
-      parameters:
-      - description: ID
-        in: path
-        name: id
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/ptop_internal_models.Offer'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Отключить объявление
-      tags:
-      - offers
-  /client/offers/{id}/enable:
-    post:
-      parameters:
-      - description: ID
-        in: path
-        name: id
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/ptop_internal_models.Offer'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Включить объявление
-      tags:
-      - offers
-  /client/orders:
-    get:
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/ptop_internal_models.Order'
-            type: array
-      security:
-      - BearerAuth: []
-      summary: Список ордеров клиента
-      tags:
-      - orders
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: данные
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/internal_handlers.OrderRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/ptop_internal_models.Order'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Создать ордер
-      tags:
-      - orders
-  /client/payment-methods:
-    get:
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/ptop_internal_models.ClientPaymentMethod'
-            type: array
-      security:
-      - BearerAuth: []
-      summary: Список платёжных методов клиента
-      tags:
-      - client-payment-methods
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: данные
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/internal_handlers.CreateClientPaymentMethodRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/ptop_internal_models.ClientPaymentMethod'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-        "409":
-          description: Conflict
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Создать платёжный метод клиента
-      tags:
-      - client-payment-methods
-  /client/payment-methods/{id}:
-    delete:
-      parameters:
-      - description: ID
-        in: path
-        name: id
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/internal_handlers.StatusResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Удалить платёжный метод клиента
-      tags:
-      - client-payment-methods
-  /client/transactions/in:
-    get:
-      parameters:
-      - description: лимит
-        in: query
-        name: limit
-        type: integer
-      - description: смещение
-        in: query
-        name: offset
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.TransactionIn'
-            type: array
-      security:
-      - BearerAuth: []
-      summary: Список входящих транзакций клиента
-      tags:
-      - transactions
-  /client/transactions/internal:
-    get:
-      parameters:
-      - description: лимит
-        in: query
-        name: limit
-        type: integer
-      - description: смещение
-        in: query
-        name: offset
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.TransactionInternal'
-            type: array
-      security:
-      - BearerAuth: []
-      summary: Список внутренних транзакций клиента
-      tags:
-      - transactions
-  /client/transactions/out:
-    get:
-      parameters:
-      - description: лимит
-        in: query
-        name: limit
-        type: integer
-      - description: смещение
-        in: query
-        name: offset
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.TransactionOut'
-            type: array
-      security:
-      - BearerAuth: []
-      summary: Список исходящих транзакций клиента
-      tags:
-      - transactions
-  /client/wallets:
-    get:
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.Wallet'
-            type: array
-      security:
-      - BearerAuth: []
-      summary: Список кошельков клиента
-      tags:
-      - wallets
-    post:
-      consumes:
-      - application/json
-      description: При DEBUG_FAKE_NETWORK=true адрес генерируется без обращения к
-        сети в формате fake:{asset}:{client}:{index}
-      parameters:
-      - description: данные
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/internal_handlers.WalletRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Wallet'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Создать кошелёк
-      tags:
-      - wallets
-  /countries:
-    get:
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/ptop_internal_models.Country'
-            type: array
-      security:
-      - BearerAuth: []
-      summary: Список стран
-      tags:
-      - reference
-  /debug/deposit:
-    post:
-      consumes:
-      - application/json
-      description: Создаёт фейковый депозит на указанный кошелёк
-      parameters:
-      - description: Запрос
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/internal_handlers.DebugDepositRequest'
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: No Content
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Тестовый депозит
-      tags:
-      - debug
-  /health:
-    get:
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/internal_handlers.StatusResponse'
-        "503":
-          description: Service Unavailable
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-      summary: Проверка состояния сервиса
-      tags:
-      - health
-  /offers:
-    get:
-      parameters:
-      - description: ID актива от
-        in: query
-        name: from_asset
-        type: string
-      - description: ID актива к
-        in: query
-        name: to_asset
-        type: string
-      - description: минимальная сумма
-        in: query
-        name: min_amount
-        type: string
-      - description: максимальная сумма
-        in: query
-        name: max_amount
-        type: string
-      - description: ID способа оплаты
-        in: query
-        name: payment_method
-        type: string
-      - description: 'тип объявления: buy или sell'
-        in: query
-        name: type
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/ptop_internal_models.Offer'
-            type: array
-      security:
-      - BearerAuth: []
-      summary: Список активных объявлений
-      tags:
-      - offers
-  /orders/{id}/messages:
-    get:
-      parameters:
-      - description: ID ордера
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: cursor
-        in: query
-        name: cursor
-        type: string
-      - description: after
-        in: query
-        name: after
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/ptop_internal_models.OrderMessage'
-            type: array
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Список сообщений ордера
-      tags:
-      - orders
-    post:
-      consumes:
-      - application/json
-      - multipart/form-data
-      description: 'Поддерживаются типы файлов: image/jpeg, image/png, application/pdf'
-      parameters:
-      - description: ID ордера
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: данные
-        in: body
-        name: input
-        schema:
-          $ref: '#/definitions/internal_handlers.OrderMessageRequest'
-      - description: файл (image/jpeg, image/png, application/pdf)
-        in: formData
-        name: file
-        type: file
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/ptop_internal_models.OrderMessage'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Отправить сообщение в ордер
-      tags:
-      - orders
-  /orders/{id}/messages/{msgId}/read:
-    patch:
-      parameters:
-      - description: ID ордера
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: ID сообщения
-        in: path
-        name: msgId
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/ptop_internal_models.OrderMessage'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Отметить сообщение прочитанным
-      tags:
-      - orders
-  /payment-methods:
-    get:
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Расширенная структура платёжных методов
-          schema:
-            items:
-              $ref: '#/definitions/ptop_internal_models.PaymentMethod'
-            type: array
-      security:
-      - BearerAuth: []
-      summary: Список платёжных методов
-      tags:
-      - reference
-  /ws/orders/{id}/chat:
-    get:
-      description: При подключении отправляет историю сообщений из кеша Redis
-      parameters:
-      - description: ID ордера
-        in: path
-        name: id
-        required: true
-        type: string
-      responses:
-        "101":
-          description: Switching Protocols
-          schema:
-            type: string
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/internal_handlers.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Websocket чат ордера
-      tags:
-      - orders
 securityDefinitions:
   BearerAuth:
-    in: header
-    name: Authorization
     type: apiKey
-swagger: "2.0"
+    name: Authorization
+    in: header
