@@ -6,13 +6,15 @@ import (
 )
 
 type ClientPaymentMethod struct {
-	ID              string `gorm:"primaryKey;size:21"`
-	ClientID        string `gorm:"size:21;not null;uniqueIndex:idx_client_name"`
-	CountryID       string `gorm:"size:21;not null"`
-	PaymentMethodID string `gorm:"size:21;not null"`
-	City            string `gorm:"type:text"`
-	PostCode        string `gorm:"type:text"`
-	Name            string `gorm:"type:varchar(255);not null;uniqueIndex:idx_client_name"`
+	ID              string        `gorm:"primaryKey;size:21" json:"id"`
+	ClientID        string        `gorm:"size:21;not null;uniqueIndex:idx_client_name" json:"clientID"`
+	CountryID       string        `gorm:"size:21;not null" json:"countryID"`
+	PaymentMethodID string        `gorm:"size:21;not null" json:"paymentMethodID"`
+	City            string        `gorm:"type:text" json:"city"`
+	PostCode        string        `gorm:"type:text" json:"postCode"`
+	Name            string        `gorm:"type:varchar(255);not null;uniqueIndex:idx_client_name" json:"name"`
+	Country         Country       `gorm:"foreignKey:CountryID" json:"country"`
+	PaymentMethod   PaymentMethod `gorm:"foreignKey:PaymentMethodID" json:"paymentMethod"`
 }
 
 func (cpm *ClientPaymentMethod) BeforeCreate(tx *gorm.DB) (err error) {

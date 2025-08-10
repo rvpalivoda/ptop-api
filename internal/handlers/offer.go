@@ -310,11 +310,19 @@ func DisableOffer(db *gorm.DB) gin.HandlerFunc {
 // @Param max_amount query string false "максимальная сумма"
 // @Param payment_method query string false "ID способа оплаты"
 // @Param type query string false "тип объявления: buy или sell"
-// @Success 200 {array} models.Offer
+// @Success 200 {array} models.OfferFull
 // @Router /offers [get]
 func ListOffers(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		query := db.Model(&models.Offer{}).Where("is_enabled = ? AND ttl > ?", true, time.Now()).Distinct()
+		query := db.Model(&models.Offer{}).
+			Where("is_enabled = ? AND ttl > ?", true, time.Now()).
+			Distinct().
+			Preload("FromAsset").
+			Preload("ToAsset").
+			Preload("Client").
+			Preload("ClientPaymentMethods").
+			Preload("ClientPaymentMethods.Country").
+			Preload("ClientPaymentMethods.PaymentMethod")
 		if fa := c.Query("from_asset"); fa != "" {
 			query = query.Where("from_asset_id = ?", fa)
 		}
@@ -354,7 +362,17 @@ func ListOffers(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
 			return
 		}
-		c.JSON(http.StatusOK, offers)
+		res := make([]models.OfferFull, len(offers))
+		for i, o := range offers {
+			res[i] = models.OfferFull{
+				Offer:                o,
+				FromAsset:            o.FromAsset,
+				ToAsset:              o.ToAsset,
+				Client:               o.Client,
+				ClientPaymentMethods: o.ClientPaymentMethods,
+			}
+		}
+		c.JSON(http.StatusOK, res)
 	}
 }
 
@@ -364,7 +382,7 @@ func ListOffers(db *gorm.DB) gin.HandlerFunc {
 // @Security BearerAuth
 // @Produce json
 // @Param enabled query bool false "фильтр по активным"
-// @Success 200 {array} models.Offer
+// @Success 200 {array} models.OfferFull
 // @Router /client/offers [get]
 func ListClientOffers(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -374,7 +392,13 @@ func ListClientOffers(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		clientID := clientIDVal.(string)
-		query := db.Where("client_id = ?", clientID)
+		query := db.Where("client_id = ?", clientID).
+			Preload("FromAsset").
+			Preload("ToAsset").
+			Preload("Client").
+			Preload("ClientPaymentMethods").
+			Preload("ClientPaymentMethods.Country").
+			Preload("ClientPaymentMethods.PaymentMethod")
 		if en := c.Query("enabled"); en != "" {
 			if en == "true" {
 				query = query.Where("is_enabled = ?", true)
@@ -387,6 +411,16 @@ func ListClientOffers(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
 			return
 		}
-		c.JSON(http.StatusOK, offers)
+		res := make([]models.OfferFull, len(offers))
+		for i, o := range offers {
+			res[i] = models.OfferFull{
+				Offer:                o,
+				FromAsset:            o.FromAsset,
+				ToAsset:              o.ToAsset,
+				Client:               o.Client,
+				ClientPaymentMethods: o.ClientPaymentMethods,
+			}
+		}
+		c.JSON(http.StatusOK, res)
 	}
 }
