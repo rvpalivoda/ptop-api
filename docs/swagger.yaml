@@ -1414,7 +1414,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/ptop_internal_models.Wallet'
+              $ref: '#/definitions/models.Wallet'
             type: array
       security:
       - BearerAuth: []
@@ -1439,7 +1439,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/ptop_internal_models.Wallet'
+            $ref: '#/definitions/models.Wallet'
         "400":
           description: Bad Request
           schema:

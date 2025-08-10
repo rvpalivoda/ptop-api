@@ -1216,7 +1216,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.TransactionInternal"
+                                "$ref": "#/definitions/models.TransactionInternal"
                             }
                         }
                     }
