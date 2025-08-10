@@ -133,6 +133,7 @@ func TestTransactionHandlers(t *testing.T) {
                 t.Fatalf("asset name missing in out list")
         }
 
+
         w = httptest.NewRecorder()
         req, _ = http.NewRequest("GET", "/client/transactions/out?limit=1&offset=1", nil)
         req.Header.Set("Authorization", "Bearer "+tok.AccessToken)
