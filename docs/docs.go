@@ -1148,6 +1148,129 @@ const docTemplate = `{
                 }
             }
         },
+        "/client/transactions/in": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transactions"
+                ],
+                "summary": "Список входящих транзакций клиента",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "лимит",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "смещение",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TransactionIn"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/client/transactions/internal": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transactions"
+                ],
+                "summary": "Список внутренних транзакций клиента",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "лимит",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "смещение",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TransactionInternal"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/client/transactions/out": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transactions"
+                ],
+                "summary": "Список исходящих транзакций клиента",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "лимит",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "смещение",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TransactionOut"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/client/wallets": {
             "get": {
                 "security": [
@@ -1640,6 +1763,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "amount": {
+                    "type": "number"
+                },
+                "amountEscrow": {
                     "type": "number"
                 },
                 "description": {
@@ -2289,7 +2415,8 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "fileSize": {
-                    "type": "integer"
+                    "type": "integer",
+                    "format": "int64"
                 },
                 "fileType": {
                     "type": "string"
@@ -2377,6 +2504,162 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "models.TransactionIn": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "assetID": {
+                    "type": "string"
+                },
+                "assetName": {
+                    "type": "string"
+                },
+                "clientID": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "data": {
+                    "type": "object"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/models.TransactionInStatus"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "walletID": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.TransactionInStatus": {
+            "type": "string",
+            "enum": [
+                "pending",
+                "processing",
+                "confirmed",
+                "failed"
+            ],
+            "x-enum-varnames": [
+                "TransactionInStatusPending",
+                "TransactionInStatusProcessing",
+                "TransactionInStatusConfirmed",
+                "TransactionInStatusFailed"
+            ]
+        },
+        "models.TransactionInternal": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "assetID": {
+                    "type": "string"
+                },
+                "assetName": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "data": {
+                    "type": "object"
+                },
+                "fromClientID": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "orderInfo": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/models.TransactionInternalStatus"
+                },
+                "toClientID": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.TransactionInternalStatus": {
+            "type": "string",
+            "enum": [
+                "processing",
+                "confirmed",
+                "failed"
+            ],
+            "x-enum-varnames": [
+                "TransactionInternalStatusProcessing",
+                "TransactionInternalStatusConfirmed",
+                "TransactionInternalStatusFailed"
+            ]
+        },
+        "models.TransactionOut": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "assetID": {
+                    "type": "string"
+                },
+                "assetName": {
+                    "type": "string"
+                },
+                "clientID": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "data": {
+                    "type": "object"
+                },
+                "fromAddress": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/models.TransactionOutStatus"
+                },
+                "toAddress": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.TransactionOutStatus": {
+            "type": "string",
+            "enum": [
+                "pending",
+                "processing",
+                "confirmed",
+                "failed",
+                "cancelled"
+            ],
+            "x-enum-varnames": [
+                "TransactionOutStatusPending",
+                "TransactionOutStatusProcessing",
+                "TransactionOutStatusConfirmed",
+                "TransactionOutStatusFailed",
+                "TransactionOutStatusCancelled"
+            ]
         },
         "models.Wallet": {
             "type": "object",

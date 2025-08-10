@@ -4,6 +4,8 @@ definitions:
     properties:
       amount:
         type: number
+      amountEscrow:
+        type: number
       description:
         type: string
       id:
@@ -428,6 +430,7 @@ definitions:
       createdAt:
         type: string
       fileSize:
+        format: int64
         type: integer
       fileType:
         type: string
@@ -489,6 +492,115 @@ definitions:
       typicalFiatCCY:
         type: string
     type: object
+  models.TransactionIn:
+    properties:
+      amount:
+        type: number
+      assetID:
+        type: string
+      assetName:
+        type: string
+      clientID:
+        type: string
+      createdAt:
+        type: string
+      data:
+        type: object
+      id:
+        type: string
+      status:
+        $ref: '#/definitions/models.TransactionInStatus'
+      updatedAt:
+        type: string
+      walletID:
+        type: string
+    type: object
+  models.TransactionInStatus:
+    enum:
+    - pending
+    - processing
+    - confirmed
+    - failed
+    type: string
+    x-enum-varnames:
+    - TransactionInStatusPending
+    - TransactionInStatusProcessing
+    - TransactionInStatusConfirmed
+    - TransactionInStatusFailed
+  models.TransactionInternal:
+    properties:
+      amount:
+        type: number
+      assetID:
+        type: string
+      assetName:
+        type: string
+      createdAt:
+        type: string
+      data:
+        type: object
+      fromClientID:
+        type: string
+      id:
+        type: string
+      orderInfo:
+        type: string
+      status:
+        $ref: '#/definitions/models.TransactionInternalStatus'
+      toClientID:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  models.TransactionInternalStatus:
+    enum:
+    - processing
+    - confirmed
+    - failed
+    type: string
+    x-enum-varnames:
+    - TransactionInternalStatusProcessing
+    - TransactionInternalStatusConfirmed
+    - TransactionInternalStatusFailed
+  models.TransactionOut:
+    properties:
+      amount:
+        type: number
+      assetID:
+        type: string
+      assetName:
+        type: string
+      clientID:
+        type: string
+      createdAt:
+        type: string
+      data:
+        type: object
+      fromAddress:
+        type: string
+      id:
+        type: string
+      status:
+        $ref: '#/definitions/models.TransactionOutStatus'
+      toAddress:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  models.TransactionOutStatus:
+    enum:
+    - pending
+    - processing
+    - confirmed
+    - failed
+    - cancelled
+    type: string
+    x-enum-varnames:
+    - TransactionOutStatusPending
+    - TransactionOutStatusProcessing
+    - TransactionOutStatusConfirmed
+    - TransactionOutStatusFailed
+    - TransactionOutStatusCancelled
   models.Wallet:
     properties:
       assetID:
@@ -1218,6 +1330,81 @@ paths:
       summary: Удалить платёжный метод клиента
       tags:
       - client-payment-methods
+  /client/transactions/in:
+    get:
+      parameters:
+      - description: лимит
+        in: query
+        name: limit
+        type: integer
+      - description: смещение
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TransactionIn'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Список входящих транзакций клиента
+      tags:
+      - transactions
+  /client/transactions/internal:
+    get:
+      parameters:
+      - description: лимит
+        in: query
+        name: limit
+        type: integer
+      - description: смещение
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TransactionInternal'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Список внутренних транзакций клиента
+      tags:
+      - transactions
+  /client/transactions/out:
+    get:
+      parameters:
+      - description: лимит
+        in: query
+        name: limit
+        type: integer
+      - description: смещение
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TransactionOut'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Список исходящих транзакций клиента
+      tags:
+      - transactions
   /client/wallets:
     get:
       produces:

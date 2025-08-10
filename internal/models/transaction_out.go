@@ -23,13 +23,14 @@ type TransactionOut struct {
 	ID          string               `gorm:"primaryKey;size:21"`
 	ClientID    string               `gorm:"size:21;not null"`
 	Client      Client               `gorm:"foreignKey:ClientID" json:"-"`
-	AssetID     string               `gorm:"size:21;not null"`
-	Asset       Asset                `gorm:"foreignKey:AssetID" json:"-"`
+        AssetID     string               `gorm:"size:21;not null"`
+        Asset       Asset                `gorm:"foreignKey:AssetID" json:"-"`
+        AssetName   string               `gorm:"->;column:asset_name" json:"assetName"`
 	Amount      decimal.Decimal      `gorm:"type:decimal(32,8);not null"`
 	FromAddress string               `gorm:"type:varchar(255)"`
 	ToAddress   string               `gorm:"type:varchar(255)"`
 	Status      TransactionOutStatus `gorm:"type:varchar(20);not null"`
-	Data        datatypes.JSON       `gorm:"type:json"`
+        Data        datatypes.JSON       `gorm:"type:json" swaggertype:"object"`
 	CreatedAt   time.Time            `gorm:"autoCreateTime"`
 	UpdatedAt   time.Time            `gorm:"autoUpdateTime"`
 }
