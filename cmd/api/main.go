@@ -104,6 +104,10 @@ func main() {
 	api.POST("/client/offers/:id/enable", handlers.EnableOffer(gormDB, cfg.MaxActiveOffersPerClient))
 	api.POST("/client/offers/:id/disable", handlers.DisableOffer(gormDB))
 
+	api.GET("/client/transactions/in", handlers.ListClientTransactionsIn(gormDB))
+	api.GET("/client/transactions/out", handlers.ListClientTransactionsOut(gormDB))
+	api.GET("/client/transactions/internal", handlers.ListClientTransactionsInternal(gormDB))
+
 	ws := r.Group("/ws")
 	ws.Use(handlers.AuthMiddleware(gormDB))
 	ws.GET("/orders/:id/chat", handlers.OrderChatWS(gormDB, chatCache))
