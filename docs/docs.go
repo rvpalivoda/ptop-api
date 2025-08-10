@@ -1271,6 +1271,129 @@ const docTemplate = `{
                 }
             }
         },
+        "/client/transactions/in": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transactions"
+                ],
+                "summary": "Список входящих транзакций клиента",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "лимит",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "смещение",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TransactionIn"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/client/transactions/internal": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transactions"
+                ],
+                "summary": "Список внутренних транзакций клиента",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "лимит",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "смещение",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TransactionInternal"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/client/transactions/out": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transactions"
+                ],
+                "summary": "Список исходящих транзакций клиента",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "лимит",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "смещение",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TransactionOut"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/client/wallets": {
             "get": {
                 "security": [
@@ -2415,7 +2538,8 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "fileSize": {
-                    "type": "integer"
+                    "type": "integer",
+                    "format": "int64"
                 },
                 "fileType": {
                     "type": "string"
@@ -2504,13 +2628,16 @@ const docTemplate = `{
                 }
             }
         },
-        "ptop_internal_models.TransactionIn": {
+        "models.TransactionIn": {
             "type": "object",
             "properties": {
                 "amount": {
                     "type": "number"
                 },
                 "assetID": {
+                    "type": "string"
+                },
+                "assetName": {
                     "type": "string"
                 },
                 "clientID": {
@@ -2526,7 +2653,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "$ref": "#/definitions/ptop_internal_models.TransactionInStatus"
+                    "$ref": "#/definitions/models.TransactionInStatus"
                 },
                 "updatedAt": {
                     "type": "string"
@@ -2536,7 +2663,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ptop_internal_models.TransactionInStatus": {
+        "models.TransactionInStatus": {
             "type": "string",
             "enum": [
                 "pending",
@@ -2551,13 +2678,16 @@ const docTemplate = `{
                 "TransactionInStatusFailed"
             ]
         },
-        "ptop_internal_models.TransactionInternal": {
+        "models.TransactionInternal": {
             "type": "object",
             "properties": {
                 "amount": {
                     "type": "number"
                 },
                 "assetID": {
+                    "type": "string"
+                },
+                "assetName": {
                     "type": "string"
                 },
                 "createdAt": {
@@ -2576,7 +2706,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "$ref": "#/definitions/ptop_internal_models.TransactionInternalStatus"
+                    "$ref": "#/definitions/models.TransactionInternalStatus"
                 },
                 "toClientID": {
                     "type": "string"
@@ -2586,7 +2716,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ptop_internal_models.TransactionInternalStatus": {
+        "models.TransactionInternalStatus": {
             "type": "string",
             "enum": [
                 "processing",
@@ -2599,13 +2729,16 @@ const docTemplate = `{
                 "TransactionInternalStatusFailed"
             ]
         },
-        "ptop_internal_models.TransactionOut": {
+        "models.TransactionOut": {
             "type": "object",
             "properties": {
                 "amount": {
                     "type": "number"
                 },
                 "assetID": {
+                    "type": "string"
+                },
+                "assetName": {
                     "type": "string"
                 },
                 "clientID": {
@@ -2624,7 +2757,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "$ref": "#/definitions/ptop_internal_models.TransactionOutStatus"
+                    "$ref": "#/definitions/models.TransactionOutStatus"
                 },
                 "toAddress": {
                     "type": "string"
@@ -2634,7 +2767,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ptop_internal_models.TransactionOutStatus": {
+        "models.TransactionOutStatus": {
             "type": "string",
             "enum": [
                 "pending",
@@ -2651,7 +2784,7 @@ const docTemplate = `{
                 "TransactionOutStatusCancelled"
             ]
         },
-        "ptop_internal_models.Wallet": {
+        "models.Wallet": {
             "type": "object",
             "properties": {
                 "assetID": {

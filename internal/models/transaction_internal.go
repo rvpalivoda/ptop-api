@@ -19,8 +19,9 @@ const (
 
 type TransactionInternal struct {
 	ID           string                    `gorm:"primaryKey;size:21"`
-	AssetID      string                    `gorm:"size:21;not null"`
-	Asset        Asset                     `gorm:"foreignKey:AssetID" json:"-"`
+        AssetID      string                    `gorm:"size:21;not null"`
+        Asset        Asset                     `gorm:"foreignKey:AssetID" json:"-"`
+        AssetName    string                    `gorm:"->;column:asset_name" json:"assetName"`
 	Amount       decimal.Decimal           `gorm:"type:decimal(32,8);not null"`
 	OrderInfo    string                    `gorm:"type:text"`
 	FromClientID string                    `gorm:"size:21"`

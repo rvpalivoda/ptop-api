@@ -95,12 +95,15 @@ func TestTransactionHandlers(t *testing.T) {
 	}
 	var inList []models.TransactionIn
 	json.Unmarshal(w.Body.Bytes(), &inList)
-	if len(inList) != 1 {
-		t.Fatalf("expected 1, got %d", len(inList))
-	}
-	if inList[0].ID != tInNew.ID {
-		t.Fatalf("expected newest tx")
-	}
+        if len(inList) != 1 {
+                t.Fatalf("expected 1, got %d", len(inList))
+        }
+        if inList[0].ID != tInNew.ID {
+                t.Fatalf("expected newest tx")
+        }
+        if inList[0].AssetName != asset.Name {
+                t.Fatalf("asset name missing")
+        }
 
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/client/transactions/in?limit=1&offset=1", nil)
@@ -126,6 +129,10 @@ func TestTransactionHandlers(t *testing.T) {
         if len(outList) != 2 {
                 t.Fatalf("expected 2, got %d", len(outList))
         }
+        if outList[0].AssetName != asset.Name || outList[1].AssetName != asset.Name {
+                t.Fatalf("asset name missing in out list")
+        }
+
 
         w = httptest.NewRecorder()
         req, _ = http.NewRequest("GET", "/client/transactions/out?limit=1&offset=1", nil)
@@ -148,9 +155,12 @@ func TestTransactionHandlers(t *testing.T) {
 	}
 	var intList []models.TransactionInternal
 	json.Unmarshal(w.Body.Bytes(), &intList)
-	if len(intList) != 2 {
-		t.Fatalf("expected 2, got %d", len(intList))
-	}
+        if len(intList) != 2 {
+                t.Fatalf("expected 2, got %d", len(intList))
+        }
+        if intList[0].AssetName != asset.Name || intList[1].AssetName != asset.Name {
+                t.Fatalf("asset name missing in internal list")
+        }
 
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/client/transactions/internal?limit=1&offset=1", nil)

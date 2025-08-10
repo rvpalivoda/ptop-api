@@ -430,6 +430,7 @@ definitions:
       createdAt:
         type: string
       fileSize:
+        format: int64
         type: integer
       fileType:
         type: string
@@ -491,11 +492,13 @@ definitions:
       typicalFiatCCY:
         type: string
     type: object
-  ptop_internal_models.TransactionIn:
+  models.TransactionIn:
     properties:
       amount:
         type: number
       assetID:
+        type: string
+      assetName:
         type: string
       clientID:
         type: string
@@ -506,13 +509,13 @@ definitions:
       id:
         type: string
       status:
-        $ref: '#/definitions/ptop_internal_models.TransactionInStatus'
+        $ref: '#/definitions/models.TransactionInStatus'
       updatedAt:
         type: string
       walletID:
         type: string
     type: object
-  ptop_internal_models.TransactionInStatus:
+  models.TransactionInStatus:
     enum:
     - pending
     - processing
@@ -524,11 +527,13 @@ definitions:
     - TransactionInStatusProcessing
     - TransactionInStatusConfirmed
     - TransactionInStatusFailed
-  ptop_internal_models.TransactionInternal:
+  models.TransactionInternal:
     properties:
       amount:
         type: number
       assetID:
+        type: string
+      assetName:
         type: string
       createdAt:
         type: string
@@ -541,13 +546,13 @@ definitions:
       orderInfo:
         type: string
       status:
-        $ref: '#/definitions/ptop_internal_models.TransactionInternalStatus'
+        $ref: '#/definitions/models.TransactionInternalStatus'
       toClientID:
         type: string
       updatedAt:
         type: string
     type: object
-  ptop_internal_models.TransactionInternalStatus:
+  models.TransactionInternalStatus:
     enum:
     - processing
     - confirmed
@@ -557,11 +562,13 @@ definitions:
     - TransactionInternalStatusProcessing
     - TransactionInternalStatusConfirmed
     - TransactionInternalStatusFailed
-  ptop_internal_models.TransactionOut:
+  models.TransactionOut:
     properties:
       amount:
         type: number
       assetID:
+        type: string
+      assetName:
         type: string
       clientID:
         type: string
@@ -574,13 +581,13 @@ definitions:
       id:
         type: string
       status:
-        $ref: '#/definitions/ptop_internal_models.TransactionOutStatus'
+        $ref: '#/definitions/models.TransactionOutStatus'
       toAddress:
         type: string
       updatedAt:
         type: string
     type: object
-  ptop_internal_models.TransactionOutStatus:
+  models.TransactionOutStatus:
     enum:
     - pending
     - processing
@@ -594,7 +601,7 @@ definitions:
     - TransactionOutStatusConfirmed
     - TransactionOutStatusFailed
     - TransactionOutStatusCancelled
-  ptop_internal_models.Wallet:
+  models.Wallet:
     properties:
       assetID:
         type: string
@@ -1341,7 +1348,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/ptop_internal_models.TransactionIn'
+              $ref: '#/definitions/models.TransactionIn'
             type: array
       security:
       - BearerAuth: []
@@ -1366,7 +1373,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/ptop_internal_models.TransactionInternal'
+              $ref: '#/definitions/models.TransactionInternal'
             type: array
       security:
       - BearerAuth: []
@@ -1391,7 +1398,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/ptop_internal_models.TransactionOut'
+              $ref: '#/definitions/models.TransactionOut'
             type: array
       security:
       - BearerAuth: []
