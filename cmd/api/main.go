@@ -97,6 +97,8 @@ func main() {
 	api.POST("/client/wallets", handlers.CreateWallet(gormDB))
 	api.GET("/client/assets", handlers.GetClientAssets(gormDB))
 	api.GET("/client/balances", handlers.ListClientBalances(gormDB))
+	api.GET("/client/escrows", handlers.ListClientEscrows(gormDB))
+	api.GET("/client/escrows/:id", handlers.GetClientEscrow(gormDB))
 
 	api.GET("/client/offers", handlers.ListClientOffers(gormDB))
 	api.POST("/client/offers", handlers.CreateOffer(gormDB))
