@@ -24,6 +24,7 @@ import (
 	"ptop/internal/ethwatcher"
 	"ptop/internal/handlers"
 	"ptop/internal/services"
+	"ptop/internal/solwatcher"
 	"ptop/internal/xmrwatcher"
 
 	docs "ptop/docs"
@@ -122,15 +123,24 @@ func main() {
 		if err := ethW.Start(); err != nil {
 			log.Fatalf("eth watcher start: %v", err)
 		}
+		mint := os.Getenv("USDC_MINT_ADDRESS")
+		solW, err := solwatcher.New(gormDB, "", mint, true)
+		if err != nil {
+			log.Fatalf("sol watcher: %v", err)
+		}
+		if err := solW.Start(); err != nil {
+			log.Fatalf("sol watcher start: %v", err)
+		}
 		xmrW, err := xmrwatcher.New(gormDB, cfg.MoneroRPCURL, 0, true)
 		if err != nil {
 			log.Fatalf("xmr watcher: %v", err)
 		}
 		xmrW.Start()
 		watchers := map[string]handlers.DebugDepositor{
-			"BTC": btcW,
-			"ETH": ethW,
-			"XMR": xmrW,
+			"BTC":  btcW,
+			"ETH":  ethW,
+			"XMR":  xmrW,
+			"USDC": solW,
 		}
 		r.POST("/debug/deposit", handlers.DebugDeposit(gormDB, watchers))
 	}

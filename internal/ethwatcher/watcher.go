@@ -144,6 +144,12 @@ func (w *Watcher) createDebugDeposit(walletID string, amount decimal.Decimal) {
 	}
 	if err := w.db.Create(&dep).Error; err != nil {
 		log.Printf("не удалось сохранить депозит: %v", err)
+		return
+	}
+	if err := w.db.Model(&models.Balance{}).
+		Where("client_id = ? AND asset_id = ?", wallet.ClientID, wallet.AssetID).
+		Update("amount", gorm.Expr("amount + ?", amount)).Error; err != nil {
+		log.Printf("не удалось обновить баланс: %v", err)
 	}
 }
 
@@ -193,6 +199,12 @@ func (w *Watcher) processTx(tx *types.Transaction, blockNumber uint64) {
 	}
 	if err := w.db.Create(&dep).Error; err != nil {
 		log.Printf("не удалось сохранить депозит: %v", err)
+		return
+	}
+	if err := w.db.Model(&models.Balance{}).
+		Where("client_id = ? AND asset_id = ?", wallet.ClientID, wallet.AssetID).
+		Update("amount", gorm.Expr("amount + ?", amount)).Error; err != nil {
+		log.Printf("не удалось обновить баланс: %v", err)
 	}
 }
 
@@ -247,5 +259,11 @@ func (w *Watcher) processLog(vLog types.Log) {
 	}
 	if err := w.db.Create(&dep).Error; err != nil {
 		log.Printf("не удалось сохранить депозит: %v", err)
+		return
+	}
+	if err := w.db.Model(&models.Balance{}).
+		Where("client_id = ? AND asset_id = ?", wallet.ClientID, wallet.AssetID).
+		Update("amount", gorm.Expr("amount + ?", amount)).Error; err != nil {
+		log.Printf("не удалось обновить баланс: %v", err)
 	}
 }
