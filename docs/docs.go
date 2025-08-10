@@ -756,6 +756,51 @@ const docTemplate = `{
                 }
             }
         },
+        "/client/escrows/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "escrows"
+                ],
+                "summary": "Просмотр эскроу клиента",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID эскроу",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "навигация: next или prev",
+                        "name": "dir",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.EscrowNavResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/client/offers": {
             "get": {
                 "security": [
@@ -784,7 +829,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.Offer"
+                                "$ref": "#/definitions/ptop_internal_models.OfferFull"
                             }
                         }
                     }
@@ -1182,7 +1227,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.TransactionIn"
+                                "$ref": "#/definitions/ptop_internal_models.TransactionIn"
                             }
                         }
                     }
@@ -1223,7 +1268,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.TransactionInternal"
+                                "$ref": "#/definitions/ptop_internal_models.TransactionInternal"
                             }
                         }
                     }
@@ -1264,7 +1309,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.TransactionOut"
+                                "$ref": "#/definitions/ptop_internal_models.TransactionOut"
                             }
                         }
                     }
@@ -1500,7 +1545,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ptop_internal_models.Offer"
+                                "$ref": "#/definitions/ptop_internal_models.OfferFull"
                             }
                         }
                     }
@@ -1886,6 +1931,49 @@ const docTemplate = `{
                 }
             }
         },
+        "internal_handlers.EscrowDetail": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "asset": {
+                    "$ref": "#/definitions/ptop_internal_models.Asset"
+                },
+                "client": {
+                    "$ref": "#/definitions/ptop_internal_models.Client"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "offer": {
+                    "$ref": "#/definitions/ptop_internal_models.Offer"
+                },
+                "order": {
+                    "$ref": "#/definitions/ptop_internal_models.Order"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_handlers.EscrowNavResponse": {
+            "type": "object",
+            "properties": {
+                "escrow": {
+                    "$ref": "#/definitions/internal_handlers.EscrowDetail"
+                },
+                "nextId": {
+                    "type": "string"
+                },
+                "prevId": {
+                    "type": "string"
+                }
+            }
+        },
         "internal_handlers.LoginRequest": {
             "type": "object",
             "properties": {
@@ -2188,6 +2276,29 @@ const docTemplate = `{
                 }
             }
         },
+        "ptop_internal_models.Client": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "ordersCount": {
+                    "type": "integer"
+                },
+                "rating": {
+                    "type": "number"
+                },
+                "registredAt": {
+                    "type": "string"
+                },
+                "twoFAEnabled": {
+                    "type": "boolean"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "ptop_internal_models.ClientPaymentMethod": {
             "type": "object",
             "properties": {
@@ -2197,6 +2308,9 @@ const docTemplate = `{
                 "clientID": {
                     "type": "string"
                 },
+                "country": {
+                    "$ref": "#/definitions/ptop_internal_models.Country"
+                },
                 "countryID": {
                     "type": "string"
                 },
@@ -2205,6 +2319,9 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "paymentMethod": {
+                    "$ref": "#/definitions/ptop_internal_models.PaymentMethod"
                 },
                 "paymentMethodID": {
                     "type": "string"
@@ -2337,6 +2454,77 @@ const docTemplate = `{
                 },
                 "price": {
                     "type": "number"
+                },
+                "toAssetID": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "ptop_internal_models.OfferFull": {
+            "type": "object",
+            "properties": {
+                "TTL": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "number"
+                },
+                "client": {
+                    "$ref": "#/definitions/ptop_internal_models.Client"
+                },
+                "clientID": {
+                    "type": "string"
+                },
+                "clientPaymentMethods": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ptop_internal_models.ClientPaymentMethod"
+                    }
+                },
+                "conditions": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "disabledAt": {
+                    "type": "string"
+                },
+                "enabledAt": {
+                    "type": "string"
+                },
+                "fromAsset": {
+                    "$ref": "#/definitions/ptop_internal_models.Asset"
+                },
+                "fromAssetID": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "isEnabled": {
+                    "type": "boolean"
+                },
+                "maxAmount": {
+                    "type": "number"
+                },
+                "minAmount": {
+                    "type": "number"
+                },
+                "orderExpirationTimeout": {
+                    "type": "integer"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "toAsset": {
+                    "$ref": "#/definitions/ptop_internal_models.Asset"
                 },
                 "toAssetID": {
                     "type": "string"
@@ -2505,7 +2693,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.TransactionIn": {
+        "ptop_internal_models.TransactionIn": {
             "type": "object",
             "properties": {
                 "amount": {
@@ -2530,7 +2718,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "$ref": "#/definitions/models.TransactionInStatus"
+                    "$ref": "#/definitions/ptop_internal_models.TransactionInStatus"
                 },
                 "updatedAt": {
                     "type": "string"
@@ -2540,7 +2728,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.TransactionInStatus": {
+        "ptop_internal_models.TransactionInStatus": {
             "type": "string",
             "enum": [
                 "pending",
@@ -2555,7 +2743,7 @@ const docTemplate = `{
                 "TransactionInStatusFailed"
             ]
         },
-        "models.TransactionInternal": {
+        "ptop_internal_models.TransactionInternal": {
             "type": "object",
             "properties": {
                 "amount": {
@@ -2583,7 +2771,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "$ref": "#/definitions/models.TransactionInternalStatus"
+                    "$ref": "#/definitions/ptop_internal_models.TransactionInternalStatus"
                 },
                 "toClientID": {
                     "type": "string"
@@ -2593,7 +2781,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.TransactionInternalStatus": {
+        "ptop_internal_models.TransactionInternalStatus": {
             "type": "string",
             "enum": [
                 "processing",
@@ -2606,7 +2794,7 @@ const docTemplate = `{
                 "TransactionInternalStatusFailed"
             ]
         },
-        "models.TransactionOut": {
+        "ptop_internal_models.TransactionOut": {
             "type": "object",
             "properties": {
                 "amount": {
@@ -2634,7 +2822,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "$ref": "#/definitions/models.TransactionOutStatus"
+                    "$ref": "#/definitions/ptop_internal_models.TransactionOutStatus"
                 },
                 "toAddress": {
                     "type": "string"
@@ -2644,7 +2832,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.TransactionOutStatus": {
+        "ptop_internal_models.TransactionOutStatus": {
             "type": "string",
             "enum": [
                 "pending",
@@ -2661,7 +2849,7 @@ const docTemplate = `{
                 "TransactionOutStatusCancelled"
             ]
         },
-        "models.Wallet": {
+        "ptop_internal_models.Wallet": {
             "type": "object",
             "properties": {
                 "assetID": {
