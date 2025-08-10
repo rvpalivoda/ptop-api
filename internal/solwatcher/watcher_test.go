@@ -16,7 +16,7 @@ func TestWatcherDebugDeposit(t *testing.T) {
 	if err != nil {
 		t.Fatalf("db open: %v", err)
 	}
-	if err := db.AutoMigrate(&models.Client{}, &models.Asset{}, &models.Wallet{}, &models.TransactionIn{}); err != nil {
+	if err := db.AutoMigrate(&models.Client{}, &models.Asset{}, &models.Wallet{}, &models.TransactionIn{}, &models.Balance{}); err != nil {
 		t.Fatalf("migrate: %v", err)
 	}
 	client := models.Client{Username: "u"}
@@ -25,8 +25,10 @@ func TestWatcherDebugDeposit(t *testing.T) {
 	db.Create(&asset)
 	wallet := models.Wallet{ClientID: client.ID, AssetID: asset.ID, Value: "addr", DerivationIndex: 1}
 	db.Create(&wallet)
+	bal := models.Balance{ClientID: client.ID, AssetID: asset.ID, Amount: decimal.Zero, AmountEscrow: decimal.Zero}
+	db.Create(&bal)
 
-	w, err := New(db, "", "11111111111111111111111111111111", true)
+	w, err := New(db, "", "", true)
 	if err != nil {
 		t.Fatalf("watcher: %v", err)
 	}
@@ -41,5 +43,21 @@ func TestWatcherDebugDeposit(t *testing.T) {
 	}
 	if !tx.Amount.Equal(decimal.RequireFromString("2")) {
 		t.Fatalf("amount %s", tx.Amount)
+	}
+	if err := db.First(&bal).Error; err != nil {
+		t.Fatalf("balance: %v", err)
+	}
+	if !bal.Amount.Equal(decimal.RequireFromString("2")) {
+		t.Fatalf("balance amount %s", bal.Amount)
+	}
+}
+
+func TestWatcherMintRequiredInProd(t *testing.T) {
+	db, err := gorm.Open(sqlite.Open("file:sol_prod?mode=memory&cache=shared"), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("db open: %v", err)
+	}
+	if _, err := New(db, "", "", false); err == nil {
+		t.Fatalf("expected error")
 	}
 }
