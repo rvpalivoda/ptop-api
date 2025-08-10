@@ -58,10 +58,12 @@ func DebugDeposit(db *gorm.DB, watchers map[string]DebugDepositor) gin.HandlerFu
 		switch {
 		case strings.HasPrefix(name, "BTC"):
 			watcher = watchers["BTC"]
-		case strings.HasPrefix(name, "ETH"):
+		case strings.HasPrefix(name, "ETH"), strings.HasPrefix(name, "USDT"):
 			watcher = watchers["ETH"]
 		case strings.HasPrefix(name, "XMR"):
 			watcher = watchers["XMR"]
+		case strings.HasPrefix(name, "USDC"):
+			watcher = watchers["USDC"]
 		}
 		if watcher == nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "watcher not available"})
