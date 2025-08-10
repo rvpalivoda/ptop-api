@@ -1,20 +1,22 @@
 package models
 
 import (
-	"time"
+        "time"
 
-	"ptop/internal/utils"
+        "ptop/internal/utils"
 
-	"github.com/shopspring/decimal"
-	"gorm.io/datatypes"
-	"gorm.io/gorm"
+        "github.com/shopspring/decimal"
+        "gorm.io/datatypes"
+        "gorm.io/gorm"
 )
 
+// Client представляет клиента
+// swagger:model
 type Client struct {
-	ID           string          `gorm:"primaryKey;size:21" json:"id"`
-	Username     string          `gorm:"type:varchar(255);not null;unique" json:"username"`
-	PinCode      *string         `gorm:"type:varchar(255)" json:"-"`
-	TwoFAEnabled bool            `gorm:"not null;default:false" json:"twoFAEnabled"`
+        ID           string          `gorm:"primaryKey;size:21" json:"id"`
+        Username     string          `gorm:"type:varchar(255);not null;unique" json:"username"`
+        PinCode      *string         `gorm:"type:varchar(255)" json:"-"`
+        TwoFAEnabled bool            `gorm:"not null;default:false" json:"twoFAEnabled"`
 	TOTPSecret   *string         `gorm:"type:varchar(255)" json:"-"`
 	Bip39        datatypes.JSON  `gorm:"type:json"  json:"-"`
 	Password     *string         `gorm:"type:varchar(255)" json:"-"`
