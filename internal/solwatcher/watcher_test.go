@@ -28,7 +28,7 @@ func TestWatcherDebugDeposit(t *testing.T) {
 	bal := models.Balance{ClientID: client.ID, AssetID: asset.ID, Amount: decimal.Zero, AmountEscrow: decimal.Zero}
 	db.Create(&bal)
 
-	w, err := New(db, "", "11111111111111111111111111111111", true)
+	w, err := New(db, "", "", true)
 	if err != nil {
 		t.Fatalf("watcher: %v", err)
 	}
@@ -50,4 +50,15 @@ func TestWatcherDebugDeposit(t *testing.T) {
 	if !bal.Amount.Equal(decimal.RequireFromString("2")) {
 		t.Fatalf("balance amount %s", bal.Amount)
 	}
+}
+
+func TestWatcherMintRequiredInProd(t *testing.T) {
+	db, err := gorm.Open(sqlite.Open("file:sol_prod?mode=memory&cache=shared"), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("db open: %v", err)
+	}
+	if _, err := New(db, "", "", false); err == nil {
+		t.Fatalf("expected error")
+	}
+
 }

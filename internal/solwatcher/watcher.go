@@ -38,13 +38,16 @@ type debugDeposit struct {
 func New(db *gorm.DB, rpcURL, mintAddress string, debug bool) (*Watcher, error) {
 	w := &Watcher{db: db, debug: debug}
 	if mintAddress == "" {
-		return nil, fmt.Errorf("mint address required")
+		if !debug {
+			return nil, fmt.Errorf("mint address required")
+		}
+	} else {
+		mint, err := solana.PublicKeyFromBase58(mintAddress)
+		if err != nil {
+			return nil, fmt.Errorf("mint address: %w", err)
+		}
+		w.mint = mint
 	}
-	mint, err := solana.PublicKeyFromBase58(mintAddress)
-	if err != nil {
-		return nil, fmt.Errorf("mint address: %w", err)
-	}
-	w.mint = mint
 	if debug {
 		w.debugCh = make(chan debugDeposit)
 		return w, nil
