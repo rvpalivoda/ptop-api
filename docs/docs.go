@@ -1128,7 +1128,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "нельзя создавать ордер на своё предложение",
                         "schema": {
                             "$ref": "#/definitions/handlers.ErrorResponse"
                         }
@@ -1881,6 +1881,34 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/models.PaymentMethod"
                             }
+                        }
+                    }
+                }
+            }
+        },
+        "/ws/orders": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Подписка на события по ордерам клиента",
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Websocket ордеров клиента",
+                "responses": {
+                    "101": {
+                        "description": "Switching Protocols",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
