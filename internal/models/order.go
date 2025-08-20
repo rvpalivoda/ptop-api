@@ -19,31 +19,31 @@ const (
 )
 
 type Order struct {
-	ID                    string              `gorm:"primaryKey;size:21"`
-	OfferID               string              `gorm:"size:21;not null"`
+	ID                    string              `gorm:"primaryKey;size:21" json:"id"`
+	OfferID               string              `gorm:"size:21;not null" json:"offerID"`
 	Offer                 Offer               `gorm:"foreignKey:OfferID" json:"-"`
-	BuyerID               string              `gorm:"size:21;not null"`
+	BuyerID               string              `gorm:"size:21;not null" json:"buyerID"`
 	Buyer                 Client              `gorm:"foreignKey:BuyerID" json:"-"`
-	SellerID              string              `gorm:"size:21;not null"`
+	SellerID              string              `gorm:"size:21;not null" json:"sellerID"`
 	Seller                Client              `gorm:"foreignKey:SellerID" json:"-"`
 	AuthorID              string              `gorm:"size:21;not null" json:"authorID"`
 	Author                Client              `gorm:"foreignKey:AuthorID" json:"-"`
 	OfferOwnerID          string              `gorm:"size:21;not null" json:"offerOwnerID"`
 	OfferOwner            Client              `gorm:"foreignKey:OfferOwnerID" json:"-"`
-	FromAssetID           string              `gorm:"size:21;not null"`
+	FromAssetID           string              `gorm:"size:21;not null" json:"fromAssetID"`
 	FromAsset             Asset               `gorm:"foreignKey:FromAssetID" json:"-"`
-	ToAssetID             string              `gorm:"size:21;not null"`
+	ToAssetID             string              `gorm:"size:21;not null" json:"toAssetID"`
 	ToAsset               Asset               `gorm:"foreignKey:ToAssetID" json:"-"`
-	Amount                decimal.Decimal     `gorm:"type:decimal(32,8);not null"`
-	Price                 decimal.Decimal     `gorm:"type:decimal(32,8);not null"`
-	ClientPaymentMethodID string              `gorm:"size:21"`
+	Amount                decimal.Decimal     `gorm:"type:decimal(32,8);not null" json:"amount"`
+	Price                 decimal.Decimal     `gorm:"type:decimal(32,8);not null" json:"price"`
+	ClientPaymentMethodID string              `gorm:"size:21" json:"clientPaymentMethodID"`
 	ClientPaymentMethod   ClientPaymentMethod `gorm:"foreignKey:ClientPaymentMethodID" json:"-"`
-	Status                OrderStatus         `gorm:"type:varchar(20);not null"`
-	IsEscrow              bool                `gorm:"not null;default:false"`
-	ExpiresAt             time.Time           `gorm:"not null"`
-	ReleasedAt            *time.Time
-	CreatedAt             time.Time
-	UpdatedAt             time.Time
+	Status                OrderStatus         `gorm:"type:varchar(20);not null" json:"status"`
+	IsEscrow              bool                `gorm:"not null;default:false" json:"isEscrow"`
+	ExpiresAt             time.Time           `gorm:"not null" json:"expiresAt"`
+	ReleasedAt            *time.Time          `json:"releasedAt"`
+	CreatedAt             time.Time           `json:"createdAt"`
+	UpdatedAt             time.Time           `json:"updatedAt"`
 }
 
 func (o *Order) BeforeCreate(tx *gorm.DB) (err error) {
