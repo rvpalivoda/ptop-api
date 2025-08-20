@@ -62,6 +62,17 @@ func TestOrderChatWS(t *testing.T) {
 	var buyer models.Client
 	db.Where("username = ?", "buyer").First(&buyer)
 
+	// set pincode for buyer
+	w = httptest.NewRecorder()
+	body = `{"password":"pass","pincode":"1234"}`
+	req, _ = http.NewRequest("POST", "/auth/pincode", bytes.NewBufferString(body))
+	req.Header.Set("Authorization", "Bearer "+buyerTok.AccessToken)
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("buyer pincode status %d", w.Code)
+	}
+
 	// register hacker
 	w = httptest.NewRecorder()
 	body = `{"username":"hacker","password":"pass","password_confirm":"pass"}`
@@ -105,7 +116,7 @@ func TestOrderChatWS(t *testing.T) {
 	}
 
 	w = httptest.NewRecorder()
-	body = `{"offer_id":"` + offer.ID + `","amount":"5"}`
+	body = `{"offer_id":"` + offer.ID + `","amount":"5","pin_code":"1234"}`
 	req, _ = http.NewRequest("POST", "/client/orders", bytes.NewBufferString(body))
 	req.Header.Set("Authorization", "Bearer "+buyerTok.AccessToken)
 	req.Header.Set("Content-Type", "application/json")

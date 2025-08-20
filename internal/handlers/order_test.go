@@ -34,6 +34,17 @@ func TestOrderHandler(t *testing.T) {
 	}
 	json.Unmarshal(w.Body.Bytes(), &tok)
 
+	// set pincode
+	w = httptest.NewRecorder()
+	body = `{"password":"pass","pincode":"1234"}`
+	req, _ = http.NewRequest("POST", "/auth/pincode", bytes.NewBufferString(body))
+	req.Header.Set("Authorization", "Bearer "+tok.AccessToken)
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("pincode status %d", w.Code)
+	}
+
 	var client models.Client
 	db.Where("username = ?", "orduser").First(&client)
 
@@ -62,6 +73,26 @@ func TestOrderHandler(t *testing.T) {
 
 	w = httptest.NewRecorder()
 	body = `{"offer_id":"` + offer.ID + `","amount":"5"}`
+	req, _ = http.NewRequest("POST", "/client/orders", bytes.NewBufferString(body))
+	req.Header.Set("Authorization", "Bearer "+tok.AccessToken)
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusUnauthorized {
+		t.Fatalf("expected unauthorized, got %d", w.Code)
+	}
+
+	w = httptest.NewRecorder()
+	body = `{"offer_id":"` + offer.ID + `","amount":"5","pin_code":"0000"}`
+	req, _ = http.NewRequest("POST", "/client/orders", bytes.NewBufferString(body))
+	req.Header.Set("Authorization", "Bearer "+tok.AccessToken)
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusUnauthorized {
+		t.Fatalf("expected unauthorized, got %d", w.Code)
+	}
+
+	w = httptest.NewRecorder()
+	body = `{"offer_id":"` + offer.ID + `","amount":"5","pin_code":"1234"}`
 	req, _ = http.NewRequest("POST", "/client/orders", bytes.NewBufferString(body))
 	req.Header.Set("Authorization", "Bearer "+tok.AccessToken)
 	req.Header.Set("Content-Type", "application/json")
