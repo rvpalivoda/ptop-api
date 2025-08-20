@@ -632,3 +632,131 @@ func TestListOffersPagination(t *testing.T) {
 		t.Fatalf("unexpected pagination result")
 	}
 }
+
+func TestListOffersIsMine(t *testing.T) {
+	db, r, _ := setupTest(t)
+
+	// register seller
+	body := `{"username":"seller","password":"pass","password_confirm":"pass"}`
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/auth/register", bytes.NewBufferString(body))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+
+	// login seller
+	w = httptest.NewRecorder()
+	body = `{"username":"seller","password":"pass"}`
+	req, _ = http.NewRequest("POST", "/auth/login", bytes.NewBufferString(body))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("login seller status %d", w.Code)
+	}
+	var tokSeller struct {
+		AccessToken string `json:"access_token"`
+	}
+	json.Unmarshal(w.Body.Bytes(), &tokSeller)
+
+	// register buyer
+	w = httptest.NewRecorder()
+	body = `{"username":"buyer","password":"pass","password_confirm":"pass"}`
+	req, _ = http.NewRequest("POST", "/auth/register", bytes.NewBufferString(body))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+
+	// login buyer
+	w = httptest.NewRecorder()
+	body = `{"username":"buyer","password":"pass"}`
+	req, _ = http.NewRequest("POST", "/auth/login", bytes.NewBufferString(body))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("login buyer status %d", w.Code)
+	}
+	var tokBuyer struct {
+		AccessToken string `json:"access_token"`
+	}
+	json.Unmarshal(w.Body.Bytes(), &tokBuyer)
+
+	// assets and payment method
+	usd := models.Asset{Name: "USD_is", Type: models.AssetTypeFiat, IsActive: true}
+	btc := models.Asset{Name: "BTC_is", Type: models.AssetTypeCrypto, IsActive: true}
+	country := models.Country{Name: "CountryI"}
+	pm := models.PaymentMethod{Name: "BankI", MethodGroup: "bank", IsRealtime: false, FeeSide: models.FeeSideSender, KycLevelHint: models.KycLevelHintLow}
+	if err := db.Create(&usd).Error; err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Create(&btc).Error; err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Create(&country).Error; err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Create(&pm).Error; err != nil {
+		t.Fatal(err)
+	}
+
+	var seller models.Client
+	db.Where("username = ?", "seller").First(&seller)
+	cpm := models.ClientPaymentMethod{ClientID: seller.ID, CountryID: country.ID, PaymentMethodID: pm.ID, Name: "pm"}
+	if err := db.Create(&cpm).Error; err != nil {
+		t.Fatal(err)
+	}
+
+	reqBody := OfferRequest{
+		MaxAmount:              "100",
+		MinAmount:              "10",
+		Amount:                 "50",
+		Price:                  "1",
+		Type:                   models.OfferTypeBuy,
+		FromAssetID:            usd.ID,
+		ToAssetID:              btc.ID,
+		ClientPaymentMethodIDs: []string{cpm.ID},
+	}
+	b, _ := json.Marshal(reqBody)
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("POST", "/client/offers", bytes.NewReader(b))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+tokSeller.AccessToken)
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("create offer status %d", w.Code)
+	}
+	var off models.Offer
+	json.Unmarshal(w.Body.Bytes(), &off)
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("POST", "/client/offers/"+off.ID+"/enable", nil)
+	req.Header.Set("Authorization", "Bearer "+tokSeller.AccessToken)
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("enable offer status %d", w.Code)
+	}
+
+	// list as seller
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("GET", "/offers", nil)
+	req.Header.Set("Authorization", "Bearer "+tokSeller.AccessToken)
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("seller list status %d", w.Code)
+	}
+	var list []models.OfferFull
+	json.Unmarshal(w.Body.Bytes(), &list)
+	if len(list) != 1 || !list[0].IsMine {
+		t.Fatalf("expected own offer")
+	}
+
+	// list as buyer
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("GET", "/offers", nil)
+	req.Header.Set("Authorization", "Bearer "+tokBuyer.AccessToken)
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("buyer list status %d", w.Code)
+	}
+	list = nil
+	json.Unmarshal(w.Body.Bytes(), &list)
+	if len(list) != 1 || list[0].IsMine {
+		t.Fatalf("expected foreign offer")
+	}
+}

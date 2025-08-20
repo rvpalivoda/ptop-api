@@ -10,4 +10,5 @@ type OfferFull struct {
 	ToAsset              Asset                 `json:"toAsset"`
 	Client               Client                `json:"client"`
 	ClientPaymentMethods []ClientPaymentMethod `json:"clientPaymentMethods"`
+	IsMine               bool                  `json:"isMine"`
 }

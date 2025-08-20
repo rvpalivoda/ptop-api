@@ -469,6 +469,8 @@ definitions:
         type: string
       isEnabled:
         type: boolean
+      isMine:
+        type: boolean
       maxAmount:
         type: number
       minAmount:
@@ -587,7 +589,6 @@ definitions:
       createdAt:
         type: string
       fileSize:
-        format: int64
         type: integer
       fileType:
         type: string
@@ -1473,7 +1474,7 @@ paths:
           schema:
             $ref: '#/definitions/models.Order'
         "400":
-          description: Bad Request
+          description: invalid json or own offer
           schema:
             $ref: '#/definitions/handlers.ErrorResponse'
         "401":

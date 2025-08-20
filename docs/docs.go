@@ -1128,7 +1128,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "invalid json or own offer",
                         "schema": {
                             "$ref": "#/definitions/handlers.ErrorResponse"
                         }
@@ -2647,6 +2647,9 @@ const docTemplate = `{
                 "isEnabled": {
                     "type": "boolean"
                 },
+                "isMine": {
+                    "type": "boolean"
+                },
                 "maxAmount": {
                     "type": "number"
                 },
@@ -2825,8 +2828,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "fileSize": {
-                    "type": "integer",
-                    "format": "int64"
+                    "type": "integer"
                 },
                 "fileType": {
                     "type": "string"

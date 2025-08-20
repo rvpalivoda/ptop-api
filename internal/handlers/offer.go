@@ -347,6 +347,10 @@ func DeleteOffer(db *gorm.DB) gin.HandlerFunc {
 func ListOffers(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		limit, offset := parsePagination(c)
+		var clientID string
+		if cid, ok := c.Get("client_id"); ok {
+			clientID = cid.(string)
+		}
 		query := db.Model(&models.Offer{}).
 			Where("is_enabled = ? AND ttl > ?", true, time.Now()).
 			Distinct().
@@ -411,6 +415,7 @@ func ListOffers(db *gorm.DB) gin.HandlerFunc {
 				ToAsset:              o.ToAsset,
 				Client:               o.Client,
 				ClientPaymentMethods: o.ClientPaymentMethods,
+				IsMine:               o.ClientID == clientID,
 			}
 		}
 		c.JSON(http.StatusOK, res)
