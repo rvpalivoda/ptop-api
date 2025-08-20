@@ -27,7 +27,7 @@ type OrderRequest struct {
 // @Produce json
 // @Param input body OrderRequest true "данные"
 // @Success 200 {object} models.Order
-// @Failure 400 {object} ErrorResponse
+// @Failure 400 {object} ErrorResponse "нельзя создавать ордер на своё предложение"
 // @Failure 401 {object} ErrorResponse
 // @Router /client/orders [post]
 func CreateOrder(db *gorm.DB) gin.HandlerFunc {
@@ -62,6 +62,10 @@ func CreateOrder(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "invalid offer"})
 			return
 		}
+		if offer.ClientID == clientID {
+			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "cannot order own offer"})
+			return
+		}
 		order := models.Order{
 			OfferID:               offer.ID,
 			BuyerID:               clientID,
@@ -83,6 +87,45 @@ func CreateOrder(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
 			return
 		}
+var full models.Order
+if err := db.Preload("Offer").
+	Preload("Buyer").
+	Preload("Seller").
+	Preload("Author").
+	Preload("OfferOwner").
+	Preload("FromAsset").
+	Preload("ToAsset").
+	Preload("ClientPaymentMethod").
+	Preload("ClientPaymentMethod.Country").
+	Preload("ClientPaymentMethod.PaymentMethod").
+	Where("id = ?", order.ID).
+	First(&full).Error; err == nil {
+
+	// Новый вызов из ветки codex/add-broadcastorderstatus-function
+	broadcastOrderStatus(full)
+
+	// Логика из master остаётся
+	var cpm *models.ClientPaymentMethod
+	if full.ClientPaymentMethodID != "" {
+		cpm = &full.ClientPaymentMethod
+	}
+
+	of := models.OrderFull{
+		Order:               full,
+		Offer:               full.Offer,
+		Buyer:               full.Buyer,
+		Seller:              full.Seller,
+		Author:              full.Author,
+		OfferOwner:          full.OfferOwner,
+		FromAsset:           full.FromAsset,
+		ToAsset:             full.ToAsset,
+		ClientPaymentMethod: cpm,
+	}
+
+	// Можно использовать full.OfferOwnerID, он уже загружен
+	broadcastOrderEvent(full.OfferOwnerID, newOrderEvent(of))
+}
+
 		c.JSON(http.StatusOK, order)
 	}
 }

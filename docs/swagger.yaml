@@ -587,7 +587,6 @@ definitions:
       createdAt:
         type: string
       fileSize:
-        format: int64
         type: integer
       fileType:
         type: string
@@ -1473,7 +1472,7 @@ paths:
           schema:
             $ref: '#/definitions/models.Order'
         "400":
-          description: Bad Request
+          description: нельзя создавать ордер на своё предложение
           schema:
             $ref: '#/definitions/handlers.ErrorResponse'
         "401":
@@ -1951,6 +1950,23 @@ paths:
       summary: Список платёжных методов
       tags:
       - reference
+  /ws/orders:
+    get:
+      description: Подписка на события по ордерам клиента
+      responses:
+        "101":
+          description: Switching Protocols
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Websocket ордеров клиента
+      tags:
+      - orders
   /ws/orders/{id}/chat:
     get:
       description: При подключении отправляет историю сообщений из кеша Redis
@@ -1976,6 +1992,33 @@ paths:
       security:
       - BearerAuth: []
       summary: Websocket чат ордера
+      tags:
+      - orders
+  /ws/orders/{id}/status:
+    get:
+      description: Отправляет события изменения статуса ордера.
+      parameters:
+      - description: ID ордера
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "101":
+          description: Switching Protocols
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Websocket уведомлений о статусе ордера
       tags:
       - orders
 securityDefinitions:

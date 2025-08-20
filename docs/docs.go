@@ -1128,7 +1128,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "нельзя создавать ордер на своё предложение",
                         "schema": {
                             "$ref": "#/definitions/handlers.ErrorResponse"
                         }
@@ -1886,6 +1886,34 @@ const docTemplate = `{
                 }
             }
         },
+        "/ws/orders": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Подписка на события по ордерам клиента",
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Websocket ордеров клиента",
+                "responses": {
+                    "101": {
+                        "description": "Switching Protocols",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/ws/orders/{id}/chat": {
             "get": {
                 "security": [
@@ -1898,6 +1926,49 @@ const docTemplate = `{
                     "orders"
                 ],
                 "summary": "Websocket чат ордера",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID ордера",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "101": {
+                        "description": "Switching Protocols",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/ws/orders/{id}/status": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Отправляет события изменения статуса ордера.",
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Websocket уведомлений о статусе ордера",
                 "parameters": [
                     {
                         "type": "string",
@@ -2825,8 +2896,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "fileSize": {
-                    "type": "integer",
-                    "format": "int64"
+                    "type": "integer"
                 },
                 "fileType": {
                     "type": "string"
