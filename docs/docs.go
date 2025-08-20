@@ -1198,6 +1198,61 @@ const docTemplate = `{
             }
         },
         "/client/payment-methods/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "client-payment-methods"
+                ],
+                "summary": "Изменить платёжный метод клиента",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "данные",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.CreateClientPaymentMethodRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ClientPaymentMethod"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            },
             "delete": {
                 "security": [
                     {
@@ -1922,6 +1977,9 @@ const docTemplate = `{
                 "country_id": {
                     "type": "string"
                 },
+                "detailed_information": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -2367,6 +2425,9 @@ const docTemplate = `{
                     "$ref": "#/definitions/models.Country"
                 },
                 "countryID": {
+                    "type": "string"
+                },
+                "detailedInformation": {
                     "type": "string"
                 },
                 "id": {

@@ -92,6 +92,7 @@ func main() {
 	api.Use(handlers.AuthMiddleware(gormDB))
 	api.GET("/client/payment-methods", handlers.ListClientPaymentMethods(gormDB))
 	api.POST("/client/payment-methods", handlers.CreateClientPaymentMethod(gormDB))
+	api.PUT("/client/payment-methods/:id", handlers.UpdateClientPaymentMethod(gormDB))
 	api.DELETE("/client/payment-methods/:id", handlers.DeleteClientPaymentMethod(gormDB))
 	api.GET("/client/wallets", handlers.ListClientWallets(gormDB))
 	api.POST("/client/wallets", handlers.CreateWallet(gormDB))
