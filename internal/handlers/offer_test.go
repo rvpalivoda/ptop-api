@@ -227,6 +227,27 @@ func TestOfferLifecycle(t *testing.T) {
 	if offer2.IsEnabled {
 		t.Fatalf("offer not disabled")
 	}
+
+	// delete second offer
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("DELETE", "/client/offers/"+offer2.ID, nil)
+	req.Header.Set("Authorization", "Bearer "+tok.AccessToken)
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("delete offer status %d", w.Code)
+	}
+	var status StatusResponse
+	json.Unmarshal(w.Body.Bytes(), &status)
+	if status.Status != "deleted" {
+		t.Fatalf("unexpected status %s", status.Status)
+	}
+	var count int64
+	if err := db.Model(&models.Offer{}).Where("id = ?", offer2.ID).Count(&count).Error; err != nil {
+		t.Fatal(err)
+	}
+	if count != 0 {
+		t.Fatalf("offer not deleted")
+	}
 }
 
 func TestListOffersFilters(t *testing.T) {
