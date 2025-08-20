@@ -26,6 +26,10 @@ type Order struct {
 	Buyer                 Client              `gorm:"foreignKey:BuyerID" json:"-"`
 	SellerID              string              `gorm:"size:21;not null"`
 	Seller                Client              `gorm:"foreignKey:SellerID" json:"-"`
+	AuthorID              string              `gorm:"size:21;not null" json:"authorID"`
+	Author                Client              `gorm:"foreignKey:AuthorID" json:"-"`
+	OfferOwnerID          string              `gorm:"size:21;not null" json:"offerOwnerID"`
+	OfferOwner            Client              `gorm:"foreignKey:OfferOwnerID" json:"-"`
 	FromAssetID           string              `gorm:"size:21;not null"`
 	FromAsset             Asset               `gorm:"foreignKey:FromAssetID" json:"-"`
 	ToAssetID             string              `gorm:"size:21;not null"`

@@ -486,6 +486,8 @@ definitions:
     properties:
       amount:
         type: number
+      authorID:
+        type: string
       buyerID:
         type: string
       clientPaymentMethodID:
@@ -501,6 +503,8 @@ definitions:
       isEscrow:
         type: boolean
       offerID:
+        type: string
+      offerOwnerID:
         type: string
       price:
         type: number
@@ -519,6 +523,10 @@ definitions:
     properties:
       amount:
         type: number
+      author:
+        $ref: '#/definitions/models.Client'
+      authorID:
+        type: string
       buyer:
         $ref: '#/definitions/models.Client'
       buyerID:
@@ -542,6 +550,10 @@ definitions:
       offer:
         $ref: '#/definitions/models.Offer'
       offerID:
+        type: string
+      offerOwner:
+        $ref: '#/definitions/models.Client'
+      offerOwnerID:
         type: string
       price:
         type: number
@@ -1412,6 +1424,19 @@ paths:
       - offers
   /client/orders:
     get:
+      parameters:
+      - description: роль клиента (author или offerOwner)
+        in: query
+        name: role
+        type: string
+      - description: лимит
+        in: query
+        name: limit
+        type: integer
+      - description: смещение
+        in: query
+        name: offset
+        type: integer
       produces:
       - application/json
       responses:

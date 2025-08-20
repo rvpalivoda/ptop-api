@@ -1061,6 +1061,26 @@ const docTemplate = `{
                     "orders"
                 ],
                 "summary": "Список ордеров клиента",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "роль клиента (author или offerOwner)",
+                        "name": "role",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "лимит",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "смещение",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -2598,6 +2618,9 @@ const docTemplate = `{
                 "amount": {
                     "type": "number"
                 },
+                "authorID": {
+                    "type": "string"
+                },
                 "buyerID": {
                     "type": "string"
                 },
@@ -2620,6 +2643,9 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "offerID": {
+                    "type": "string"
+                },
+                "offerOwnerID": {
                     "type": "string"
                 },
                 "price": {
@@ -2647,6 +2673,12 @@ const docTemplate = `{
             "properties": {
                 "amount": {
                     "type": "number"
+                },
+                "author": {
+                    "$ref": "#/definitions/models.Client"
+                },
+                "authorID": {
+                    "type": "string"
                 },
                 "buyer": {
                     "$ref": "#/definitions/models.Client"
@@ -2682,6 +2714,12 @@ const docTemplate = `{
                     "$ref": "#/definitions/models.Offer"
                 },
                 "offerID": {
+                    "type": "string"
+                },
+                "offerOwner": {
+                    "$ref": "#/definitions/models.Client"
+                },
+                "offerOwnerID": {
                     "type": "string"
                 },
                 "price": {
