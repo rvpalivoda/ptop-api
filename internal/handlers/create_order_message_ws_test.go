@@ -15,6 +15,11 @@ import (
 	"ptop/internal/models"
 )
 
+type orderChatEvent struct {
+	Type    string              `json:"type"`
+	Message models.OrderMessage `json:"message"`
+}
+
 func TestCreateOrderMessageBroadcast(t *testing.T) {
 	db, r, _ := setupTest(t)
 	srv := httptest.NewServer(r)
