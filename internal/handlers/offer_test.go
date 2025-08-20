@@ -392,6 +392,148 @@ func TestListOffersFilters(t *testing.T) {
 	}
 }
 
+func TestListOffersAmountRange(t *testing.T) {
+	db, r, _ := setupTest(t)
+
+	tokens := make([]string, 3)
+	for i := 1; i <= 3; i++ {
+		// register
+		body := fmt.Sprintf(`{"username":"user%d","password":"pass","password_confirm":"pass"}`, i)
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("POST", "/auth/register", bytes.NewBufferString(body))
+		req.Header.Set("Content-Type", "application/json")
+		r.ServeHTTP(w, req)
+
+		// login
+		w = httptest.NewRecorder()
+		body = fmt.Sprintf(`{"username":"user%d","password":"pass"}`, i)
+		req, _ = http.NewRequest("POST", "/auth/login", bytes.NewBufferString(body))
+		req.Header.Set("Content-Type", "application/json")
+		r.ServeHTTP(w, req)
+		if w.Code != http.StatusOK {
+			t.Fatalf("login%d status %d", i, w.Code)
+		}
+		var tok struct {
+			AccessToken string `json:"access_token"`
+		}
+		json.Unmarshal(w.Body.Bytes(), &tok)
+		tokens[i-1] = tok.AccessToken
+	}
+
+	usd := models.Asset{Name: "USD_r", Type: models.AssetTypeFiat, IsActive: true}
+	btc := models.Asset{Name: "BTC_r", Type: models.AssetTypeCrypto, IsActive: true}
+	country := models.Country{Name: "CountryR"}
+	pm := models.PaymentMethod{Name: "BankR", MethodGroup: "bank", IsRealtime: false, FeeSide: models.FeeSideSender, KycLevelHint: models.KycLevelHintLow}
+	if err := db.Create(&usd).Error; err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Create(&btc).Error; err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Create(&country).Error; err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Create(&pm).Error; err != nil {
+		t.Fatal(err)
+	}
+
+	cpmIDs := make([]string, 3)
+	for i := 1; i <= 3; i++ {
+		var c models.Client
+		db.Where("username = ?", fmt.Sprintf("user%d", i)).First(&c)
+		cpm := models.ClientPaymentMethod{ClientID: c.ID, CountryID: country.ID, PaymentMethodID: pm.ID, Name: fmt.Sprintf("pm%d", i)}
+		if err := db.Create(&cpm).Error; err != nil {
+			t.Fatal(err)
+		}
+		cpmIDs[i-1] = cpm.ID
+	}
+
+	// offer1: satisfies range
+	reqBody := OfferRequest{
+		MaxAmount:              "100",
+		MinAmount:              "5",
+		Amount:                 "50",
+		Price:                  "1",
+		Type:                   models.OfferTypeSell,
+		FromAssetID:            btc.ID,
+		ToAssetID:              usd.ID,
+		ClientPaymentMethodIDs: []string{cpmIDs[0]},
+	}
+	b, _ := json.Marshal(reqBody)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/client/offers", bytes.NewReader(b))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+tokens[0])
+	r.ServeHTTP(w, req)
+	var off1 models.Offer
+	json.Unmarshal(w.Body.Bytes(), &off1)
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("POST", "/client/offers/"+off1.ID+"/enable", nil)
+	req.Header.Set("Authorization", "Bearer "+tokens[0])
+	r.ServeHTTP(w, req)
+
+	// offer2: max < filter max
+	reqBody = OfferRequest{
+		MaxAmount:              "40",
+		MinAmount:              "5",
+		Amount:                 "10",
+		Price:                  "1",
+		Type:                   models.OfferTypeSell,
+		FromAssetID:            btc.ID,
+		ToAssetID:              usd.ID,
+		ClientPaymentMethodIDs: []string{cpmIDs[1]},
+	}
+	b, _ = json.Marshal(reqBody)
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("POST", "/client/offers", bytes.NewReader(b))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+tokens[1])
+	r.ServeHTTP(w, req)
+	var off2 models.Offer
+	json.Unmarshal(w.Body.Bytes(), &off2)
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("POST", "/client/offers/"+off2.ID+"/enable", nil)
+	req.Header.Set("Authorization", "Bearer "+tokens[1])
+	r.ServeHTTP(w, req)
+
+	// offer3: min > filter min
+	reqBody = OfferRequest{
+		MaxAmount:              "100",
+		MinAmount:              "20",
+		Amount:                 "30",
+		Price:                  "1",
+		Type:                   models.OfferTypeSell,
+		FromAssetID:            btc.ID,
+		ToAssetID:              usd.ID,
+		ClientPaymentMethodIDs: []string{cpmIDs[2]},
+	}
+	b, _ = json.Marshal(reqBody)
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("POST", "/client/offers", bytes.NewReader(b))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+tokens[2])
+	r.ServeHTTP(w, req)
+	var off3 models.Offer
+	json.Unmarshal(w.Body.Bytes(), &off3)
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("POST", "/client/offers/"+off3.ID+"/enable", nil)
+	req.Header.Set("Authorization", "Bearer "+tokens[2])
+	r.ServeHTTP(w, req)
+
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("GET", "/offers?min_amount=10&max_amount=50&type="+models.OfferTypeSell, nil)
+	req.Header.Set("Authorization", "Bearer "+tokens[0])
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("list status %d", w.Code)
+	}
+	var list []models.OfferFull
+	json.Unmarshal(w.Body.Bytes(), &list)
+	if len(list) != 1 || list[0].ID != off1.ID {
+		t.Fatalf("unexpected amount filter result")
+	}
+}
+
 func TestListOffersPagination(t *testing.T) {
 	db, r, _ := setupTest(t)
 

@@ -1631,13 +1631,13 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "минимальная сумма",
+                        "description": "минимальная сумма диапазона",
                         "name": "min_amount",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "максимальная сумма",
+                        "description": "максимальная сумма диапазона",
                         "name": "max_amount",
                         "in": "query"
                     },

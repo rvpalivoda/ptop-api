@@ -1782,11 +1782,11 @@ paths:
         in: query
         name: to_asset
         type: string
-      - description: минимальная сумма
+      - description: минимальная сумма диапазона
         in: query
         name: min_amount
         type: string
-      - description: максимальная сумма
+      - description: максимальная сумма диапазона
         in: query
         name: max_amount
         type: string

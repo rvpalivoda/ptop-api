@@ -336,8 +336,8 @@ func DeleteOffer(db *gorm.DB) gin.HandlerFunc {
 // @Produce json
 // @Param from_asset query string false "ID актива от"
 // @Param to_asset query string false "ID актива к"
-// @Param min_amount query string false "минимальная сумма"
-// @Param max_amount query string false "максимальная сумма"
+// @Param min_amount query string false "минимальная сумма диапазона"
+// @Param max_amount query string false "максимальная сумма диапазона"
 // @Param payment_method query string false "ID способа оплаты"
 // @Param type query string false "тип объявления: buy или sell"
 // @Param limit query int false "лимит"
@@ -362,21 +362,29 @@ func ListOffers(db *gorm.DB) gin.HandlerFunc {
 		if ta := c.Query("to_asset"); ta != "" {
 			query = query.Where("to_asset_id = ?", ta)
 		}
-		if min := c.Query("min_amount"); min != "" {
-			v, err := decimal.NewFromString(min)
-			if err != nil {
+		minStr := c.Query("min_amount")
+		maxStr := c.Query("max_amount")
+		var minVal, maxVal decimal.Decimal
+		var err error
+		if minStr != "" {
+			if minVal, err = decimal.NewFromString(minStr); err != nil {
 				c.JSON(http.StatusBadRequest, ErrorResponse{Error: "invalid min_amount"})
 				return
 			}
-			query = query.Where("max_amount >= ?", v)
 		}
-		if max := c.Query("max_amount"); max != "" {
-			v, err := decimal.NewFromString(max)
-			if err != nil {
+		if maxStr != "" {
+			if maxVal, err = decimal.NewFromString(maxStr); err != nil {
 				c.JSON(http.StatusBadRequest, ErrorResponse{Error: "invalid max_amount"})
 				return
 			}
-			query = query.Where("min_amount <= ?", v)
+		}
+		switch {
+		case minStr != "" && maxStr != "":
+			query = query.Where("min_amount <= ? AND max_amount >= ?", minVal, maxVal)
+		case minStr != "":
+			query = query.Where("min_amount <= ? AND max_amount >= ?", minVal, minVal)
+		case maxStr != "":
+			query = query.Where("min_amount <= ? AND max_amount >= ?", maxVal, maxVal)
 		}
 		if pm := c.Query("payment_method"); pm != "" {
 			query = query.Joins("JOIN offer_client_payment_methods ocpm ON ocpm.offer_id = offers.id").
