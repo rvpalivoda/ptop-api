@@ -12,6 +12,7 @@ import (
 	"gorm.io/gorm"
 
 	"ptop/internal/models"
+	"ptop/internal/orderchat"
 	"ptop/internal/services"
 	storage "ptop/internal/services/storage"
 	"ptop/internal/utils"
@@ -198,7 +199,7 @@ func CreateOrderMessage(db *gorm.DB, st storage.Storage, cache *services.ChatCac
 		if cache != nil {
 			_ = cache.AddMessage(c.Request.Context(), chat.ID, msg)
 		}
-		broadcastOrderChatMessage(chat.ID, msg)
+		orderchat.Broadcast(chat.ID, msg)
 		c.JSON(http.StatusOK, msg)
 	}
 }
