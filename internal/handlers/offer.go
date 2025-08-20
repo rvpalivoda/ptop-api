@@ -299,6 +299,36 @@ func DisableOffer(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
+// DeleteOffer godoc
+// @Summary Удалить объявление
+// @Tags offers
+// @Security BearerAuth
+// @Param id path string true "ID"
+// @Success 200 {object} StatusResponse
+// @Failure 404 {object} ErrorResponse
+// @Router /client/offers/{id} [delete]
+func DeleteOffer(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		clientIDVal, ok := c.Get("client_id")
+		if !ok {
+			c.JSON(http.StatusUnauthorized, ErrorResponse{Error: "no client"})
+			return
+		}
+		clientID := clientIDVal.(string)
+		var offer models.Offer
+		if err := db.Where("id = ? AND client_id = ?", id, clientID).First(&offer).Error; err != nil {
+			c.JSON(http.StatusNotFound, ErrorResponse{Error: "not found"})
+			return
+		}
+		if err := db.Delete(&offer).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
+			return
+		}
+		c.JSON(http.StatusOK, StatusResponse{Status: "deleted"})
+	}
+}
+
 // ListOffers godoc
 // @Summary Список активных объявлений
 // @Tags offers

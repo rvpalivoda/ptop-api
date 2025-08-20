@@ -105,6 +105,7 @@ func main() {
 	api.PUT("/client/offers/:id", handlers.UpdateOffer(gormDB))
 	api.POST("/client/offers/:id/enable", handlers.EnableOffer(gormDB, cfg.MaxActiveOffersPerClient))
 	api.POST("/client/offers/:id/disable", handlers.DisableOffer(gormDB))
+	api.DELETE("/client/offers/:id", handlers.DeleteOffer(gormDB))
 
 	api.GET("/client/transactions/in", handlers.ListClientTransactionsIn(gormDB))
 	api.GET("/client/transactions/out", handlers.ListClientTransactionsOut(gormDB))

@@ -116,6 +116,7 @@ func setupTest(t *testing.T) (*gorm.DB, *gin.Engine, map[string]time.Duration) {
 	api.PUT("/client/offers/:id", UpdateOffer(db))
 	api.POST("/client/offers/:id/enable", EnableOffer(db, maxOffers))
 	api.POST("/client/offers/:id/disable", DisableOffer(db))
+	api.DELETE("/client/offers/:id", DeleteOffer(db))
 
 	ws := r.Group("/ws")
 	ws.Use(AuthMiddleware(db))
