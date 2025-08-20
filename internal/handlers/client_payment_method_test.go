@@ -40,7 +40,7 @@ func TestClientPaymentMethods(t *testing.T) {
 	token1 := reg1.AccessToken
 
 	// create client payment method
-	createBody := fmt.Sprintf(`{"country_id":"%s","payment_method_id":"%s","city":"Moscow","post_code":"101000","name":"Main"}`, country.ID, method.ID)
+	createBody := fmt.Sprintf(`{"country_id":"%s","payment_method_id":"%s","city":"Moscow","post_code":"101000","detailed_information":"info","name":"Main"}`, country.ID, method.ID)
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("POST", "/client/payment-methods", bytes.NewBufferString(createBody))
 	req.Header.Set("Content-Type", "application/json")
@@ -52,6 +52,9 @@ func TestClientPaymentMethods(t *testing.T) {
 	var created models.ClientPaymentMethod
 	if err := json.Unmarshal(w.Body.Bytes(), &created); err != nil {
 		t.Fatalf("create parse: %v", err)
+	}
+	if created.DetailedInformation != "info" || created.Country.ID != country.ID || created.PaymentMethod.ID != method.ID {
+		t.Fatalf("create data mismatch")
 	}
 
 	// create with same name should fail
@@ -78,6 +81,27 @@ func TestClientPaymentMethods(t *testing.T) {
 	}
 	if len(list) != 1 {
 		t.Fatalf("list length %d", len(list))
+	}
+	if list[0].DetailedInformation != "info" || list[0].Country.ID != country.ID || list[0].PaymentMethod.ID != method.ID {
+		t.Fatalf("list data mismatch")
+	}
+
+	// update client payment method
+	updateBody := fmt.Sprintf(`{"country_id":"%s","payment_method_id":"%s","city":"Moscow","post_code":"101000","detailed_information":"updated","name":"Main"}`, country.ID, method.ID)
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("PUT", "/client/payment-methods/"+created.ID, bytes.NewBufferString(updateBody))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+token1)
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("update status %d", w.Code)
+	}
+	var updated models.ClientPaymentMethod
+	if err := json.Unmarshal(w.Body.Bytes(), &updated); err != nil {
+		t.Fatalf("update parse: %v", err)
+	}
+	if updated.DetailedInformation != "updated" {
+		t.Fatalf("update data mismatch")
 	}
 
 	// register second user

@@ -94,6 +94,7 @@ func setupTest(t *testing.T) (*gorm.DB, *gin.Engine, map[string]time.Duration) {
 	api.GET("/client/assets", GetClientAssets(db))
 	api.GET("/client/payment-methods", ListClientPaymentMethods(db))
 	api.POST("/client/payment-methods", CreateClientPaymentMethod(db))
+	api.PUT("/client/payment-methods/:id", UpdateClientPaymentMethod(db))
 	api.DELETE("/client/payment-methods/:id", DeleteClientPaymentMethod(db))
 	api.GET("/client/wallets", ListClientWallets(db))
 	api.POST("/client/wallets", CreateWallet(db))

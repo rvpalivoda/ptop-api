@@ -10,11 +10,12 @@ import (
 )
 
 type CreateClientPaymentMethodRequest struct {
-	CountryID       string `json:"country_id"`
-	PaymentMethodID string `json:"payment_method_id"`
-	City            string `json:"city"`
-	PostCode        string `json:"post_code"`
-	Name            string `json:"name"`
+	CountryID           string `json:"country_id"`
+	PaymentMethodID     string `json:"payment_method_id"`
+	City                string `json:"city"`
+	PostCode            string `json:"post_code"`
+	DetailedInformation string `json:"detailed_information"`
+	Name                string `json:"name"`
 }
 
 // ListClientPaymentMethods godoc
@@ -33,7 +34,7 @@ func ListClientPaymentMethods(db *gorm.DB) gin.HandlerFunc {
 		}
 		clientID := clientIDVal.(string)
 		var methods []models.ClientPaymentMethod
-		if err := db.Where("client_id = ?", clientID).Find(&methods).Error; err != nil {
+		if err := db.Where("client_id = ?", clientID).Preload("Country").Preload("PaymentMethod").Find(&methods).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
 			return
 		}
@@ -72,14 +73,74 @@ func CreateClientPaymentMethod(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		m := models.ClientPaymentMethod{
-			ClientID:        clientID,
-			CountryID:       r.CountryID,
-			PaymentMethodID: r.PaymentMethodID,
-			City:            r.City,
-			PostCode:        r.PostCode,
-			Name:            r.Name,
+			ClientID:            clientID,
+			CountryID:           r.CountryID,
+			PaymentMethodID:     r.PaymentMethodID,
+			City:                r.City,
+			PostCode:            r.PostCode,
+			DetailedInformation: r.DetailedInformation,
+			Name:                r.Name,
 		}
 		if err := db.Create(&m).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
+			return
+		}
+		if err := db.Preload("Country").Preload("PaymentMethod").First(&m, "id = ?", m.ID).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
+			return
+		}
+		c.JSON(http.StatusOK, m)
+	}
+}
+
+// UpdateClientPaymentMethod godoc
+// @Summary Изменить платёжный метод клиента
+// @Tags client-payment-methods
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param id path string true "ID"
+// @Param input body CreateClientPaymentMethodRequest true "данные"
+// @Success 200 {object} models.ClientPaymentMethod
+// @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Router /client/payment-methods/{id} [put]
+func UpdateClientPaymentMethod(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		clientIDVal, ok := c.Get("client_id")
+		if !ok {
+			c.JSON(http.StatusUnauthorized, ErrorResponse{Error: "no client"})
+			return
+		}
+		clientID := clientIDVal.(string)
+		var m models.ClientPaymentMethod
+		if err := db.Where("id = ? AND client_id = ?", id, clientID).First(&m).Error; err != nil {
+			c.JSON(http.StatusNotFound, ErrorResponse{Error: "not found"})
+			return
+		}
+		var r CreateClientPaymentMethodRequest
+		if err := c.BindJSON(&r); err != nil {
+			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "invalid json"})
+			return
+		}
+		var count int64
+		db.Model(&models.ClientPaymentMethod{}).Where("client_id = ? AND name = ? AND id <> ?", clientID, r.Name, m.ID).Count(&count)
+		if count > 0 {
+			c.JSON(http.StatusConflict, ErrorResponse{Error: "name exists"})
+			return
+		}
+		m.CountryID = r.CountryID
+		m.PaymentMethodID = r.PaymentMethodID
+		m.City = r.City
+		m.PostCode = r.PostCode
+		m.DetailedInformation = r.DetailedInformation
+		m.Name = r.Name
+		if err := db.Save(&m).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
+			return
+		}
+		if err := db.Preload("Country").Preload("PaymentMethod").First(&m, "id = ?", m.ID).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
 			return
 		}
