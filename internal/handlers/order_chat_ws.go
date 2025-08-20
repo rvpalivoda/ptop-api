@@ -14,11 +14,13 @@ import (
 
 // OrderChatWS godoc
 // @Summary Websocket чат ордера
-// @Description При подключении отправляет историю сообщений из кеша Redis
+// @Description Подключает покупателя и продавца к чату ордера.
+// После подключения сервер отправляет историю сообщений (models.OrderMessage).
+// Клиент отправляет новые сообщения в формате OrderMessageRequest, а получает сообщения типа models.OrderMessage.
 // @Tags orders
 // @Security BearerAuth
 // @Param id path string true "ID ордера"
-// @Success 101 {string} string "Switching Protocols"
+// @Success 101 {object} models.OrderMessage "Switching Protocols"
 // @Failure 403 {object} ErrorResponse
 // @Failure 404 {object} ErrorResponse
 // @Router /ws/orders/{id}/chat [get]
