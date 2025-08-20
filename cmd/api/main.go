@@ -110,6 +110,9 @@ func main() {
 	api.GET("/client/transactions/out", handlers.ListClientTransactionsOut(gormDB))
 	api.GET("/client/transactions/internal", handlers.ListClientTransactionsInternal(gormDB))
 
+	api.POST("/client/order", handlers.CreateOrder(gormDB))
+	api.GET("/client/orders", handlers.ListClientOrders(gormDB))
+
 	ws := r.Group("/ws")
 	ws.Use(handlers.AuthMiddleware(gormDB))
 	ws.GET("/orders/:id/chat", handlers.OrderChatWS(gormDB, chatCache))
