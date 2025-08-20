@@ -4,9 +4,13 @@ import (
 	"net/http"
 	"sync"
 
-	"golang.org/x/net/websocket"
+	"github.com/gorilla/websocket"
 	"ptop/internal/models"
 )
+
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool { return true },
+}
 
 // offerEvent описывает событие оффера, передаваемое по websocket.
 type offerEvent struct {
@@ -16,8 +20,8 @@ type offerEvent struct {
 
 var offerWSConns = struct {
 	sync.Mutex
-	m map[string][]*websocket.Conn
-}{m: make(map[string][]*websocket.Conn)}
+	m map[string]map[*websocket.Conn]bool
+}{m: make(map[string]map[*websocket.Conn]bool)}
 
 // OffersWS godoc
 // @Summary WebSocket обновления офферов
@@ -34,31 +38,32 @@ func OffersWS() http.HandlerFunc {
 		if channel == "" {
 			channel = "offers"
 		}
-		websocket.Handler(func(ws *websocket.Conn) {
+		conn, err := upgrader.Upgrade(w, r, nil)
+		if err != nil {
+			return
+		}
+		offerWSConns.Lock()
+		conns, ok := offerWSConns.m[channel]
+		if !ok {
+			conns = make(map[*websocket.Conn]bool)
+			offerWSConns.m[channel] = conns
+		}
+		conns[conn] = true
+		offerWSConns.Unlock()
+
+		defer func() {
 			offerWSConns.Lock()
-			offerWSConns.m[channel] = append(offerWSConns.m[channel], ws)
+			delete(offerWSConns.m[channel], conn)
 			offerWSConns.Unlock()
+			conn.Close()
+		}()
 
-			defer func() {
-				offerWSConns.Lock()
-				conns := offerWSConns.m[channel]
-				for i, c := range conns {
-					if c == ws {
-						offerWSConns.m[channel] = append(conns[:i], conns[i+1:]...)
-						break
-					}
-				}
-				offerWSConns.Unlock()
-				ws.Close()
-			}()
-
-			for {
-				var v interface{}
-				if err := websocket.JSON.Receive(ws, &v); err != nil {
-					break
-				}
+		for {
+			var v interface{}
+			if err := conn.ReadJSON(&v); err != nil {
+				break
 			}
-		}).ServeHTTP(w, r)
+		}
 	}
 }
 
@@ -66,14 +71,11 @@ func broadcastOfferEvent(eventType string, offer models.OfferFull) {
 	channel := "offers"
 	offerWSConns.Lock()
 	conns := offerWSConns.m[channel]
-	for i := 0; i < len(conns); {
-		if err := websocket.JSON.Send(conns[i], offerEvent{Type: eventType, Offer: offer}); err != nil {
-			conns[i].Close()
-			conns = append(conns[:i], conns[i+1:]...)
-		} else {
-			i++
+	for c := range conns {
+		if err := c.WriteJSON(offerEvent{Type: eventType, Offer: offer}); err != nil {
+			c.Close()
+			delete(conns, c)
 		}
 	}
-	offerWSConns.m[channel] = conns
 	offerWSConns.Unlock()
 }
