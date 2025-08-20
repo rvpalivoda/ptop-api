@@ -118,6 +118,11 @@ func CreateOffer(db *gorm.DB) gin.HandlerFunc {
 				return
 			}
 		}
+		var loaded models.Offer
+		if err := db.Preload("FromAsset").Preload("ToAsset").Preload("Client").Preload("ClientPaymentMethods").Preload("ClientPaymentMethods.Country").Preload("ClientPaymentMethods.PaymentMethod").Where("id = ?", offer.ID).First(&loaded).Error; err == nil {
+			full := models.OfferFull{Offer: loaded, FromAsset: loaded.FromAsset, ToAsset: loaded.ToAsset, Client: loaded.Client, ClientPaymentMethods: loaded.ClientPaymentMethods}
+			broadcastOfferEvent("created", full)
+		}
 		c.JSON(http.StatusOK, offer)
 	}
 }
@@ -213,6 +218,11 @@ func UpdateOffer(db *gorm.DB) gin.HandlerFunc {
 		if err := db.Model(&offer).Association("ClientPaymentMethods").Replace(clientMethods); err != nil {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
 			return
+		}
+		var loaded models.Offer
+		if err := db.Preload("FromAsset").Preload("ToAsset").Preload("Client").Preload("ClientPaymentMethods").Preload("ClientPaymentMethods.Country").Preload("ClientPaymentMethods.PaymentMethod").Where("id = ?", offer.ID).First(&loaded).Error; err == nil {
+			full := models.OfferFull{Offer: loaded, FromAsset: loaded.FromAsset, ToAsset: loaded.ToAsset, Client: loaded.Client, ClientPaymentMethods: loaded.ClientPaymentMethods}
+			broadcastOfferEvent("updated", full)
 		}
 		c.JSON(http.StatusOK, offer)
 	}
@@ -317,14 +327,16 @@ func DeleteOffer(db *gorm.DB) gin.HandlerFunc {
 		}
 		clientID := clientIDVal.(string)
 		var offer models.Offer
-		if err := db.Where("id = ? AND client_id = ?", id, clientID).First(&offer).Error; err != nil {
+		if err := db.Preload("FromAsset").Preload("ToAsset").Preload("Client").Preload("ClientPaymentMethods").Preload("ClientPaymentMethods.Country").Preload("ClientPaymentMethods.PaymentMethod").Where("id = ? AND client_id = ?", id, clientID).First(&offer).Error; err != nil {
 			c.JSON(http.StatusNotFound, ErrorResponse{Error: "not found"})
 			return
 		}
+		full := models.OfferFull{Offer: offer, FromAsset: offer.FromAsset, ToAsset: offer.ToAsset, Client: offer.Client, ClientPaymentMethods: offer.ClientPaymentMethods}
 		if err := db.Delete(&offer).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
 			return
 		}
+		broadcastOfferEvent("deleted", full)
 		c.JSON(http.StatusOK, StatusResponse{Status: "deleted"})
 	}
 }
