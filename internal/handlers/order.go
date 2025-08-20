@@ -87,36 +87,45 @@ func CreateOrder(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
 			return
 		}
+var full models.Order
+if err := db.Preload("Offer").
+	Preload("Buyer").
+	Preload("Seller").
+	Preload("Author").
+	Preload("OfferOwner").
+	Preload("FromAsset").
+	Preload("ToAsset").
+	Preload("ClientPaymentMethod").
+	Preload("ClientPaymentMethod.Country").
+	Preload("ClientPaymentMethod.PaymentMethod").
+	Where("id = ?", order.ID).
+	First(&full).Error; err == nil {
 
-		var full models.Order
-		if err := db.Preload("Offer").
-			Preload("Buyer").
-			Preload("Seller").
-			Preload("Author").
-			Preload("OfferOwner").
-			Preload("FromAsset").
-			Preload("ToAsset").
-			Preload("ClientPaymentMethod").
-			Preload("ClientPaymentMethod.Country").
-			Preload("ClientPaymentMethod.PaymentMethod").
-			Where("id = ?", order.ID).First(&full).Error; err == nil {
-			var cpm *models.ClientPaymentMethod
-			if full.ClientPaymentMethodID != "" {
-				cpm = &full.ClientPaymentMethod
-			}
-			of := models.OrderFull{
-				Order:               full,
-				Offer:               full.Offer,
-				Buyer:               full.Buyer,
-				Seller:              full.Seller,
-				Author:              full.Author,
-				OfferOwner:          full.OfferOwner,
-				FromAsset:           full.FromAsset,
-				ToAsset:             full.ToAsset,
-				ClientPaymentMethod: cpm,
-			}
-			broadcastOrderEvent(order.OfferOwnerID, newOrderEvent(of))
-		}
+	// Новый вызов из ветки codex/add-broadcastorderstatus-function
+	broadcastOrderStatus(full)
+
+	// Логика из master остаётся
+	var cpm *models.ClientPaymentMethod
+	if full.ClientPaymentMethodID != "" {
+		cpm = &full.ClientPaymentMethod
+	}
+
+	of := models.OrderFull{
+		Order:               full,
+		Offer:               full.Offer,
+		Buyer:               full.Buyer,
+		Seller:              full.Seller,
+		Author:              full.Author,
+		OfferOwner:          full.OfferOwner,
+		FromAsset:           full.FromAsset,
+		ToAsset:             full.ToAsset,
+		ClientPaymentMethod: cpm,
+	}
+
+	// Можно использовать full.OfferOwnerID, он уже загружен
+	broadcastOrderEvent(full.OfferOwnerID, newOrderEvent(of))
+}
+
 		c.JSON(http.StatusOK, order)
 	}
 }
