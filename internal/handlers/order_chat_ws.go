@@ -1,51 +1,17 @@
 package handlers
 
 import (
-	"encoding/json"
 	"errors"
 	"net/http"
-	"sync"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
+	"golang.org/x/net/websocket"
 	"gorm.io/gorm"
 
 	"ptop/internal/models"
+	"ptop/internal/orderchat"
 	"ptop/internal/services"
 )
-
-var upgrader = websocket.Upgrader{
-	CheckOrigin: func(r *http.Request) bool { return true },
-}
-
-var orderChatClients = struct {
-	sync.RWMutex
-	m map[string]map[*websocket.Conn]bool
-}{m: make(map[string]map[*websocket.Conn]bool)}
-
-type orderChatEvent struct {
-	Type    string              `json:"type"`
-	Message models.OrderMessage `json:"message"`
-}
-
-func newOrderChatEvent(msg models.OrderMessage) orderChatEvent {
-	return orderChatEvent{Type: string(msg.Type), Message: msg}
-}
-
-func sendOrderChatEvent(conn *websocket.Conn, msg models.OrderMessage) error {
-	return conn.WriteJSON(newOrderChatEvent(msg))
-}
-
-func broadcastOrderChatMessage(chatID string, msg models.OrderMessage) {
-	orderChatClients.Lock()
-	for c := range orderChatClients.m[chatID] {
-		if err := sendOrderChatEvent(c, msg); err != nil {
-			c.Close()
-			delete(orderChatClients.m[chatID], c)
-		}
-	}
-	orderChatClients.Unlock()
-}
 
 // OrderChatWS godoc
 // @Summary Websocket чат ордера
@@ -88,52 +54,44 @@ func OrderChatWS(db *gorm.DB, cache *services.ChatCache) gin.HandlerFunc {
 				return
 			}
 		}
-		conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
-		if err != nil {
-			return
-		}
-		defer conn.Close()
-		orderChatClients.Lock()
-		conns, ok := orderChatClients.m[chat.ID]
-		if !ok {
-			conns = make(map[*websocket.Conn]bool)
-			orderChatClients.m[chat.ID] = conns
-		}
-		conns[conn] = true
-		orderChatClients.Unlock()
-		defer func() {
-			orderChatClients.Lock()
-			delete(orderChatClients.m[chat.ID], conn)
-			orderChatClients.Unlock()
-		}()
+		wsHandler := websocket.Server{
+			Handshake: func(*websocket.Config, *http.Request) error { return nil },
+			Handler: func(conn *websocket.Conn) {
+				orderchat.AddClient(chat.ID, conn)
+				defer func() {
+					orderchat.RemoveClient(chat.ID, conn)
+					conn.Close()
+				}()
 
-		if cache != nil {
-			if history, err := cache.GetHistory(c.Request.Context(), chat.ID); err == nil {
-				for _, m := range history {
-					if err := sendOrderChatEvent(conn, m); err != nil {
-						return
+				if cache != nil {
+					if history, err := cache.GetHistory(c.Request.Context(), chat.ID); err == nil {
+						for _, m := range history {
+							if err := orderchat.Send(conn, m); err != nil {
+								return
+							}
+						}
 					}
 				}
-			}
-		}
 
-		for {
-			_, msgBytes, err := conn.ReadMessage()
-			if err != nil {
-				break
-			}
-			var r OrderMessageRequest
-			if err := json.Unmarshal(msgBytes, &r); err != nil || r.Content == "" {
-				continue
-			}
-			msg := models.OrderMessage{ChatID: chat.ID, ClientID: clientID, Type: models.MessageTypeText, Content: r.Content}
-			if err := db.Create(&msg).Error; err != nil {
-				continue
-			}
-			if cache != nil {
-				_ = cache.AddMessage(c.Request.Context(), chat.ID, msg)
-			}
-			broadcastOrderChatMessage(chat.ID, msg)
+				for {
+					var r OrderMessageRequest
+					if err := websocket.JSON.Receive(conn, &r); err != nil {
+						break
+					}
+					if r.Content == "" {
+						continue
+					}
+					msg := models.OrderMessage{ChatID: chat.ID, ClientID: clientID, Type: models.MessageTypeText, Content: r.Content}
+					if err := db.Create(&msg).Error; err != nil {
+						continue
+					}
+					if cache != nil {
+						_ = cache.AddMessage(c.Request.Context(), chat.ID, msg)
+					}
+					orderchat.Broadcast(chat.ID, msg)
+				}
+			},
 		}
+		wsHandler.ServeHTTP(c.Writer, c.Request)
 	}
 }

@@ -10,9 +10,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gorilla/websocket"
 	"github.com/shopspring/decimal"
+	"golang.org/x/net/websocket"
 	"ptop/internal/models"
+	"ptop/internal/orderchat"
 )
 
 func TestOrderChatWS(t *testing.T) {
@@ -130,23 +131,25 @@ func TestOrderChatWS(t *testing.T) {
 	wsURL := "ws" + strings.TrimPrefix(srv.URL, "http") + "/ws/orders/" + ord.ID + "/chat"
 
 	// hacker tries to connect
-	header := http.Header{"Authorization": {"Bearer " + hackerTok.AccessToken}}
-	_, resp, err := websocket.DefaultDialer.Dial(wsURL, header)
-	if err == nil || resp == nil || resp.StatusCode != http.StatusForbidden {
-		t.Fatalf("expected forbidden, got %v %v", err, resp)
+	cfg, _ := websocket.NewConfig(wsURL, "http://example.com")
+	cfg.Header = http.Header{"Authorization": {"Bearer " + hackerTok.AccessToken}}
+	_, err = websocket.DialConfig(cfg)
+	if err == nil || !strings.Contains(err.Error(), "403") {
+		t.Fatalf("expected forbidden, got %v", err)
 	}
 
 	// buyer connects and sends message
-	header = http.Header{"Authorization": {"Bearer " + buyerTok.AccessToken}}
-	buyerConn, _, err := websocket.DefaultDialer.Dial(wsURL, header)
+	cfg, _ = websocket.NewConfig(wsURL, "http://example.com")
+	cfg.Header = http.Header{"Authorization": {"Bearer " + buyerTok.AccessToken}}
+	buyerConn, err := websocket.DialConfig(cfg)
 	if err != nil {
 		t.Fatalf("buyer dial: %v", err)
 	}
-	if err := buyerConn.WriteJSON(OrderMessageRequest{Content: "hello"}); err != nil {
+	if err := websocket.JSON.Send(buyerConn, OrderMessageRequest{Content: "hello"}); err != nil {
 		t.Fatalf("write: %v", err)
 	}
-	var echo orderChatEvent
-	if err := buyerConn.ReadJSON(&echo); err != nil {
+	var echo orderchat.Event
+	if err := websocket.JSON.Receive(buyerConn, &echo); err != nil {
 		t.Fatalf("read echo: %v", err)
 	}
 	if echo.Type != string(models.MessageTypeText) || echo.Message.Content != "hello" {
@@ -155,14 +158,15 @@ func TestOrderChatWS(t *testing.T) {
 	buyerConn.Close()
 
 	// seller connects after message and receives history
-	header = http.Header{"Authorization": {"Bearer " + sellerTok.AccessToken}}
-	sellerConn, _, err := websocket.DefaultDialer.Dial(wsURL, header)
+	cfg, _ = websocket.NewConfig(wsURL, "http://example.com")
+	cfg.Header = http.Header{"Authorization": {"Bearer " + sellerTok.AccessToken}}
+	sellerConn, err := websocket.DialConfig(cfg)
 	if err != nil {
 		t.Fatalf("seller dial: %v", err)
 	}
 	defer sellerConn.Close()
-	var history orderChatEvent
-	if err := sellerConn.ReadJSON(&history); err != nil {
+	var history orderchat.Event
+	if err := websocket.JSON.Receive(sellerConn, &history); err != nil {
 		t.Fatalf("history read: %v", err)
 	}
 	if history.Type != string(models.MessageTypeText) || history.Message.Content != "hello" {
@@ -192,8 +196,8 @@ func TestOrderChatWS(t *testing.T) {
 		t.Fatalf("file msg status %d", w.Code)
 	}
 
-	var fileEvt orderChatEvent
-	if err := sellerConn.ReadJSON(&fileEvt); err != nil {
+	var fileEvt orderchat.Event
+	if err := websocket.JSON.Receive(sellerConn, &fileEvt); err != nil {
 		t.Fatalf("file read: %v", err)
 	}
 	if fileEvt.Type != string(models.MessageTypeFile) || fileEvt.Message.FileURL == nil {
