@@ -55,8 +55,9 @@ func TestOffersWS(t *testing.T) {
 	}
 
 	wsURL := "ws" + strings.TrimPrefix(srv.URL, "http") + "/ws/offers"
+	header := http.Header{"Authorization": {"Bearer " + tok.AccessToken}}
 	cfg, _ := websocket.NewConfig(wsURL, "http://example.com")
-	cfg.Header = http.Header{"Authorization": {"Bearer " + tok.AccessToken}}
+	cfg.Header = header
 	conn, err := websocket.DialConfig(cfg)
 	if err != nil {
 		t.Fatalf("dial: %v", err)

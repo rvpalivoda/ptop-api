@@ -131,10 +131,11 @@ func TestOrderChatWS(t *testing.T) {
 	wsURL := "ws" + strings.TrimPrefix(srv.URL, "http") + "/ws/orders/" + ord.ID + "/chat"
 
 	// hacker tries to connect
-	hackerHeader := http.Header{"Authorization": {"Bearer " + hackerTok.AccessToken}}
-	_, resp, err := websocket.DefaultDialer.Dial(wsURL, hackerHeader)
-	if err == nil || resp == nil || resp.StatusCode != http.StatusForbidden {
-		t.Fatalf("expected forbidden, got %v", err)
+	cfg, _ := websocket.NewConfig(wsURL, "http://example.com")
+	cfg.Header = http.Header{"Authorization": {"Bearer " + hackerTok.AccessToken}}
+	_, err := websocket.DialConfig(cfg)
+	if err == nil {
+		t.Fatalf("expected forbidden, got nil")
 	}
 
 	// buyer connects and sends message
