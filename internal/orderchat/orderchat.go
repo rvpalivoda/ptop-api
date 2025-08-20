@@ -3,7 +3,7 @@ package orderchat
 import (
 	"sync"
 
-	"golang.org/x/net/websocket"
+	"github.com/gorilla/websocket"
 
 	"ptop/internal/models"
 )
@@ -42,7 +42,7 @@ func newEvent(msg models.OrderMessage) Event {
 }
 
 func Send(conn *websocket.Conn, msg models.OrderMessage) error {
-	return websocket.JSON.Send(conn, newEvent(msg))
+	return conn.WriteJSON(newEvent(msg))
 }
 
 func Broadcast(chatID string, msg models.OrderMessage) {

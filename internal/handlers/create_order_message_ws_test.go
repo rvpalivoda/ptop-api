@@ -13,6 +13,7 @@ import (
 	"github.com/shopspring/decimal"
 
 	"ptop/internal/models"
+	"ptop/internal/orderchat"
 )
 
 type orderChatEvent struct {
@@ -136,7 +137,7 @@ func TestCreateOrderMessageBroadcast(t *testing.T) {
 	}
 
 	// seller receives message via WS
-	var evt orderChatEvent
+	var evt orderchat.Event
 	if err := conn.ReadJSON(&evt); err != nil {
 		t.Fatalf("ws read: %v", err)
 	}
