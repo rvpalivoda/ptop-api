@@ -29,24 +29,58 @@ func TestOrderHandler(t *testing.T) {
 	if w.Code != http.StatusOK {
 		t.Fatalf("login status %d", w.Code)
 	}
-	var tok struct {
+	var buyerTok struct {
 		AccessToken string `json:"access_token"`
 	}
-	json.Unmarshal(w.Body.Bytes(), &tok)
+	json.Unmarshal(w.Body.Bytes(), &buyerTok)
 
 	// set pincode
 	w = httptest.NewRecorder()
 	body = `{"password":"pass","pincode":"1234"}`
 	req, _ = http.NewRequest("POST", "/auth/pincode", bytes.NewBufferString(body))
-	req.Header.Set("Authorization", "Bearer "+tok.AccessToken)
+	req.Header.Set("Authorization", "Bearer "+buyerTok.AccessToken)
 	req.Header.Set("Content-Type", "application/json")
 	r.ServeHTTP(w, req)
 	if w.Code != http.StatusOK {
 		t.Fatalf("pincode status %d", w.Code)
 	}
 
-	var client models.Client
-	db.Where("username = ?", "orduser").First(&client)
+	var buyer models.Client
+	db.Where("username = ?", "orduser").First(&buyer)
+
+	// register seller
+	w = httptest.NewRecorder()
+	body = `{"username":"selluser","password":"pass","password_confirm":"pass"}`
+	req, _ = http.NewRequest("POST", "/auth/register", bytes.NewBufferString(body))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+
+	w = httptest.NewRecorder()
+	body = `{"username":"selluser","password":"pass"}`
+	req, _ = http.NewRequest("POST", "/auth/login", bytes.NewBufferString(body))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("seller login status %d", w.Code)
+	}
+	var sellerTok struct {
+		AccessToken string `json:"access_token"`
+	}
+	json.Unmarshal(w.Body.Bytes(), &sellerTok)
+
+	// set seller pincode
+	w = httptest.NewRecorder()
+	body = `{"password":"pass","pincode":"1234"}`
+	req, _ = http.NewRequest("POST", "/auth/pincode", bytes.NewBufferString(body))
+	req.Header.Set("Authorization", "Bearer "+sellerTok.AccessToken)
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("seller pincode status %d", w.Code)
+	}
+
+	var seller models.Client
+	db.Where("username = ?", "selluser").First(&seller)
 
 	asset1 := models.Asset{Name: "USD_order", Type: models.AssetTypeFiat, IsActive: true}
 	asset2 := models.Asset{Name: "BTC_order", Type: models.AssetTypeCrypto, IsActive: true}
@@ -72,7 +106,7 @@ func TestOrderHandler(t *testing.T) {
 		t.Fatalf("method: %v", err)
 	}
 	cpm := models.ClientPaymentMethod{
-		ClientID:        client.ID,
+		ClientID:        buyer.ID,
 		CountryID:       country.ID,
 		PaymentMethodID: method.ID,
 		City:            "Moscow",
@@ -91,16 +125,27 @@ func TestOrderHandler(t *testing.T) {
 		ToAssetID:              asset2.ID,
 		OrderExpirationTimeout: 10,
 		TTL:                    time.Now().Add(24 * time.Hour),
-		ClientID:               client.ID,
+		ClientID:               seller.ID,
 	}
 	if err := db.Create(&offer).Error; err != nil {
 		t.Fatalf("offer: %v", err)
 	}
 
+	// попытка создать ордер на своё предложение должна вернуть ошибку
+	w = httptest.NewRecorder()
+	body = `{"offer_id":"` + offer.ID + `","amount":"5","pin_code":"1234"}`
+	req, _ = http.NewRequest("POST", "/client/orders", bytes.NewBufferString(body))
+	req.Header.Set("Authorization", "Bearer "+sellerTok.AccessToken)
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusBadRequest {
+		t.Fatalf("expected bad request, got %d", w.Code)
+	}
+
 	w = httptest.NewRecorder()
 	body = `{"offer_id":"` + offer.ID + `","amount":"5"}`
 	req, _ = http.NewRequest("POST", "/client/orders", bytes.NewBufferString(body))
-	req.Header.Set("Authorization", "Bearer "+tok.AccessToken)
+	req.Header.Set("Authorization", "Bearer "+buyerTok.AccessToken)
 	req.Header.Set("Content-Type", "application/json")
 	r.ServeHTTP(w, req)
 	if w.Code != http.StatusUnauthorized {
@@ -110,7 +155,7 @@ func TestOrderHandler(t *testing.T) {
 	w = httptest.NewRecorder()
 	body = `{"offer_id":"` + offer.ID + `","amount":"5","pin_code":"0000"}`
 	req, _ = http.NewRequest("POST", "/client/orders", bytes.NewBufferString(body))
-	req.Header.Set("Authorization", "Bearer "+tok.AccessToken)
+	req.Header.Set("Authorization", "Bearer "+buyerTok.AccessToken)
 	req.Header.Set("Content-Type", "application/json")
 	r.ServeHTTP(w, req)
 	if w.Code != http.StatusUnauthorized {
@@ -120,7 +165,7 @@ func TestOrderHandler(t *testing.T) {
 	w = httptest.NewRecorder()
 	body = `{"offer_id":"` + offer.ID + `","amount":"5","pin_code":"1234","client_payment_method_id":"` + cpm.ID + `"}`
 	req, _ = http.NewRequest("POST", "/client/orders", bytes.NewBufferString(body))
-	req.Header.Set("Authorization", "Bearer "+tok.AccessToken)
+	req.Header.Set("Authorization", "Bearer "+buyerTok.AccessToken)
 	req.Header.Set("Content-Type", "application/json")
 	r.ServeHTTP(w, req)
 	if w.Code != http.StatusOK {
@@ -137,7 +182,7 @@ func TestOrderHandler(t *testing.T) {
 
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/client/orders", nil)
-	req.Header.Set("Authorization", "Bearer "+tok.AccessToken)
+	req.Header.Set("Authorization", "Bearer "+buyerTok.AccessToken)
 	r.ServeHTTP(w, req)
 	if w.Code != http.StatusOK {
 		t.Fatalf("list status %d", w.Code)
@@ -153,10 +198,10 @@ func TestOrderHandler(t *testing.T) {
 	if list[0].FromAsset.ID != asset1.ID || list[0].ToAsset.ID != asset2.ID {
 		t.Fatalf("unexpected assets")
 	}
-	if list[0].Buyer.ID != client.ID || list[0].Seller.ID != client.ID {
+	if list[0].Buyer.ID != buyer.ID || list[0].Seller.ID != seller.ID {
 		t.Fatalf("unexpected client ids")
 	}
-	if list[0].Author.ID != client.ID || list[0].OfferOwner.ID != client.ID {
+	if list[0].Author.ID != buyer.ID || list[0].OfferOwner.ID != seller.ID {
 		t.Fatalf("unexpected author or offer owner")
 	}
 	if list[0].ClientPaymentMethod == nil || list[0].ClientPaymentMethod.ID != cpm.ID {
@@ -169,7 +214,7 @@ func TestOrderHandler(t *testing.T) {
 	// create second order for pagination test
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("POST", "/client/orders", bytes.NewBufferString(body))
-	req.Header.Set("Authorization", "Bearer "+tok.AccessToken)
+	req.Header.Set("Authorization", "Bearer "+buyerTok.AccessToken)
 	req.Header.Set("Content-Type", "application/json")
 	r.ServeHTTP(w, req)
 	if w.Code != http.StatusOK {
@@ -179,7 +224,7 @@ func TestOrderHandler(t *testing.T) {
 	// test pagination
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/client/orders?limit=1", nil)
-	req.Header.Set("Authorization", "Bearer "+tok.AccessToken)
+	req.Header.Set("Authorization", "Bearer "+buyerTok.AccessToken)
 	r.ServeHTTP(w, req)
 	if w.Code != http.StatusOK {
 		t.Fatalf("paginated list status %d", w.Code)
@@ -193,7 +238,7 @@ func TestOrderHandler(t *testing.T) {
 	// test role filter
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/client/orders?role=author", nil)
-	req.Header.Set("Authorization", "Bearer "+tok.AccessToken)
+	req.Header.Set("Authorization", "Bearer "+buyerTok.AccessToken)
 	r.ServeHTTP(w, req)
 	if w.Code != http.StatusOK {
 		t.Fatalf("author filter status %d", w.Code)
@@ -206,10 +251,24 @@ func TestOrderHandler(t *testing.T) {
 
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/client/orders?role=offerOwner", nil)
-	req.Header.Set("Authorization", "Bearer "+tok.AccessToken)
+	req.Header.Set("Authorization", "Bearer "+buyerTok.AccessToken)
 	r.ServeHTTP(w, req)
 	if w.Code != http.StatusOK {
 		t.Fatalf("owner filter status %d", w.Code)
+	}
+	list = nil
+	json.Unmarshal(w.Body.Bytes(), &list)
+	if len(list) != 0 {
+		t.Fatalf("expected 0 orders for owner, got %d", len(list))
+	}
+
+	// seller checks his orders as offer owner
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("GET", "/client/orders?role=offerOwner", nil)
+	req.Header.Set("Authorization", "Bearer "+sellerTok.AccessToken)
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("seller owner filter status %d", w.Code)
 	}
 	list = nil
 	json.Unmarshal(w.Body.Bytes(), &list)

@@ -27,7 +27,7 @@ type OrderRequest struct {
 // @Produce json
 // @Param input body OrderRequest true "данные"
 // @Success 200 {object} models.Order
-// @Failure 400 {object} ErrorResponse
+// @Failure 400 {object} ErrorResponse "нельзя создавать ордер на своё предложение"
 // @Failure 401 {object} ErrorResponse
 // @Router /client/orders [post]
 func CreateOrder(db *gorm.DB) gin.HandlerFunc {
@@ -60,6 +60,10 @@ func CreateOrder(db *gorm.DB) gin.HandlerFunc {
 		var offer models.Offer
 		if err := db.Preload("FromAsset").Preload("ToAsset").Where("id = ?", r.OfferID).First(&offer).Error; err != nil {
 			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "invalid offer"})
+			return
+		}
+		if offer.ClientID == clientID {
+			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "cannot order own offer"})
 			return
 		}
 		order := models.Order{
