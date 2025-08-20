@@ -17,19 +17,19 @@ const (
 )
 
 type OrderMessage struct {
-	ID        string      `gorm:"primaryKey;size:21"`
-	ChatID    string      `gorm:"size:21;not null;index:idx_chat_created,priority:1"`
+	ID        string      `gorm:"primaryKey;size:21" json:"id"`
+	ChatID    string      `gorm:"size:21;not null;index:idx_chat_created,priority:1" json:"chatID"`
 	Chat      OrderChat   `gorm:"foreignKey:ChatID" json:"-"`
-	ClientID  string      `gorm:"size:21;not null;index"`
+	ClientID  string      `gorm:"size:21;not null;index" json:"clientID"`
 	Client    Client      `gorm:"foreignKey:ClientID" json:"-"`
-	Type      MessageType `gorm:"type:varchar(10);not null"`
-	Content   string      `gorm:"type:text;not null"`
-	FileURL   *string     `gorm:"type:text"`
-	FileSize  *int64
-	FileType  *string    `gorm:"type:varchar(100)"`
-	ReadAt    *time.Time `gorm:"index"`
-	CreatedAt time.Time  `gorm:"autoCreateTime;index:idx_chat_created,priority:2"`
-	UpdatedAt time.Time  `gorm:"autoUpdateTime"`
+	Type      MessageType `gorm:"type:varchar(10);not null" json:"type"`
+	Content   string      `gorm:"type:text;not null" json:"content"`
+	FileURL   *string     `gorm:"type:text" json:"fileURL,omitempty"`
+	FileSize  *int64      `json:"fileSize,omitempty"`
+	FileType  *string     `gorm:"type:varchar(100)" json:"fileType,omitempty"`
+	ReadAt    *time.Time  `gorm:"index" json:"readAt,omitempty"`
+	CreatedAt time.Time   `gorm:"autoCreateTime;index:idx_chat_created,priority:2" json:"createdAt"`
+	UpdatedAt time.Time   `gorm:"autoUpdateTime" json:"updatedAt"`
 }
 
 func (m *OrderMessage) BeforeCreate(tx *gorm.DB) (err error) {

@@ -1686,6 +1686,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
+                "description": "Возвращает историю переписки. Новые сообщения приходят в реальном времени через WebSocket ` + "`" + `/ws/orders/{id}/chat` + "`" + `.",
                 "produces": [
                     "application/json"
                 ],
@@ -1744,7 +1745,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Поддерживаются типы файлов: image/jpeg, image/png, application/pdf",
+                "description": "Поддерживаются типы файлов: image/jpeg, image/png, application/pdf. После сохранения сообщение мгновенно рассылается всем участникам через WebSocket ` + "`" + `/ws/orders/{id}/chat` + "`" + `.",
                 "consumes": [
                     "application/json",
                     "multipart/form-data"
@@ -2825,8 +2826,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "fileSize": {
-                    "type": "integer",
-                    "format": "int64"
+                    "type": "integer"
                 },
                 "fileType": {
                     "type": "string"
