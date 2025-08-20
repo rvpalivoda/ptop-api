@@ -9,6 +9,8 @@ type OrderFull struct {
 	Offer               Offer                `json:"offer"`
 	Buyer               Client               `json:"buyer"`
 	Seller              Client               `json:"seller"`
+	Author              Client               `json:"author"`
+	OfferOwner          Client               `json:"offerOwner"`
 	FromAsset           Asset                `json:"fromAsset"`
 	ToAsset             Asset                `json:"toAsset"`
 	ClientPaymentMethod *ClientPaymentMethod `json:"clientPaymentMethod,omitempty"`

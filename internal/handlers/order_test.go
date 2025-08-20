@@ -156,10 +156,64 @@ func TestOrderHandler(t *testing.T) {
 	if list[0].Buyer.ID != client.ID || list[0].Seller.ID != client.ID {
 		t.Fatalf("unexpected client ids")
 	}
+	if list[0].Author.ID != client.ID || list[0].OfferOwner.ID != client.ID {
+		t.Fatalf("unexpected author or offer owner")
+	}
 	if list[0].ClientPaymentMethod == nil || list[0].ClientPaymentMethod.ID != cpm.ID {
 		t.Fatalf("missing client payment method")
 	}
 	if list[0].ClientPaymentMethod.Country.ID != country.ID || list[0].ClientPaymentMethod.PaymentMethod.ID != method.ID {
 		t.Fatalf("missing nested payment method data")
+	}
+
+	// create second order for pagination test
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("POST", "/client/orders", bytes.NewBufferString(body))
+	req.Header.Set("Authorization", "Bearer "+tok.AccessToken)
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("second order status %d", w.Code)
+	}
+
+	// test pagination
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("GET", "/client/orders?limit=1", nil)
+	req.Header.Set("Authorization", "Bearer "+tok.AccessToken)
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("paginated list status %d", w.Code)
+	}
+	list = nil
+	json.Unmarshal(w.Body.Bytes(), &list)
+	if len(list) != 1 {
+		t.Fatalf("expected 1 order with limit, got %d", len(list))
+	}
+
+	// test role filter
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("GET", "/client/orders?role=author", nil)
+	req.Header.Set("Authorization", "Bearer "+tok.AccessToken)
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("author filter status %d", w.Code)
+	}
+	list = nil
+	json.Unmarshal(w.Body.Bytes(), &list)
+	if len(list) != 2 {
+		t.Fatalf("expected 2 orders for author, got %d", len(list))
+	}
+
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("GET", "/client/orders?role=offerOwner", nil)
+	req.Header.Set("Authorization", "Bearer "+tok.AccessToken)
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("owner filter status %d", w.Code)
+	}
+	list = nil
+	json.Unmarshal(w.Body.Bytes(), &list)
+	if len(list) != 2 {
+		t.Fatalf("expected 2 orders for owner, got %d", len(list))
 	}
 }

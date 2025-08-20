@@ -66,6 +66,8 @@ func CreateOrder(db *gorm.DB) gin.HandlerFunc {
 			OfferID:               offer.ID,
 			BuyerID:               clientID,
 			SellerID:              offer.ClientID,
+			AuthorID:              clientID,
+			OfferOwnerID:          offer.ClientID,
 			FromAssetID:           offer.FromAssetID,
 			ToAssetID:             offer.ToAssetID,
 			Amount:                amt,
@@ -90,6 +92,9 @@ func CreateOrder(db *gorm.DB) gin.HandlerFunc {
 // @Tags orders
 // @Security BearerAuth
 // @Produce json
+// @Param role query string false "роль клиента (author или offerOwner)"
+// @Param limit query int false "лимит"
+// @Param offset query int false "смещение"
 // @Success 200 {array} models.OrderFull
 // @Router /client/orders [get]
 func ListClientOrders(db *gorm.DB) gin.HandlerFunc {
@@ -100,16 +105,31 @@ func ListClientOrders(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		clientID := clientIDVal.(string)
-		var orders []models.Order
-		if err := db.Preload("Offer").
+		role := c.Query("role")
+		limit, offset := parsePagination(c)
+
+		query := db.Preload("Offer").
 			Preload("Buyer").
 			Preload("Seller").
+			Preload("Author").
+			Preload("OfferOwner").
 			Preload("FromAsset").
 			Preload("ToAsset").
 			Preload("ClientPaymentMethod").
 			Preload("ClientPaymentMethod.Country").
-			Preload("ClientPaymentMethod.PaymentMethod").
-			Where("buyer_id = ?", clientID).Find(&orders).Error; err != nil {
+			Preload("ClientPaymentMethod.PaymentMethod")
+
+		switch role {
+		case "author":
+			query = query.Where("author_id = ?", clientID)
+		case "offerOwner":
+			query = query.Where("offer_owner_id = ?", clientID)
+		default:
+			query = query.Where("author_id = ? OR offer_owner_id = ?", clientID, clientID)
+		}
+
+		var orders []models.Order
+		if err := query.Order("created_at desc").Limit(limit).Offset(offset).Find(&orders).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
 			return
 		}
@@ -124,6 +144,8 @@ func ListClientOrders(db *gorm.DB) gin.HandlerFunc {
 				Offer:               o.Offer,
 				Buyer:               o.Buyer,
 				Seller:              o.Seller,
+				Author:              o.Author,
+				OfferOwner:          o.OfferOwner,
 				FromAsset:           o.FromAsset,
 				ToAsset:             o.ToAsset,
 				ClientPaymentMethod: cpm,
