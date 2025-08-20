@@ -1067,7 +1067,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Order"
+                                "$ref": "#/definitions/models.OrderFull"
                             }
                         }
                     }
@@ -2633,6 +2633,74 @@ const docTemplate = `{
                 },
                 "status": {
                     "$ref": "#/definitions/models.OrderStatus"
+                },
+                "toAssetID": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.OrderFull": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "buyer": {
+                    "$ref": "#/definitions/models.Client"
+                },
+                "buyerID": {
+                    "type": "string"
+                },
+                "clientPaymentMethod": {
+                    "$ref": "#/definitions/models.ClientPaymentMethod"
+                },
+                "clientPaymentMethodID": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "expiresAt": {
+                    "type": "string"
+                },
+                "fromAsset": {
+                    "$ref": "#/definitions/models.Asset"
+                },
+                "fromAssetID": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "isEscrow": {
+                    "type": "boolean"
+                },
+                "offer": {
+                    "$ref": "#/definitions/models.Offer"
+                },
+                "offerID": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "releasedAt": {
+                    "type": "string"
+                },
+                "seller": {
+                    "$ref": "#/definitions/models.Client"
+                },
+                "sellerID": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/models.OrderStatus"
+                },
+                "toAsset": {
+                    "$ref": "#/definitions/models.Asset"
                 },
                 "toAssetID": {
                     "type": "string"
