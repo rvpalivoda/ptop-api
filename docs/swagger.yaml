@@ -1821,6 +1821,8 @@ paths:
       - offers
   /orders/{id}/messages:
     get:
+      description: Возвращает историю переписки. Новые сообщения приходят в реальном
+        времени через WebSocket `/ws/orders/{id}/chat`.
       parameters:
       - description: ID ордера
         in: path
@@ -1861,7 +1863,9 @@ paths:
       consumes:
       - application/json
       - multipart/form-data
-      description: 'Поддерживаются типы файлов: image/jpeg, image/png, application/pdf'
+      description: 'Поддерживаются типы файлов: image/jpeg, image/png, application/pdf.
+        После сохранения сообщение мгновенно рассылается всем участникам через WebSocket
+        `/ws/orders/{id}/chat`.'
       parameters:
       - description: ID ордера
         in: path

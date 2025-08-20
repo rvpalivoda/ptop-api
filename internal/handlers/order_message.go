@@ -25,6 +25,7 @@ type OrderMessageRequest struct {
 
 // ListOrderMessages godoc
 // @Summary Список сообщений ордера
+// @Description Возвращает историю переписки. Новые сообщения приходят в реальном времени через WebSocket `/ws/orders/{id}/chat`.
 // @Tags orders
 // @Security BearerAuth
 // @Produce json
@@ -82,7 +83,7 @@ func ListOrderMessages(db *gorm.DB) gin.HandlerFunc {
 
 // CreateOrderMessage godoc
 // @Summary Отправить сообщение в ордер
-// @Description Поддерживаются типы файлов: image/jpeg, image/png, application/pdf
+// @Description Поддерживаются типы файлов: image/jpeg, image/png, application/pdf. После сохранения сообщение мгновенно рассылается всем участникам через WebSocket `/ws/orders/{id}/chat`.
 // @Tags orders
 // @Security BearerAuth
 // @Accept json
