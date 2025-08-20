@@ -1887,6 +1887,42 @@ const docTemplate = `{
                 }
             }
         },
+        "/ws/offers": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Подключение для получения событий CRUD по офферам.",
+                "tags": [
+                    "offers"
+                ],
+                "summary": "WebSocket обновления офферов",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "канал",
+                        "name": "channel",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "101": {
+                        "description": "Switching Protocols",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.OfferEvent"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/ws/orders": {
             "get": {
                 "security": [
@@ -1894,7 +1930,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Подписка на события по ордерам клиента",
+                "description": "После подключения авторизованный клиент получает события OrderEvent о создании своих ордеров.",
                 "tags": [
                     "orders"
                 ],
@@ -1903,7 +1939,7 @@ const docTemplate = `{
                     "101": {
                         "description": "Switching Protocols",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/handlers.OrderEvent"
                         }
                     },
                     "401": {
@@ -1922,7 +1958,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "При подключении отправляет историю сообщений из кеша Redis",
+                "description": "Подключает покупателя и продавца к чату ордера.",
                 "tags": [
                     "orders"
                 ],
@@ -1940,7 +1976,7 @@ const docTemplate = `{
                     "101": {
                         "description": "Switching Protocols",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/models.OrderMessage"
                         }
                     },
                     "403": {
@@ -1965,7 +2001,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Отправляет события изменения статуса ордера.",
+                "description": "Позволяет автору и владельцу оффера получать события OrderStatusEvent при каждом изменении статуса указанного ордера.",
                 "tags": [
                     "orders"
                 ],
@@ -1983,7 +2019,7 @@ const docTemplate = `{
                     "101": {
                         "description": "Switching Protocols",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/handlers.OrderStatusEvent"
                         }
                     },
                     "403": {
@@ -2201,6 +2237,18 @@ const docTemplate = `{
                 }
             }
         },
+        "handlers.OfferEvent": {
+            "type": "object",
+            "properties": {
+                "offer": {
+                    "$ref": "#/definitions/models.OfferFull"
+                },
+                "type": {
+                    "type": "string",
+                    "example": "created"
+                }
+            }
+        },
         "handlers.OfferRequest": {
             "type": "object",
             "properties": {
@@ -2239,6 +2287,18 @@ const docTemplate = `{
                 }
             }
         },
+        "handlers.OrderEvent": {
+            "type": "object",
+            "properties": {
+                "order": {
+                    "$ref": "#/definitions/models.OrderFull"
+                },
+                "type": {
+                    "type": "string",
+                    "example": "order.created"
+                }
+            }
+        },
         "handlers.OrderMessageRequest": {
             "type": "object",
             "properties": {
@@ -2261,6 +2321,18 @@ const docTemplate = `{
                 },
                 "pin_code": {
                     "type": "string"
+                }
+            }
+        },
+        "handlers.OrderStatusEvent": {
+            "type": "object",
+            "properties": {
+                "order": {
+                    "$ref": "#/definitions/models.OrderFull"
+                },
+                "type": {
+                    "type": "string",
+                    "example": "order.status_changed"
                 }
             }
         },

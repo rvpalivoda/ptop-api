@@ -8,9 +8,10 @@ import (
 	"ptop/internal/models"
 )
 
-// offerEvent описывает событие оффера, передаваемое по websocket.
-type offerEvent struct {
-	Type  string           `json:"type"`
+// OfferEvent описывает сообщение, которое получает клиент при изменениях оффера.
+// Type принимает значения `created`, `updated` или `deleted`.
+type OfferEvent struct {
+	Type  string           `json:"type" example:"created"`
 	Offer models.OfferFull `json:"offer"`
 }
 
@@ -22,11 +23,13 @@ var offerWSConns = struct {
 
 // OffersWS godoc
 // @Summary WebSocket обновления офферов
-// @Description Подключение для получения событий создания, обновления и удаления объявлений
+// @Description Подключение для получения событий CRUD по офферам.
+// Клиенту необходимо установить соединение и при необходимости передать query `channel`.
+// В ответ сервер отправляет сообщения формата OfferEvent: {"type":"created","offer":OfferFull}.
 // @Tags offers
 // @Security BearerAuth
 // @Param channel query string false "канал"
-// @Success 101 {string} string "Switching Protocols"
+// @Success 101 {object} handlers.OfferEvent "Switching Protocols"
 // @Failure 403 {object} ErrorResponse
 // @Router /ws/offers [get]
 func OffersWS() http.HandlerFunc {
@@ -89,7 +92,7 @@ func broadcastOfferEvent(eventType string, offer models.OfferFull) {
 
 	// Пишем события; проблемные соединения отписываем
 	for _, c := range snapshot {
-		if err := c.WriteJSON(offerEvent{Type: eventType, Offer: offer}); err != nil {
+		if err := c.WriteJSON(OfferEvent{Type: eventType, Offer: offer}); err != nil {
 			c.Close()
 			offerWSConns.Lock()
 			if conns, ok := offerWSConns.m[channel]; ok {

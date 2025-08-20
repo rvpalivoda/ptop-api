@@ -15,16 +15,18 @@ var orderClients = struct {
 	m map[string]map[*websocket.Conn]bool
 }{m: make(map[string]map[*websocket.Conn]bool)}
 
-type orderEvent struct {
-	Type  string           `json:"type"`
+// OrderEvent событие, отправляемое клиенту при создании его ордера.
+// Type всегда имеет значение `order.created`.
+type OrderEvent struct {
+	Type  string           `json:"type" example:"order.created"`
 	Order models.OrderFull `json:"order"`
 }
 
-func newOrderEvent(of models.OrderFull) orderEvent {
-	return orderEvent{Type: "order.created", Order: of}
+func newOrderEvent(of models.OrderFull) OrderEvent {
+	return OrderEvent{Type: "order.created", Order: of}
 }
 
-func broadcastOrderEvent(clientID string, evt orderEvent) {
+func broadcastOrderEvent(clientID string, evt OrderEvent) {
 	orderClients.Lock()
 	defer orderClients.Unlock()
 	for c := range orderClients.m[clientID] {
@@ -37,10 +39,11 @@ func broadcastOrderEvent(clientID string, evt orderEvent) {
 
 // OrdersWS godoc
 // @Summary Websocket ордеров клиента
-// @Description Подписка на события по ордерам клиента
+// @Description После подключения авторизованный клиент получает события OrderEvent о создании своих ордеров.
+// Клиенту не нужно отправлять данные, соединение используется только для чтения.
 // @Tags orders
 // @Security BearerAuth
-// @Success 101 {string} string "Switching Protocols"
+// @Success 101 {object} handlers.OrderEvent "Switching Protocols"
 // @Failure 401 {object} ErrorResponse
 // @Router /ws/orders [get]
 func OrdersWS() gin.HandlerFunc {

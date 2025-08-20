@@ -11,8 +11,10 @@ import (
 	"ptop/internal/models"
 )
 
-type orderStatusEvent struct {
-	Type  string           `json:"type"`
+// OrderStatusEvent уведомление об изменении статуса ордера.
+// Type всегда `order.status_changed`.
+type OrderStatusEvent struct {
+	Type  string           `json:"type" example:"order.status_changed"`
 	Order models.OrderFull `json:"order"`
 }
 
@@ -22,7 +24,7 @@ var orderStatusClients = struct {
 }{m: make(map[string]map[*websocket.Conn]bool)}
 
 func sendOrderStatusEvent(conn *websocket.Conn, ord models.OrderFull) error {
-	return conn.WriteJSON(orderStatusEvent{Type: "order.status_changed", Order: ord})
+	return conn.WriteJSON(OrderStatusEvent{Type: "order.status_changed", Order: ord})
 }
 
 func broadcastOrderStatus(order models.Order) {
@@ -52,11 +54,11 @@ func broadcastOrderStatus(order models.Order) {
 
 // OrderStatusWS godoc
 // @Summary Websocket уведомлений о статусе ордера
-// @Description Отправляет события изменения статуса ордера.
+// @Description Позволяет автору и владельцу оффера получать события OrderStatusEvent при каждом изменении статуса указанного ордера.
 // @Tags orders
 // @Security BearerAuth
 // @Param id path string true "ID ордера"
-// @Success 101 {string} string "Switching Protocols"
+// @Success 101 {object} handlers.OrderStatusEvent "Switching Protocols"
 // @Failure 403 {object} ErrorResponse
 // @Failure 404 {object} ErrorResponse
 // @Router /ws/orders/{id}/status [get]
