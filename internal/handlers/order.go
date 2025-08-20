@@ -83,6 +83,20 @@ func CreateOrder(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
 			return
 		}
+		var full models.Order
+		if err := db.Preload("Offer").
+			Preload("Buyer").
+			Preload("Seller").
+			Preload("Author").
+			Preload("OfferOwner").
+			Preload("FromAsset").
+			Preload("ToAsset").
+			Preload("ClientPaymentMethod").
+			Preload("ClientPaymentMethod.Country").
+			Preload("ClientPaymentMethod.PaymentMethod").
+			Where("id = ?", order.ID).First(&full).Error; err == nil {
+			broadcastOrderStatus(full)
+		}
 		c.JSON(http.StatusOK, order)
 	}
 }

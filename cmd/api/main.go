@@ -118,6 +118,7 @@ func main() {
 	ws := r.Group("/ws")
 	ws.Use(handlers.AuthMiddleware(gormDB))
 	ws.GET("/orders/:id/chat", handlers.OrderChatWS(gormDB, chatCache))
+	ws.GET("/orders/:id/status", handlers.OrderStatusWS(gormDB))
 
 	if cfg.WatchersDebug {
 		btcW, err := btcwatcher.New(gormDB, cfg.BtcRPCHost, cfg.BtcRPCUser, cfg.BtcRPCPass, nil, true)

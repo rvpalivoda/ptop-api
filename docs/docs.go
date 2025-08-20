@@ -1928,6 +1928,49 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/ws/orders/{id}/status": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Отправляет события изменения статуса ордера.",
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Websocket уведомлений о статусе ордера",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID ордера",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "101": {
+                        "description": "Switching Protocols",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -2825,8 +2868,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "fileSize": {
-                    "type": "integer",
-                    "format": "int64"
+                    "type": "integer"
                 },
                 "fileType": {
                     "type": "string"
