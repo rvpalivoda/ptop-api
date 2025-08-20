@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"sync"
 
-	"golang.org/x/net/websocket"
+	"github.com/gorilla/websocket"
 	"ptop/internal/models"
 )
 
@@ -34,31 +34,34 @@ func OffersWS() http.HandlerFunc {
 		if channel == "" {
 			channel = "offers"
 		}
-		websocket.Handler(func(ws *websocket.Conn) {
+		upgrader := websocket.Upgrader{CheckOrigin: func(r *http.Request) bool { return true }}
+		ws, err := upgrader.Upgrade(w, r, nil)
+		if err != nil {
+			return
+		}
+		offerWSConns.Lock()
+		offerWSConns.m[channel] = append(offerWSConns.m[channel], ws)
+		offerWSConns.Unlock()
+
+		defer func() {
 			offerWSConns.Lock()
-			offerWSConns.m[channel] = append(offerWSConns.m[channel], ws)
-			offerWSConns.Unlock()
-
-			defer func() {
-				offerWSConns.Lock()
-				conns := offerWSConns.m[channel]
-				for i, c := range conns {
-					if c == ws {
-						offerWSConns.m[channel] = append(conns[:i], conns[i+1:]...)
-						break
-					}
-				}
-				offerWSConns.Unlock()
-				ws.Close()
-			}()
-
-			for {
-				var v interface{}
-				if err := websocket.JSON.Receive(ws, &v); err != nil {
+			conns := offerWSConns.m[channel]
+			for i, c := range conns {
+				if c == ws {
+					offerWSConns.m[channel] = append(conns[:i], conns[i+1:]...)
 					break
 				}
 			}
-		}).ServeHTTP(w, r)
+			offerWSConns.Unlock()
+			ws.Close()
+		}()
+
+		for {
+			var v interface{}
+			if err := ws.ReadJSON(&v); err != nil {
+				break
+			}
+		}
 	}
 }
 
@@ -67,7 +70,7 @@ func broadcastOfferEvent(eventType string, offer models.OfferFull) {
 	offerWSConns.Lock()
 	conns := offerWSConns.m[channel]
 	for i := 0; i < len(conns); {
-		if err := websocket.JSON.Send(conns[i], offerEvent{Type: eventType, Offer: offer}); err != nil {
+		if err := conns[i].WriteJSON(offerEvent{Type: eventType, Offer: offer}); err != nil {
 			conns[i].Close()
 			conns = append(conns[:i], conns[i+1:]...)
 		} else {
