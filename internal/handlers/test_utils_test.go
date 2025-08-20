@@ -121,6 +121,7 @@ func setupTest(t *testing.T) (*gorm.DB, *gin.Engine, map[string]time.Duration) {
 
 	ws := r.Group("/ws")
 	ws.Use(AuthMiddleware(db))
+	ws.GET("/orders", OrdersWS())
 	ws.GET("/orders/:id/chat", OrderChatWS(db, cache))
 
 	return db, r, ttl

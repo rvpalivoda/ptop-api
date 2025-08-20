@@ -1951,6 +1951,23 @@ paths:
       summary: Список платёжных методов
       tags:
       - reference
+  /ws/orders:
+    get:
+      description: Подписка на события по ордерам клиента
+      responses:
+        "101":
+          description: Switching Protocols
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Websocket ордеров клиента
+      tags:
+      - orders
   /ws/orders/{id}/chat:
     get:
       description: При подключении отправляет историю сообщений из кеша Redis

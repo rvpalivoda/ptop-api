@@ -117,6 +117,7 @@ func main() {
 
 	ws := r.Group("/ws")
 	ws.Use(handlers.AuthMiddleware(gormDB))
+	ws.GET("/orders", handlers.OrdersWS())
 	ws.GET("/orders/:id/chat", handlers.OrderChatWS(gormDB, chatCache))
 
 	if cfg.WatchersDebug {

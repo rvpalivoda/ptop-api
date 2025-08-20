@@ -1886,6 +1886,34 @@ const docTemplate = `{
                 }
             }
         },
+        "/ws/orders": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Подписка на события по ордерам клиента",
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Websocket ордеров клиента",
+                "responses": {
+                    "101": {
+                        "description": "Switching Protocols",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/ws/orders/{id}/chat": {
             "get": {
                 "security": [
