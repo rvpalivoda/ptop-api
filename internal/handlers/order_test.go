@@ -56,6 +56,32 @@ func TestOrderHandler(t *testing.T) {
 	if err := db.Create(&asset2).Error; err != nil {
 		t.Fatalf("asset: %v", err)
 	}
+
+	country := models.Country{Name: "Russia"}
+	method := models.PaymentMethod{
+		Name:         "Bank",
+		MethodGroup:  "bank_transfer",
+		IsRealtime:   false,
+		FeeSide:      models.FeeSideSender,
+		KycLevelHint: models.KycLevelHintLow,
+	}
+	if err := db.Create(&country).Error; err != nil {
+		t.Fatalf("country: %v", err)
+	}
+	if err := db.Create(&method).Error; err != nil {
+		t.Fatalf("method: %v", err)
+	}
+	cpm := models.ClientPaymentMethod{
+		ClientID:        client.ID,
+		CountryID:       country.ID,
+		PaymentMethodID: method.ID,
+		City:            "Moscow",
+		PostCode:        "101000",
+		Name:            "Main",
+	}
+	if err := db.Create(&cpm).Error; err != nil {
+		t.Fatalf("cpm: %v", err)
+	}
 	offer := models.Offer{
 		MaxAmount:              decimal.RequireFromString("100"),
 		MinAmount:              decimal.RequireFromString("1"),
@@ -92,7 +118,7 @@ func TestOrderHandler(t *testing.T) {
 	}
 
 	w = httptest.NewRecorder()
-	body = `{"offer_id":"` + offer.ID + `","amount":"5","pin_code":"1234"}`
+	body = `{"offer_id":"` + offer.ID + `","amount":"5","pin_code":"1234","client_payment_method_id":"` + cpm.ID + `"}`
 	req, _ = http.NewRequest("POST", "/client/orders", bytes.NewBufferString(body))
 	req.Header.Set("Authorization", "Bearer "+tok.AccessToken)
 	req.Header.Set("Content-Type", "application/json")
@@ -116,9 +142,24 @@ func TestOrderHandler(t *testing.T) {
 	if w.Code != http.StatusOK {
 		t.Fatalf("list status %d", w.Code)
 	}
-	var list []models.Order
+	var list []models.OrderFull
 	json.Unmarshal(w.Body.Bytes(), &list)
 	if len(list) != 1 {
 		t.Fatalf("expected 1 order, got %d", len(list))
+	}
+	if list[0].Offer.ID != offer.ID {
+		t.Fatalf("expected offer %s, got %s", offer.ID, list[0].Offer.ID)
+	}
+	if list[0].FromAsset.ID != asset1.ID || list[0].ToAsset.ID != asset2.ID {
+		t.Fatalf("unexpected assets")
+	}
+	if list[0].Buyer.ID != client.ID || list[0].Seller.ID != client.ID {
+		t.Fatalf("unexpected client ids")
+	}
+	if list[0].ClientPaymentMethod == nil || list[0].ClientPaymentMethod.ID != cpm.ID {
+		t.Fatalf("missing client payment method")
+	}
+	if list[0].ClientPaymentMethod.Country.ID != country.ID || list[0].ClientPaymentMethod.PaymentMethod.ID != method.ID {
+		t.Fatalf("missing nested payment method data")
 	}
 }

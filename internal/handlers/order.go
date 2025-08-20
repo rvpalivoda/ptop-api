@@ -90,7 +90,7 @@ func CreateOrder(db *gorm.DB) gin.HandlerFunc {
 // @Tags orders
 // @Security BearerAuth
 // @Produce json
-// @Success 200 {array} models.Order
+// @Success 200 {array} models.OrderFull
 // @Router /client/orders [get]
 func ListClientOrders(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -101,10 +101,34 @@ func ListClientOrders(db *gorm.DB) gin.HandlerFunc {
 		}
 		clientID := clientIDVal.(string)
 		var orders []models.Order
-		if err := db.Where("buyer_id = ?", clientID).Find(&orders).Error; err != nil {
+		if err := db.Preload("Offer").
+			Preload("Buyer").
+			Preload("Seller").
+			Preload("FromAsset").
+			Preload("ToAsset").
+			Preload("ClientPaymentMethod").
+			Preload("ClientPaymentMethod.Country").
+			Preload("ClientPaymentMethod.PaymentMethod").
+			Where("buyer_id = ?", clientID).Find(&orders).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
 			return
 		}
-		c.JSON(http.StatusOK, orders)
+		res := make([]models.OrderFull, len(orders))
+		for i, o := range orders {
+			var cpm *models.ClientPaymentMethod
+			if o.ClientPaymentMethodID != "" {
+				cpm = &o.ClientPaymentMethod
+			}
+			res[i] = models.OrderFull{
+				Order:               o,
+				Offer:               o.Offer,
+				Buyer:               o.Buyer,
+				Seller:              o.Seller,
+				FromAsset:           o.FromAsset,
+				ToAsset:             o.ToAsset,
+				ClientPaymentMethod: cpm,
+			}
+		}
+		c.JSON(http.StatusOK, res)
 	}
 }
