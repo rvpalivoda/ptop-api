@@ -1078,6 +1078,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/handlers.ErrorResponse"
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -2067,6 +2073,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "offer_id": {
+                    "type": "string"
+                },
+                "pin_code": {
                     "type": "string"
                 }
             }

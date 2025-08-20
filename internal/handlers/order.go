@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/shopspring/decimal"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 
 	"ptop/internal/models"
@@ -15,6 +16,7 @@ type OrderRequest struct {
 	OfferID               string `json:"offer_id"`
 	Amount                string `json:"amount"`
 	ClientPaymentMethodID string `json:"client_payment_method_id"`
+	PinCode               string `json:"pin_code"`
 }
 
 // CreateOrder godoc
@@ -26,6 +28,7 @@ type OrderRequest struct {
 // @Param input body OrderRequest true "данные"
 // @Success 200 {object} models.Order
 // @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
 // @Router /client/orders [post]
 func CreateOrder(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -45,6 +48,15 @@ func CreateOrder(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		clientID := clientIDVal.(string)
+		var client models.Client
+		if err := db.Where("id = ?", clientID).First(&client).Error; err != nil {
+			c.JSON(http.StatusUnauthorized, ErrorResponse{Error: "invalid client"})
+			return
+		}
+		if r.PinCode == "" || client.PinCode == nil || bcrypt.CompareHashAndPassword([]byte(*client.PinCode), []byte(r.PinCode)) != nil {
+			c.JSON(http.StatusUnauthorized, ErrorResponse{Error: "invalid pincode"})
+			return
+		}
 		var offer models.Offer
 		if err := db.Preload("FromAsset").Preload("ToAsset").Where("id = ?", r.OfferID).First(&offer).Error; err != nil {
 			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "invalid offer"})

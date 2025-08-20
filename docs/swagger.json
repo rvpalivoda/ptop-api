@@ -1071,6 +1071,12 @@
                         "schema": {
                             "$ref": "#/definitions/handlers.ErrorResponse"
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -2060,6 +2066,9 @@
                     "type": "string"
                 },
                 "offer_id": {
+                    "type": "string"
+                },
+                "pin_code": {
                     "type": "string"
                 }
             }
