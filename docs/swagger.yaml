@@ -587,7 +587,6 @@ definitions:
       createdAt:
         type: string
       fileSize:
-        format: int64
         type: integer
       fileType:
         type: string
@@ -1473,7 +1472,7 @@ paths:
           schema:
             $ref: '#/definitions/models.Order'
         "400":
-          description: Bad Request
+          description: нельзя создавать ордер на своё предложение
           schema:
             $ref: '#/definitions/handlers.ErrorResponse'
         "401":
