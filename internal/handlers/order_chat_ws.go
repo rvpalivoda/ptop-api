@@ -5,15 +5,12 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
 	"gorm.io/gorm"
 
 	"ptop/internal/models"
 	"ptop/internal/orderchat"
 	"ptop/internal/services"
 )
-
-var upgrader = websocket.Upgrader{CheckOrigin: func(r *http.Request) bool { return true }}
 
 // OrderChatWS godoc
 // @Summary Websocket чат ордера

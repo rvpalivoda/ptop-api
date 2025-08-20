@@ -141,10 +141,12 @@ func TestOrderChatWS(t *testing.T) {
 
 	// buyer connects and sends message
 	header = http.Header{"Authorization": {"Bearer " + buyerTok.AccessToken}}
-	buyerConn, _, err := dialer.Dial(wsURL, header)
-
+	buyerConn, resp, err := dialer.Dial(wsURL, header)
 	if err != nil {
 		t.Fatalf("buyer dial: %v", err)
+	}
+	if resp.StatusCode != http.StatusSwitchingProtocols {
+		t.Fatalf("buyer handshake status %d", resp.StatusCode)
 	}
 	if err := buyerConn.WriteJSON(OrderMessageRequest{Content: "hello"}); err != nil {
 		t.Fatalf("write: %v", err)
@@ -160,10 +162,12 @@ func TestOrderChatWS(t *testing.T) {
 
 	// seller connects after message and receives history
 	header = http.Header{"Authorization": {"Bearer " + sellerTok.AccessToken}}
-	sellerConn, _, err := dialer.Dial(wsURL, header)
-
+	sellerConn, resp, err := dialer.Dial(wsURL, header)
 	if err != nil {
 		t.Fatalf("seller dial: %v", err)
+	}
+	if resp.StatusCode != http.StatusSwitchingProtocols {
+		t.Fatalf("seller handshake status %d", resp.StatusCode)
 	}
 	defer sellerConn.Close()
 	var history orderchat.Event

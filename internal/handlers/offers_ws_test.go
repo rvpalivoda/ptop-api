@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/gorilla/websocket"
 	"github.com/shopspring/decimal"
-	"golang.org/x/net/websocket"
 	"ptop/internal/models"
 )
 
@@ -56,11 +56,12 @@ func TestOffersWS(t *testing.T) {
 
 	wsURL := "ws" + strings.TrimPrefix(srv.URL, "http") + "/ws/offers"
 	header := http.Header{"Authorization": {"Bearer " + tok.AccessToken}}
-	cfg, _ := websocket.NewConfig(wsURL, "http://example.com")
-	cfg.Header = header
-	conn, err := websocket.DialConfig(cfg)
+	conn, resp, err := websocket.DefaultDialer.Dial(wsURL, header)
 	if err != nil {
 		t.Fatalf("dial: %v", err)
+	}
+	if resp.StatusCode != http.StatusSwitchingProtocols {
+		t.Fatalf("handshake status %d", resp.StatusCode)
 	}
 	defer conn.Close()
 	if err := conn.WriteJSON(struct{}{}); err != nil {
@@ -81,7 +82,7 @@ func TestOffersWS(t *testing.T) {
 	json.Unmarshal(w.Body.Bytes(), &created)
 
 	var evt offerWSEvent
-	if err := websocket.JSON.Receive(conn, &evt); err != nil {
+	if err := conn.ReadJSON(&evt); err != nil {
 		t.Fatalf("read create: %v", err)
 	}
 	if evt.Type != "created" || evt.Offer.ID != created.ID || evt.Offer.FromAsset.ID != asset1.ID {
@@ -98,7 +99,7 @@ func TestOffersWS(t *testing.T) {
 	if w.Code != http.StatusOK {
 		t.Fatalf("update status %d", w.Code)
 	}
-	if err := websocket.JSON.Receive(conn, &evt); err != nil {
+	if err := conn.ReadJSON(&evt); err != nil {
 		t.Fatalf("read update: %v", err)
 	}
 	if evt.Type != "updated" || evt.Offer.Price.Cmp(decimal.RequireFromString("0.2")) != 0 {
@@ -113,7 +114,7 @@ func TestOffersWS(t *testing.T) {
 	if w.Code != http.StatusOK {
 		t.Fatalf("delete status %d", w.Code)
 	}
-	if err := websocket.JSON.Receive(conn, &evt); err != nil {
+	if err := conn.ReadJSON(&evt); err != nil {
 		t.Fatalf("read delete: %v", err)
 	}
 	if evt.Type != "deleted" || evt.Offer.ID != created.ID {

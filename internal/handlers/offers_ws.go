@@ -8,10 +8,6 @@ import (
 	"ptop/internal/models"
 )
 
-var upgrader = websocket.Upgrader{
-	CheckOrigin: func(r *http.Request) bool { return true },
-}
-
 // offerEvent описывает событие оффера, передаваемое по websocket.
 type offerEvent struct {
 	Type  string           `json:"type"`

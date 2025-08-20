@@ -119,9 +119,12 @@ func TestCreateOrderMessageBroadcast(t *testing.T) {
 	// seller connects via WebSocket
 	wsURL := "ws" + strings.TrimPrefix(srv.URL, "http") + "/ws/orders/" + ord.ID + "/chat"
 	header := http.Header{"Authorization": {"Bearer " + sellerTok.AccessToken}}
-	conn, _, err := websocket.DefaultDialer.Dial(wsURL, header)
+	conn, resp, err := websocket.DefaultDialer.Dial(wsURL, header)
 	if err != nil {
 		t.Fatalf("seller dial: %v", err)
+	}
+	if resp.StatusCode != http.StatusSwitchingProtocols {
+		t.Fatalf("handshake status %d", resp.StatusCode)
 	}
 	defer conn.Close()
 

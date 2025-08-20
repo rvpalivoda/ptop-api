@@ -136,16 +136,22 @@ func TestOrderStatusWS(t *testing.T) {
 	}
 
 	header = http.Header{"Authorization": {"Bearer " + buyerTok.AccessToken}}
-	buyerConn, _, err := websocket.DefaultDialer.Dial(wsURL, header)
+	buyerConn, resp, err := websocket.DefaultDialer.Dial(wsURL, header)
 	if err != nil {
 		t.Fatalf("buyer dial: %v", err)
+	}
+	if resp.StatusCode != http.StatusSwitchingProtocols {
+		t.Fatalf("buyer handshake status %d", resp.StatusCode)
 	}
 	defer buyerConn.Close()
 
 	header = http.Header{"Authorization": {"Bearer " + sellerTok.AccessToken}}
-	sellerConn, _, err := websocket.DefaultDialer.Dial(wsURL, header)
+	sellerConn, resp, err := websocket.DefaultDialer.Dial(wsURL, header)
 	if err != nil {
 		t.Fatalf("seller dial: %v", err)
+	}
+	if resp.StatusCode != http.StatusSwitchingProtocols {
+		t.Fatalf("seller handshake status %d", resp.StatusCode)
 	}
 	defer sellerConn.Close()
 
