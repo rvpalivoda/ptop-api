@@ -25,7 +25,6 @@ require (
 	github.com/tyler-smith/go-bip39 v1.1.0
 	github.com/wealdtech/go-ed25519hd v0.1.0
 	golang.org/x/crypto v0.40.0
-	golang.org/x/net v0.41.0
 	gorm.io/datatypes v1.2.6
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/driver/sqlite v1.5.7
@@ -123,6 +122,7 @@ require (
 	go.uber.org/ratelimit v0.2.0 // indirect
 	go.uber.org/zap v1.21.0 // indirect
 	golang.org/x/arch v0.18.0 // indirect
+	golang.org/x/net v0.41.0 // indirect
 	golang.org/x/sync v0.16.0 // indirect
 	golang.org/x/sys v0.34.0 // indirect
 	golang.org/x/term v0.33.0 // indirect

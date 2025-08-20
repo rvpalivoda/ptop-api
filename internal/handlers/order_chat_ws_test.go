@@ -130,17 +130,19 @@ func TestOrderChatWS(t *testing.T) {
 
 	wsURL := "ws" + strings.TrimPrefix(srv.URL, "http") + "/ws/orders/" + ord.ID + "/chat"
 
+	dialer := websocket.Dialer{}
+
 	// hacker tries to connect
-	cfg, _ := websocket.NewConfig(wsURL, "http://example.com")
-	cfg.Header = http.Header{"Authorization": {"Bearer " + hackerTok.AccessToken}}
-	_, err := websocket.DialConfig(cfg)
-	if err == nil {
-		t.Fatalf("expected forbidden, got nil")
+	header := http.Header{"Authorization": {"Bearer " + hackerTok.AccessToken}}
+	_, resp, err := dialer.Dial(wsURL, header)
+	if err == nil || resp == nil || resp.StatusCode != http.StatusForbidden {
+		t.Fatalf("expected forbidden, got err=%v status=%v", err, resp)
 	}
 
 	// buyer connects and sends message
-	buyerHeader := http.Header{"Authorization": {"Bearer " + buyerTok.AccessToken}}
-	buyerConn, _, err := websocket.DefaultDialer.Dial(wsURL, buyerHeader)
+	header = http.Header{"Authorization": {"Bearer " + buyerTok.AccessToken}}
+	buyerConn, _, err := dialer.Dial(wsURL, header)
+
 	if err != nil {
 		t.Fatalf("buyer dial: %v", err)
 	}
@@ -157,8 +159,9 @@ func TestOrderChatWS(t *testing.T) {
 	buyerConn.Close()
 
 	// seller connects after message and receives history
-	sellerHeader := http.Header{"Authorization": {"Bearer " + sellerTok.AccessToken}}
-	sellerConn, _, err := websocket.DefaultDialer.Dial(wsURL, sellerHeader)
+	header = http.Header{"Authorization": {"Bearer " + sellerTok.AccessToken}}
+	sellerConn, _, err := dialer.Dial(wsURL, header)
+
 	if err != nil {
 		t.Fatalf("seller dial: %v", err)
 	}
