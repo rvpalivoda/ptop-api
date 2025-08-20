@@ -6,33 +6,30 @@ require (
 	github.com/alicebob/miniredis/v2 v2.35.0
 	github.com/biter777/countries v1.7.5
 	github.com/btcsuite/btcd v0.20.1-beta
-        github.com/btcsuite/btcutil v1.0.2
-        github.com/ethereum/go-ethereum v1.16.1
-        github.com/gagliardetto/solana-go v1.13.0
-        github.com/gin-contrib/cors v1.7.6
-        github.com/gin-gonic/gin v1.10.1
-        github.com/bsm/ginkgo/v2 v2.12.0
-        github.com/bsm/gomega v1.27.10
-        github.com/gorilla/websocket v1.5.1
-        github.com/joho/godotenv v1.5.1
-        github.com/matoous/go-nanoid/v2 v2.1.0
-        github.com/minio/minio-go/v7 v7.0.95
-        github.com/omani/go-monero-rpc-client v0.0.0-20250208023320-c16fcacc53ad
-        github.com/pquerna/otp v1.5.0
-        github.com/redis/go-redis/v9 v9.11.0
-        github.com/shopspring/decimal v1.4.0
-        github.com/stretchr/testify v1.10.0
-        github.com/test-go/testify v1.1.4
-        github.com/swaggo/files v1.0.1
-        github.com/swaggo/gin-swagger v1.6.0
-        github.com/swaggo/swag v1.16.3
-        github.com/tyler-smith/go-bip39 v1.1.0
-        github.com/wealdtech/go-ed25519hd v0.1.0
+	github.com/btcsuite/btcutil v1.0.2
+	github.com/ethereum/go-ethereum v1.16.1
+	github.com/gagliardetto/solana-go v1.13.0
+	github.com/gin-contrib/cors v1.7.6
+	github.com/gin-gonic/gin v1.10.1
+	github.com/gorilla/websocket v1.5.1
+	github.com/joho/godotenv v1.5.1
+	github.com/matoous/go-nanoid/v2 v2.1.0
+	github.com/minio/minio-go/v7 v7.0.95
+	github.com/omani/go-monero-rpc-client v0.0.0-20250208023320-c16fcacc53ad
+	github.com/pquerna/otp v1.5.0
+	github.com/redis/go-redis/v9 v9.11.0
+	github.com/shopspring/decimal v1.4.0
+	github.com/swaggo/files v1.0.1
+	github.com/swaggo/gin-swagger v1.6.0
+	github.com/swaggo/swag v1.16.3
+	github.com/tyler-smith/go-bip39 v1.1.0
+	github.com/wealdtech/go-ed25519hd v0.1.0
 	golang.org/x/crypto v0.40.0
+	golang.org/x/net v0.41.0
 	gorm.io/datatypes v1.2.6
-        gorm.io/driver/postgres v1.6.0
-        gorm.io/driver/sqlite v1.5.7
-        gorm.io/gorm v1.30.1
+	gorm.io/driver/postgres v1.6.0
+	gorm.io/driver/sqlite v1.5.7
+	gorm.io/gorm v1.30.1
 )
 
 require (
@@ -126,7 +123,6 @@ require (
 	go.uber.org/ratelimit v0.2.0 // indirect
 	go.uber.org/zap v1.21.0 // indirect
 	golang.org/x/arch v0.18.0 // indirect
-	golang.org/x/net v0.41.0 // indirect
 	golang.org/x/sync v0.16.0 // indirect
 	golang.org/x/sys v0.34.0 // indirect
 	golang.org/x/term v0.33.0 // indirect
