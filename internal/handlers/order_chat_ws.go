@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"golang.org/x/net/websocket"
 	"gorm.io/gorm"
 
 	"ptop/internal/models"
@@ -54,44 +53,43 @@ func OrderChatWS(db *gorm.DB, cache *services.ChatCache) gin.HandlerFunc {
 				return
 			}
 		}
-		wsHandler := websocket.Server{
-			Handshake: func(*websocket.Config, *http.Request) error { return nil },
-			Handler: func(conn *websocket.Conn) {
-				orderchat.AddClient(chat.ID, conn)
-				defer func() {
-					orderchat.RemoveClient(chat.ID, conn)
-					conn.Close()
-				}()
 
-				if cache != nil {
-					if history, err := cache.GetHistory(c.Request.Context(), chat.ID); err == nil {
-						for _, m := range history {
-							if err := orderchat.Send(conn, m); err != nil {
-								return
-							}
-						}
-					}
-				}
-
-				for {
-					var r OrderMessageRequest
-					if err := websocket.JSON.Receive(conn, &r); err != nil {
-						break
-					}
-					if r.Content == "" {
-						continue
-					}
-					msg := models.OrderMessage{ChatID: chat.ID, ClientID: clientID, Type: models.MessageTypeText, Content: r.Content}
-					if err := db.Create(&msg).Error; err != nil {
-						continue
-					}
-					if cache != nil {
-						_ = cache.AddMessage(c.Request.Context(), chat.ID, msg)
-					}
-					orderchat.Broadcast(chat.ID, msg)
-				}
-			},
+		conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+		if err != nil {
+			return
 		}
-		wsHandler.ServeHTTP(c.Writer, c.Request)
+		orderchat.AddClient(chat.ID, conn)
+		defer func() {
+			orderchat.RemoveClient(chat.ID, conn)
+			conn.Close()
+		}()
+
+		if cache != nil {
+			if history, err := cache.GetHistory(c.Request.Context(), chat.ID); err == nil {
+				for _, m := range history {
+					if err := orderchat.Send(conn, m); err != nil {
+						return
+					}
+				}
+			}
+		}
+
+		for {
+			var r OrderMessageRequest
+			if err := conn.ReadJSON(&r); err != nil {
+				break
+			}
+			if r.Content == "" {
+				continue
+			}
+			msg := models.OrderMessage{ChatID: chat.ID, ClientID: clientID, Type: models.MessageTypeText, Content: r.Content}
+			if err := db.Create(&msg).Error; err != nil {
+				continue
+			}
+			if cache != nil {
+				_ = cache.AddMessage(c.Request.Context(), chat.ID, msg)
+			}
+			orderchat.Broadcast(chat.ID, msg)
+		}
 	}
 }
