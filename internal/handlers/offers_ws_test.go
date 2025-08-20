@@ -61,6 +61,9 @@ func TestOffersWS(t *testing.T) {
 		t.Fatalf("dial: %v", err)
 	}
 	defer conn.Close()
+	if err := conn.WriteJSON(struct{}{}); err != nil {
+		t.Fatalf("init write: %v", err)
+	}
 
 	// create offer
 	w = httptest.NewRecorder()
