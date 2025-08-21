@@ -1,0 +1,44 @@
+name: Run seed (manual)
+on:
+    workflow_dispatch: {}
+
+jobs:
+    build-and-run-seed:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-go@v5
+              with: { go-version: "1.24.x" }
+            
+            - name: Build seeder
+              run: |
+                  mkdir -p build
+                  go mod download
+                  CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
+                    go build -ldflags="-s -w" -o build/seed ./cmd/seed
+            
+            - name: Upload seeder to server (temp)
+              uses: appleboy/scp-action@v0.1.7
+              with:
+                  host: ${{ secrets.SSH_HOST }}
+                  username: ${{ secrets.SSH_USER }}
+                  key: ${{ secrets.SSH_KEY }}
+                  source: "build/seed"
+                  target: "/opt/ptop/backend/tmp/seed-${{ github.sha }}"
+                  strip_components: 1
+            
+            - name: Move into current release and run
+              uses: appleboy/ssh-action@v1.0.3
+              with:
+                  host: ${{ secrets.SSH_HOST }}
+                  username: ${{ secrets.SSH_USER }}
+                  key: ${{ secrets.SSH_KEY }}
+                  script: |
+                      set -e
+                      REL=$(readlink -f /opt/ptop/backend/current)
+                      # перенесём бинарь в активный релиз
+                      mv /opt/ptop/backend/tmp/seed-${GITHUB_SHA} "$REL/seed"
+                      chmod +x "$REL/seed"
+                      # выполнить с теми же переменными, что у бэкенда
+                      set -a; . /etc/ptop/backend.env; set +a
+                      "$REL/seed"
