@@ -7,35 +7,37 @@ jobs:
     build-and-deploy:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
-            - uses: actions/setup-go@v5
-              with: { go-version: "1.24.x" }
-            - name: Build
-              run: |
-                  mkdir -p build
-                  go mod download
-                  CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
-                    go build -ldflags="-s -w" -o build/server ./cmd/server
-            - name: Upload binary
-              uses: appleboy/scp-action@v0.1.7
-              with:
-                  host: ${{ secrets.SSH_HOST }}
-                  username: ${{ secrets.SSH_USER }}
-                  key: ${{ secrets.SSH_KEY }}
-                  source: "build/server"
-                  target: "/opt/ptop/backend/releases/${{ github.sha }}/"
-                  strip_components: 1
-            - name: Activate & restart
-              uses: appleboy/ssh-action@v1.0.3
-              with:
-                  host: ${{ secrets.SSH_HOST }}
-                  username: ${{ secrets.SSH_USER }}
-                  key: ${{ secrets.SSH_KEY }}
-                  script: |
-                      set -e
-                      REL="/opt/ptop/backend/releases/${{ github.sha }}"
-                      test -f "$REL/server"
-                      chmod +x "$REL/server"
-                      ln -sfn "$REL" /opt/ptop/backend/current
-                      sudo systemctl restart ${SERVICE_NAME:-ptop-backend}
-                      sudo systemctl --no-pager -l status ${SERVICE_NAME:-ptop-backend}
+            -   uses: actions/checkout@v4
+            -   uses: actions/setup-go@v5
+                with: { go-version: "1.24.x" }
+            -   name: Build
+                run: |
+                    mkdir -p build
+                    go mod download
+                    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
+                      go build -ldflags="-s -w" -o build/server ./cmd/api
+            -   name: Upload binary
+                uses: appleboy/scp-action@v0.1.7
+                with:
+                    host: ${{ secrets.SSH_HOST }}
+                    username: ${{ secrets.SSH_USER }}
+                    key: ${{ secrets.SSH_KEY }}
+                    source: "build/server"
+                    target: "/opt/ptop/backend/releases/${{ github.sha }}/"
+                    strip_components: 1
+            -   name: Activate & restart
+                uses: appleboy/ssh-action@v1.0.3
+                with:
+                    host: ${{ secrets.SSH_HOST }}
+                    username: ${{ secrets.SSH_USER }}
+                    key: ${{ secrets.SSH_KEY }}
+                    script: |
+                        set -e
+                        REL="/opt/ptop/backend/releases/${{ github.sha }}"
+                        test -f "$REL/server"
+                        chmod +x "$REL/server"
+                        ln -sfn "$REL" /opt/ptop/backend/current
+                        sudo systemctl restart ${SERVICE_NAME:-ptop-backend}
+                        sudo systemctl --no-pager -l status ${SERVICE_NAME:-ptop-backend}
+                        curl -fsS http://127.0.0.1:8080/healthz || (sudo journalctl -u ${SERVICE_NAME:-ptop-backend} -n 200 --no-pager; exit 1)
+
