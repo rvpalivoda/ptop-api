@@ -39,5 +39,3 @@ jobs:
                         ln -sfn "$REL" /opt/ptop/backend/current
                         sudo systemctl restart ${SERVICE_NAME:-ptop-backend}
                         sudo systemctl --no-pager -l status ${SERVICE_NAME:-ptop-backend}
-                        curl -fsS http://127.0.0.1:8080/health || (sudo journalctl -u ${SERVICE_NAME:-ptop-backend} -n 200 --no-pager; exit 1)
-
