@@ -65,7 +65,7 @@ func Load() (*Config, error) {
 
 	corsEnv := os.Getenv("CORS_ALLOWED_ORIGINS")
 	if corsEnv == "" {
-		corsEnv = "https://api.nextasoft.asia"
+		corsEnv = "http://localhost:5173"
 	}
 	corsOrigins := strings.Split(corsEnv, ",")
 
