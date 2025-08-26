@@ -107,6 +107,7 @@ func setupTest(t *testing.T) (*gorm.DB, *gin.Engine, map[string]time.Duration) {
 	api.GET("/client/transactions/internal", ListClientTransactionsInternal(db))
 	api.GET("/client/orders", ListClientOrders(db))
 	api.POST("/client/orders", CreateOrder(db))
+	api.GET("/orders/:id", GetOrder(db))
 	api.GET("/orders/:id/messages", ListOrderMessages(db))
 	api.POST("/orders/:id/messages", CreateOrderMessage(db, store, cache))
 	api.PATCH("/orders/:id/messages/:msgId/read", ReadOrderMessage(db))

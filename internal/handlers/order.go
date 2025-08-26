@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"time"
 
@@ -202,6 +203,72 @@ func ListClientOrders(db *gorm.DB) gin.HandlerFunc {
 				ClientPaymentMethod: cpm,
 			}
 		}
+		c.JSON(http.StatusOK, res)
+	}
+}
+
+// GetOrder godoc
+// @Summary Получить ордер
+// @Tags orders
+// @Security BearerAuth
+// @Produce json
+// @Param id path string true "ID ордера"
+// @Success 200 {object} models.OrderFull
+// @Failure 403 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Router /orders/{id} [get]
+func GetOrder(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		orderID := c.Param("id")
+		clientIDVal, ok := c.Get("client_id")
+		if !ok {
+			c.JSON(http.StatusUnauthorized, ErrorResponse{Error: "no client"})
+			return
+		}
+		clientID := clientIDVal.(string)
+
+		var order models.Order
+		if err := db.Preload("Offer").
+			Preload("Buyer").
+			Preload("Seller").
+			Preload("Author").
+			Preload("OfferOwner").
+			Preload("FromAsset").
+			Preload("ToAsset").
+			Preload("ClientPaymentMethod").
+			Preload("ClientPaymentMethod.Country").
+			Preload("ClientPaymentMethod.PaymentMethod").
+			Where("id = ?", orderID).First(&order).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				c.JSON(http.StatusNotFound, ErrorResponse{Error: "invalid order"})
+			} else {
+				c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
+			}
+			return
+		}
+
+		if clientID != order.AuthorID && clientID != order.OfferOwnerID {
+			c.JSON(http.StatusForbidden, ErrorResponse{Error: "forbidden"})
+			return
+		}
+
+		var cpm *models.ClientPaymentMethod
+		if order.ClientPaymentMethodID != "" {
+			cpm = &order.ClientPaymentMethod
+		}
+
+		res := models.OrderFull{
+			Order:               order,
+			Offer:               order.Offer,
+			Buyer:               order.Buyer,
+			Seller:              order.Seller,
+			Author:              order.Author,
+			OfferOwner:          order.OfferOwner,
+			FromAsset:           order.FromAsset,
+			ToAsset:             order.ToAsset,
+			ClientPaymentMethod: cpm,
+		}
+
 		c.JSON(http.StatusOK, res)
 	}
 }
