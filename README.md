@@ -44,6 +44,25 @@ wss://<host>/ws/orders/{orderID}/chat
 ```
 
 Каждое отправленное сообщение будет сохранено в БД и рассылается всем подключённым участникам ордера.
+## Уведомления
+
+Для доставки событий (создание ордера, изменение статуса, входящие сообщения и т.п.) используется общий канал уведомлений.
+
+### Подключение по WebSocket
+
+```
+wss://<host>/ws/notifications
+```
+
+Перед подключением необходимо получить `access_token` и передать его в заголовке `Authorization: Bearer <token>` или в параметре `token`.
+
+После установления соединения сервер отправит все непрочитанные уведомления пользователя.
+
+### REST API
+
+- `GET /notifications` — список уведомлений с поддержкой пагинации.
+- `PATCH /notifications/{id}/read` — отметка уведомления как прочитанного.
+
 ## Примеры подключения к WebSocket из React
 
 ### Получение уведомлений о создании ордеров
@@ -107,6 +126,16 @@ useEffect(() => {
 ```tsx
 useEffect(() => {
   const ws = new WebSocket(`wss://api.example.com/ws/offers?token=${token}`);
+  ws.onmessage = (evt) => console.log(JSON.parse(evt.data));
+  return () => ws.close();
+}, [token]);
+```
+
+### Лента уведомлений
+
+```tsx
+useEffect(() => {
+  const ws = new WebSocket(`wss://api.example.com/ws/notifications?token=${token}`);
   ws.onmessage = (evt) => console.log(JSON.parse(evt.data));
   return () => ws.close();
 }, [token]);

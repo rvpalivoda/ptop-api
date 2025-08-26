@@ -14,7 +14,7 @@ type Notification struct {
 	ID        string          `gorm:"primaryKey;size:21" json:"id"`
 	ClientID  string          `gorm:"size:21;not null;index" json:"clientID"`
 	Type      string          `gorm:"type:varchar(255);not null" json:"type"`
-	Payload   json.RawMessage `gorm:"type:jsonb" json:"payload"`
+	Payload   json.RawMessage `gorm:"type:jsonb" json:"payload" swaggertype:"object"`
 	SentAt    *time.Time      `gorm:"index" json:"sentAt"`
 	ReadAt    *time.Time      `gorm:"index" json:"readAt"`
 	CreatedAt time.Time       `gorm:"autoCreateTime" json:"createdAt"`

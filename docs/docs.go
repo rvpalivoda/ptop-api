@@ -1602,6 +1602,86 @@ const docTemplate = `{
                 }
             }
         },
+        "/notifications": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "notifications"
+                ],
+                "summary": "Список уведомлений клиента",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "лимит",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "смещение",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Notification"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/notifications/{id}/read": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "notifications"
+                ],
+                "summary": "Отметить уведомление прочитанным",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID уведомления",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Notification"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/offers": {
             "get": {
                 "security": [
@@ -1887,19 +1967,53 @@ const docTemplate = `{
                 }
             }
         },
-        "/ws/offers": {
+        "/ws/notifications": {
             "get": {
-                "security": [
+                "description": "Подключает клиента к потоку уведомлений. После подключения сервер отправляет непрочитанные уведомления.",
+                "tags": [
+                    "notifications"
+                ],
+                "summary": "Websocket уведомлений",
+                "parameters": [
                     {
-                        "BearerAuth": []
+                        "type": "string",
+                        "description": "access token",
+                        "name": "token",
+                        "in": "query",
+                        "required": true
                     }
                 ],
+                "responses": {
+                    "101": {
+                        "description": "Switching Protocols",
+                        "schema": {
+                            "$ref": "#/definitions/models.Notification"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/ws/offers": {
+            "get": {
                 "description": "Подключение для получения событий CRUD по активным офферам. При отключении оффера отправляется событие deleted.",
                 "tags": [
                     "offers"
                 ],
                 "summary": "WebSocket обновления офферов",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "access token",
+                        "name": "token",
+                        "in": "query",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "канал",
@@ -1925,16 +2039,20 @@ const docTemplate = `{
         },
         "/ws/orders": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
                 "description": "После подключения авторизованный клиент получает события OrderEvent о создании своих ордеров.",
                 "tags": [
                     "orders"
                 ],
                 "summary": "Websocket ордеров клиента",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "access token",
+                        "name": "token",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "101": {
                         "description": "Switching Protocols",
@@ -1953,17 +2071,19 @@ const docTemplate = `{
         },
         "/ws/orders/{id}/chat": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
                 "description": "Подключает покупателя и продавца к чату ордера.",
                 "tags": [
                     "orders"
                 ],
                 "summary": "Websocket чат ордера",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "access token",
+                        "name": "token",
+                        "in": "query",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "ID ордера",
@@ -1996,17 +2116,19 @@ const docTemplate = `{
         },
         "/ws/orders/{id}/status": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
                 "description": "Позволяет автору и владельцу оффера получать события OrderStatusEvent при каждом изменении статуса указанного ордера.",
                 "tags": [
                     "orders"
                 ],
                 "summary": "Websocket уведомлений о статусе ордера",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "access token",
+                        "name": "token",
+                        "in": "query",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "ID ордера",
@@ -2689,6 +2811,35 @@ const docTemplate = `{
                 "MessageTypeSystem",
                 "MessageTypeFile"
             ]
+        },
+        "models.Notification": {
+            "type": "object",
+            "properties": {
+                "clientID": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "payload": {
+                    "type": "object"
+                },
+                "readAt": {
+                    "type": "string"
+                },
+                "sentAt": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
         },
         "models.Offer": {
             "type": "object",
