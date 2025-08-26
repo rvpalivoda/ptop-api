@@ -179,6 +179,10 @@ func TestOrderHandler(t *testing.T) {
 	if ord.Status != models.OrderStatusWaitPayment {
 		t.Fatalf("unexpected status %s", ord.Status)
 	}
+	var n models.Notification
+	if err := db.Where("client_id = ? AND type = ?", seller.ID, "order.created").First(&n).Error; err != nil {
+		t.Fatalf("notification: %v", err)
+	}
 
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/client/orders", nil)

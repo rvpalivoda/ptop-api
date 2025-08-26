@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"net/http"
 	"sync"
 
@@ -9,6 +10,7 @@ import (
 	"gorm.io/gorm"
 
 	"ptop/internal/models"
+	"ptop/internal/notifications"
 )
 
 // OrderStatusEvent уведомление об изменении статуса ордера.
@@ -25,6 +27,22 @@ var orderStatusClients = struct {
 
 func sendOrderStatusEvent(conn *websocket.Conn, ord models.OrderFull) error {
 	return conn.WriteJSON(OrderStatusEvent{Type: "order.status_changed", Order: ord})
+}
+
+func createOrderStatusNotifications(db *gorm.DB, ord models.Order) {
+	payload, err := json.Marshal(map[string]string{
+		"orderId": ord.ID,
+		"status":  string(ord.Status),
+	})
+	if err != nil {
+		return
+	}
+	for _, cid := range []string{ord.AuthorID, ord.OfferOwnerID} {
+		n := models.Notification{ClientID: cid, Type: "order.status_changed", Payload: payload}
+		if err := db.Create(&n).Error; err == nil {
+			notifications.Broadcast(cid, n)
+		}
+	}
 }
 
 func broadcastOrderStatus(order models.Order) {
