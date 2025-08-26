@@ -171,7 +171,8 @@ func TestOrderStatusWS(t *testing.T) {
 	}
 	broadcastOrderStatus(full)
 
-	var evt orderStatusEvent
+	// используем экспортируемый тип события об изменении статуса
+	var evt OrderStatusEvent
 	if err := buyerConn.ReadJSON(&evt); err != nil {
 		t.Fatalf("buyer read: %v", err)
 	}
