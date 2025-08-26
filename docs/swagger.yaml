@@ -1932,6 +1932,34 @@ paths:
       summary: Список активных объявлений
       tags:
       - offers
+  /orders/{id}:
+    get:
+      parameters:
+      - description: ID ордера
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.OrderFull'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Получить ордер
+      tags:
+      - orders
   /orders/{id}/messages:
     get:
       description: Возвращает историю переписки. Новые сообщения приходят в реальном

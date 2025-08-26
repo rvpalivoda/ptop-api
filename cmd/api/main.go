@@ -114,6 +114,7 @@ func main() {
 
 	api.POST("/client/order", handlers.CreateOrder(gormDB))
 	api.GET("/client/orders", handlers.ListClientOrders(gormDB))
+	api.GET("/orders/:id", handlers.GetOrder(gormDB))
 	api.GET("/notifications", handlers.ListNotifications(gormDB))
 	api.POST("/notifications/:id/read", handlers.ReadNotification(gormDB))
 	api.POST("/notifications/read-all", handlers.ReadAllNotifications(gormDB))
