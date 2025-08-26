@@ -18,7 +18,7 @@ import (
 // @Param id path string true "ID уведомления"
 // @Success 200 {object} models.Notification
 // @Failure 404 {object} ErrorResponse
-// @Router /notifications/{id}/read [patch]
+// @Router /notifications/{id}/read [post]
 func ReadNotification(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		clientIDVal, ok := c.Get("client_id")

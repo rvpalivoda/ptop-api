@@ -45,7 +45,7 @@ func TestNotificationsWS(t *testing.T) {
 		t.Fatalf("query client: %v", err)
 	}
 
-	n1 := models.Notification{ClientID: client.ID, Type: "test1"}
+	n1 := models.Notification{ClientID: client.ID, Type: "test1", LinkTo: "/link1"}
 	if err := db.Create(&n1).Error; err != nil {
 		t.Fatalf("create n1: %v", err)
 	}
@@ -68,7 +68,7 @@ func TestNotificationsWS(t *testing.T) {
 		t.Fatalf("unexpected initial %s", recv.ID)
 	}
 
-	n2 := models.Notification{ClientID: client.ID, Type: "test2"}
+	n2 := models.Notification{ClientID: client.ID, Type: "test2", LinkTo: "/link2"}
 	if err := db.Create(&n2).Error; err != nil {
 		t.Fatalf("create n2: %v", err)
 	}

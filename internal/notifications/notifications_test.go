@@ -51,7 +51,7 @@ func dialWS(t *testing.T, ch chan<- models.Notification) *websocket.Conn {
 
 func TestSend(t *testing.T) {
 	db := setupDB(t)
-	n := models.Notification{ClientID: "c1", Type: "test"}
+	n := models.Notification{ClientID: "c1", Type: "test", LinkTo: "/link"}
 	if err := db.Create(&n).Error; err != nil {
 		t.Fatalf("create: %v", err)
 	}
@@ -104,7 +104,7 @@ func TestSend(t *testing.T) {
 func TestBroadcast(t *testing.T) {
 	db := setupDB(t)
 	clientID := "c1"
-	n := models.Notification{ClientID: clientID, Type: "test"}
+	n := models.Notification{ClientID: clientID, Type: "test", LinkTo: "/link"}
 	if err := db.Create(&n).Error; err != nil {
 		t.Fatalf("create: %v", err)
 	}

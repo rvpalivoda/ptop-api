@@ -1636,8 +1636,32 @@
                 }
             }
         },
+        "/notifications/read-all": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "notifications"
+                ],
+                "summary": "Отметить все уведомления прочитанными",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.NotificationsReadAllResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/notifications/{id}/read": {
-            "patch": {
+            "post": {
                 "security": [
                     {
                         "BearerAuth": []
@@ -1994,8 +2018,7 @@
         },
         "/ws/offers": {
             "get": {
-                "description": "Подключение для получения событий CRUD по активным офферам. При отключении оффера отправляется событие deleted.",
-
+                "description": "Подключение для получения событий CRUD по активным офферам.",
                 "tags": [
                     "offers"
                 ],
@@ -2350,6 +2373,14 @@
                 },
                 "word": {
                     "type": "string"
+                }
+            }
+        },
+        "handlers.NotificationsReadAllResponse": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
                 }
             }
         },
@@ -2816,6 +2847,9 @@
                     "type": "string"
                 },
                 "id": {
+                    "type": "string"
+                },
+                "linkTo": {
                     "type": "string"
                 },
                 "payload": {

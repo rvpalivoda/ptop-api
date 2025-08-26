@@ -115,7 +115,8 @@ func main() {
 	api.POST("/client/order", handlers.CreateOrder(gormDB))
 	api.GET("/client/orders", handlers.ListClientOrders(gormDB))
 	api.GET("/notifications", handlers.ListNotifications(gormDB))
-	api.PATCH("/notifications/:id/read", handlers.ReadNotification(gormDB))
+	api.POST("/notifications/:id/read", handlers.ReadNotification(gormDB))
+	api.POST("/notifications/read-all", handlers.ReadAllNotifications(gormDB))
 
 	ws := r.Group("/ws")
 	ws.Use(handlers.AuthMiddleware(gormDB))

@@ -38,7 +38,7 @@ func createOrderStatusNotifications(db *gorm.DB, ord models.Order) {
 		return
 	}
 	for _, cid := range []string{ord.AuthorID, ord.OfferOwnerID} {
-		n := models.Notification{ClientID: cid, Type: "order.status_changed", Payload: payload}
+		n := models.Notification{ClientID: cid, Type: "order.status_changed", Payload: payload, LinkTo: "/orders/" + ord.ID}
 		if err := db.Create(&n).Error; err == nil {
 			notifications.Broadcast(cid, n)
 		}
