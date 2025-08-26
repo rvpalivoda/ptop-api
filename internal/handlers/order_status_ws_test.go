@@ -169,6 +169,7 @@ func TestOrderStatusWS(t *testing.T) {
 		Where("id = ?", ord.ID).First(&full).Error; err != nil {
 		t.Fatalf("preload: %v", err)
 	}
+	createOrderStatusNotifications(db, full)
 	broadcastOrderStatus(full)
 
 	// используем экспортируемый тип события об изменении статуса
@@ -184,5 +185,12 @@ func TestOrderStatusWS(t *testing.T) {
 	}
 	if evt.Type != "order.status_changed" || evt.Order.Status != models.OrderStatusPaid {
 		t.Fatalf("unexpected seller event %#v", evt)
+	}
+	var n1, n2 models.Notification
+	if err := db.Where("client_id = ? AND type = ?", buyer.ID, "order.status_changed").First(&n1).Error; err != nil {
+		t.Fatalf("buyer notification: %v", err)
+	}
+	if err := db.Where("client_id = ? AND type = ?", seller.ID, "order.status_changed").First(&n2).Error; err != nil {
+		t.Fatalf("seller notification: %v", err)
 	}
 }

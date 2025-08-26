@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"net/http"
 	"time"
 
@@ -10,6 +11,7 @@ import (
 	"gorm.io/gorm"
 
 	"ptop/internal/models"
+	"ptop/internal/notifications"
 )
 
 type OrderRequest struct {
@@ -87,44 +89,50 @@ func CreateOrder(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
 			return
 		}
-var full models.Order
-if err := db.Preload("Offer").
-	Preload("Buyer").
-	Preload("Seller").
-	Preload("Author").
-	Preload("OfferOwner").
-	Preload("FromAsset").
-	Preload("ToAsset").
-	Preload("ClientPaymentMethod").
-	Preload("ClientPaymentMethod.Country").
-	Preload("ClientPaymentMethod.PaymentMethod").
-	Where("id = ?", order.ID).
-	First(&full).Error; err == nil {
+		if payload, err := json.Marshal(map[string]string{"orderId": order.ID}); err == nil {
+			n := models.Notification{ClientID: order.OfferOwnerID, Type: "order.created", Payload: payload}
+			if err := db.Create(&n).Error; err == nil {
+				notifications.Broadcast(order.OfferOwnerID, n)
+			}
+		}
+		var full models.Order
+		if err := db.Preload("Offer").
+			Preload("Buyer").
+			Preload("Seller").
+			Preload("Author").
+			Preload("OfferOwner").
+			Preload("FromAsset").
+			Preload("ToAsset").
+			Preload("ClientPaymentMethod").
+			Preload("ClientPaymentMethod.Country").
+			Preload("ClientPaymentMethod.PaymentMethod").
+			Where("id = ?", order.ID).
+			First(&full).Error; err == nil {
+			createOrderStatusNotifications(db, full)
+			// Новый вызов из ветки codex/add-broadcastorderstatus-function
+			broadcastOrderStatus(full)
 
-	// Новый вызов из ветки codex/add-broadcastorderstatus-function
-	broadcastOrderStatus(full)
+			// Логика из master остаётся
+			var cpm *models.ClientPaymentMethod
+			if full.ClientPaymentMethodID != "" {
+				cpm = &full.ClientPaymentMethod
+			}
 
-	// Логика из master остаётся
-	var cpm *models.ClientPaymentMethod
-	if full.ClientPaymentMethodID != "" {
-		cpm = &full.ClientPaymentMethod
-	}
+			of := models.OrderFull{
+				Order:               full,
+				Offer:               full.Offer,
+				Buyer:               full.Buyer,
+				Seller:              full.Seller,
+				Author:              full.Author,
+				OfferOwner:          full.OfferOwner,
+				FromAsset:           full.FromAsset,
+				ToAsset:             full.ToAsset,
+				ClientPaymentMethod: cpm,
+			}
 
-	of := models.OrderFull{
-		Order:               full,
-		Offer:               full.Offer,
-		Buyer:               full.Buyer,
-		Seller:              full.Seller,
-		Author:              full.Author,
-		OfferOwner:          full.OfferOwner,
-		FromAsset:           full.FromAsset,
-		ToAsset:             full.ToAsset,
-		ClientPaymentMethod: cpm,
-	}
-
-	// Можно использовать full.OfferOwnerID, он уже загружен
-	broadcastOrderEvent(full.OfferOwnerID, newOrderEvent(of))
-}
+			// Можно использовать full.OfferOwnerID, он уже загружен
+			broadcastOrderEvent(full.OfferOwnerID, newOrderEvent(of))
+		}
 
 		c.JSON(http.StatusOK, order)
 	}

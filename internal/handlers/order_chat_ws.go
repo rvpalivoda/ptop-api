@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 
@@ -8,6 +9,7 @@ import (
 	"gorm.io/gorm"
 
 	"ptop/internal/models"
+	"ptop/internal/notifications"
 	"ptop/internal/orderchat"
 	"ptop/internal/services"
 )
@@ -90,6 +92,16 @@ func OrderChatWS(db *gorm.DB, cache *services.ChatCache) gin.HandlerFunc {
 			}
 			if cache != nil {
 				_ = cache.AddMessage(c.Request.Context(), chat.ID, msg)
+			}
+			otherID := order.BuyerID
+			if clientID == order.BuyerID {
+				otherID = order.SellerID
+			}
+			if payload, err := json.Marshal(map[string]string{"orderId": order.ID, "messageId": msg.ID}); err == nil {
+				n := models.Notification{ClientID: otherID, Type: "chat.message", Payload: payload}
+				if err := db.Create(&n).Error; err == nil {
+					notifications.Broadcast(otherID, n)
+				}
 			}
 			orderchat.Broadcast(chat.ID, msg)
 		}

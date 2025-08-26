@@ -159,6 +159,14 @@ func TestOrderChatWS(t *testing.T) {
 		t.Fatalf("unexpected echo %#v", echo)
 	}
 	buyerConn.Close()
+	var notif models.Notification
+	if err := db.Where("client_id = ? AND type = ?", seller.ID, "chat.message").First(&notif).Error; err != nil {
+		t.Fatalf("seller notification: %v", err)
+	}
+	var none models.Notification
+	if err := db.Where("client_id = ? AND type = ?", buyer.ID, "chat.message").First(&none).Error; err == nil {
+		t.Fatalf("buyer should not have notification")
+	}
 
 	// seller connects after message and receives history
 	header = http.Header{"Authorization": {"Bearer " + sellerTok.AccessToken}}

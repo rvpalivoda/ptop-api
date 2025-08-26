@@ -57,6 +57,7 @@ func setupTest(t *testing.T) (*gorm.DB, *gin.Engine, map[string]time.Duration) {
 		&models.TransactionIn{},
 		&models.TransactionOut{},
 		&models.TransactionInternal{},
+		&models.Notification{},
 	); err != nil {
 		t.Fatalf("migrate: %v", err)
 	}
