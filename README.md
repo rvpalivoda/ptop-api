@@ -33,7 +33,9 @@ Rest api на golang, gin, postgresql, GORN ORM.
 wss://<host>/ws/orders/{orderID}/chat
 ```
 
-Перед подключением клиент должен получить `access_token` и передать его в заголовке `Authorization: Bearer <token>`.
+Перед подключением клиент должен получить `access_token`.
+В серверных приложениях токен передаётся в заголовке `Authorization: Bearer <token>`.
+В браузере (например, в React-приложении) токен можно добавить в query-параметр `token`.
 
 После подключения сервер отправит историю последних сообщений из кеша Redis. Чтобы отправить новое сообщение, нужно послать JSON:
 
@@ -42,6 +44,76 @@ wss://<host>/ws/orders/{orderID}/chat
 ```
 
 Каждое отправленное сообщение будет сохранено в БД и рассылается всем подключённым участникам ордера.
+## Примеры подключения к WebSocket из React
+
+### Получение уведомлений о создании ордеров
+
+```tsx
+import { useEffect } from "react";
+
+export function useOrdersWS(token: string) {
+  useEffect(() => {
+    const ws = new WebSocket(`wss://api.example.com/ws/orders?token=${token}`);
+
+    ws.onmessage = (evt) => {
+      const event = JSON.parse(evt.data);
+      console.log("Новый ордер", event);
+    };
+
+    return () => ws.close();
+  }, [token]);
+}
+```
+
+### Чат ордера
+
+```tsx
+import { useEffect, useRef } from "react";
+
+export function useOrderChat(orderId: string, token: string) {
+  const socketRef = useRef<WebSocket | null>(null);
+
+  useEffect(() => {
+    const ws = new WebSocket(`wss://api.example.com/ws/orders/${orderId}/chat?token=${token}`);
+    socketRef.current = ws;
+
+    ws.onmessage = (evt) => {
+      const message = JSON.parse(evt.data);
+      console.log("Сообщение", message);
+    };
+
+    return () => ws.close();
+  }, [orderId, token]);
+
+  const send = (content: string) =>
+    socketRef.current?.send(JSON.stringify({ content }));
+
+  return { send };
+}
+```
+
+### Статус ордера
+
+```tsx
+useEffect(() => {
+  const ws = new WebSocket(`wss://api.example.com/ws/orders/${orderId}/status?token=${token}`);
+  ws.onmessage = (evt) => console.log(JSON.parse(evt.data));
+  return () => ws.close();
+}, [orderId, token]);
+```
+
+### Обновления офферов
+
+```tsx
+useEffect(() => {
+  const ws = new WebSocket(`wss://api.example.com/ws/offers?token=${token}`);
+  ws.onmessage = (evt) => console.log(JSON.parse(evt.data));
+  return () => ws.close();
+}, [token]);
+```
+
+> Во всех примерах предполагается, что `token` содержит `access_token`.
+
 
 ## MinIO для хранения файлов
 
