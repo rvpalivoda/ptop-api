@@ -50,9 +50,8 @@ func TestNotificationsWS(t *testing.T) {
 		t.Fatalf("create n1: %v", err)
 	}
 
-	wsURL := "ws" + strings.TrimPrefix(srv.URL, "http") + "/ws/notifications"
-	header := http.Header{"Authorization": {"Bearer " + tok.AccessToken}}
-	conn, resp, err := websocket.DefaultDialer.Dial(wsURL, header)
+	wsURL := "ws" + strings.TrimPrefix(srv.URL, "http") + "/ws/notifications?token=" + tok.AccessToken
+	conn, resp, err := websocket.DefaultDialer.Dial(wsURL, nil)
 	if err != nil {
 		t.Fatalf("dial: %v", err)
 	}

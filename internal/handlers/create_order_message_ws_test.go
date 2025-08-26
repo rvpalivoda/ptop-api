@@ -117,9 +117,8 @@ func TestCreateOrderMessageBroadcast(t *testing.T) {
 	json.Unmarshal(w.Body.Bytes(), &ord)
 
 	// seller connects via WebSocket
-	wsURL := "ws" + strings.TrimPrefix(srv.URL, "http") + "/ws/orders/" + ord.ID + "/chat"
-	header := http.Header{"Authorization": {"Bearer " + sellerTok.AccessToken}}
-	conn, resp, err := websocket.DefaultDialer.Dial(wsURL, header)
+	wsURL := "ws" + strings.TrimPrefix(srv.URL, "http") + "/ws/orders/" + ord.ID + "/chat?token=" + sellerTok.AccessToken
+	conn, resp, err := websocket.DefaultDialer.Dial(wsURL, nil)
 	if err != nil {
 		t.Fatalf("seller dial: %v", err)
 	}

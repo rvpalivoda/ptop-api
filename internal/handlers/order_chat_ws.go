@@ -20,7 +20,7 @@ import (
 // После подключения сервер отправляет историю сообщений (models.OrderMessage).
 // Клиент отправляет новые сообщения в формате OrderMessageRequest, а получает сообщения типа models.OrderMessage.
 // @Tags orders
-// @Security BearerAuth
+// @Param token query string true "access token"
 // @Param id path string true "ID ордера"
 // @Success 101 {object} models.OrderMessage "Switching Protocols"
 // @Failure 403 {object} ErrorResponse

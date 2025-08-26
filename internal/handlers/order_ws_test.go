@@ -93,10 +93,9 @@ func TestOrdersWSOrderCreated(t *testing.T) {
 		t.Fatalf("offer: %v", err)
 	}
 
-	wsURL := "ws" + strings.TrimPrefix(srv.URL, "http") + "/ws/orders"
+	wsURL := "ws" + strings.TrimPrefix(srv.URL, "http") + "/ws/orders?token=" + sellerTok.AccessToken
 
-	header := http.Header{"Authorization": {"Bearer " + sellerTok.AccessToken}}
-	sellerConn, resp, err := websocket.DefaultDialer.Dial(wsURL, header)
+	sellerConn, resp, err := websocket.DefaultDialer.Dial(wsURL, nil)
 	if err != nil {
 		t.Fatalf("seller dial: %v", err)
 	}
