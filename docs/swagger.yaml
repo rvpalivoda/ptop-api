@@ -426,6 +426,25 @@ definitions:
     - MessageTypeText
     - MessageTypeSystem
     - MessageTypeFile
+  models.Notification:
+    properties:
+      clientID:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: string
+      payload:
+        type: object
+      readAt:
+        type: string
+      sentAt:
+        type: string
+      type:
+        type: string
+      updatedAt:
+        type: string
+    type: object
   models.Offer:
     properties:
       TTL:
@@ -1794,6 +1813,55 @@ paths:
       summary: Проверка состояния сервиса
       tags:
       - health
+  /notifications:
+    get:
+      parameters:
+      - description: лимит
+        in: query
+        name: limit
+        type: integer
+      - description: смещение
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Notification'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Список уведомлений клиента
+      tags:
+      - notifications
+  /notifications/{id}/read:
+    patch:
+      parameters:
+      - description: ID уведомления
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Notification'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Отметить уведомление прочитанным
+      tags:
+      - notifications
   /offers:
     get:
       parameters:
@@ -1978,10 +2046,37 @@ paths:
       summary: Список платёжных методов
       tags:
       - reference
+  /ws/notifications:
+    get:
+      description: Подключает клиента к потоку уведомлений. После подключения сервер
+        отправляет непрочитанные уведомления.
+      parameters:
+      - description: access token
+        in: query
+        name: token
+        required: true
+        type: string
+      responses:
+        "101":
+          description: Switching Protocols
+          schema:
+            $ref: '#/definitions/models.Notification'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Websocket уведомлений
+      tags:
+      - notifications
   /ws/offers:
     get:
       description: Подключение для получения событий CRUD по офферам.
       parameters:
+      - description: access token
+        in: query
+        name: token
+        required: true
+        type: string
       - description: канал
         in: query
         name: channel
@@ -1995,8 +2090,6 @@ paths:
           description: Forbidden
           schema:
             $ref: '#/definitions/handlers.ErrorResponse'
-      security:
-      - BearerAuth: []
       summary: WebSocket обновления офферов
       tags:
       - offers
@@ -2004,6 +2097,12 @@ paths:
     get:
       description: После подключения авторизованный клиент получает события OrderEvent
         о создании своих ордеров.
+      parameters:
+      - description: access token
+        in: query
+        name: token
+        required: true
+        type: string
       responses:
         "101":
           description: Switching Protocols
@@ -2013,8 +2112,6 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/handlers.ErrorResponse'
-      security:
-      - BearerAuth: []
       summary: Websocket ордеров клиента
       tags:
       - orders
@@ -2022,6 +2119,11 @@ paths:
     get:
       description: Подключает покупателя и продавца к чату ордера.
       parameters:
+      - description: access token
+        in: query
+        name: token
+        required: true
+        type: string
       - description: ID ордера
         in: path
         name: id
@@ -2040,8 +2142,6 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/handlers.ErrorResponse'
-      security:
-      - BearerAuth: []
       summary: Websocket чат ордера
       tags:
       - orders
@@ -2050,6 +2150,11 @@ paths:
       description: Позволяет автору и владельцу оффера получать события OrderStatusEvent
         при каждом изменении статуса указанного ордера.
       parameters:
+      - description: access token
+        in: query
+        name: token
+        required: true
+        type: string
       - description: ID ордера
         in: path
         name: id
@@ -2068,8 +2173,6 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/handlers.ErrorResponse'
-      security:
-      - BearerAuth: []
       summary: Websocket уведомлений о статусе ордера
       tags:
       - orders
