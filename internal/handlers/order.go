@@ -90,7 +90,7 @@ func CreateOrder(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		if payload, err := json.Marshal(map[string]string{"orderId": order.ID}); err == nil {
-			n := models.Notification{ClientID: order.OfferOwnerID, Type: "order.created", Payload: payload}
+			n := models.Notification{ClientID: order.OfferOwnerID, Type: "order.created", Payload: payload, LinkTo: "/orders/" + order.ID}
 			if err := db.Create(&n).Error; err == nil {
 				notifications.Broadcast(order.OfferOwnerID, n)
 			}

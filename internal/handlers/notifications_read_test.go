@@ -57,14 +57,14 @@ func TestReadNotification(t *testing.T) {
 	db.Where("username = ?", "user1").First(&client1)
 
 	// create notification for user1
-	n := models.Notification{ClientID: client1.ID, Type: "test"}
+	n := models.Notification{ClientID: client1.ID, Type: "test", LinkTo: "/link"}
 	if err := db.Create(&n).Error; err != nil {
 		t.Fatalf("create notification: %v", err)
 	}
 
 	// user1 marks notification read
 	w = httptest.NewRecorder()
-	req, _ = http.NewRequest("PATCH", "/notifications/"+n.ID+"/read", nil)
+	req, _ = http.NewRequest("POST", "/notifications/"+n.ID+"/read", nil)
 	req.Header.Set("Authorization", "Bearer "+tok1.AccessToken)
 	r.ServeHTTP(w, req)
 	if w.Code != http.StatusOK {
@@ -78,7 +78,7 @@ func TestReadNotification(t *testing.T) {
 
 	// user2 tries to mark someone else's notification
 	w = httptest.NewRecorder()
-	req, _ = http.NewRequest("PATCH", "/notifications/"+n.ID+"/read", nil)
+	req, _ = http.NewRequest("POST", "/notifications/"+n.ID+"/read", nil)
 	req.Header.Set("Authorization", "Bearer "+tok2.AccessToken)
 	r.ServeHTTP(w, req)
 	if w.Code != http.StatusNotFound {

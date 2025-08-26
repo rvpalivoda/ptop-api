@@ -59,14 +59,14 @@ func TestListNotifications(t *testing.T) {
 
 	// create notifications for user1
 	var n1, n2, n3 models.Notification
-	n1 = models.Notification{ClientID: client1.ID, Type: "test"}
+	n1 = models.Notification{ClientID: client1.ID, Type: "test", LinkTo: "/link1"}
 	db.Create(&n1)
-	n2 = models.Notification{ClientID: client1.ID, Type: "test"}
+	n2 = models.Notification{ClientID: client1.ID, Type: "test", LinkTo: "/link2"}
 	db.Create(&n2)
-	n3 = models.Notification{ClientID: client1.ID, Type: "test"}
+	n3 = models.Notification{ClientID: client1.ID, Type: "test", LinkTo: "/link3"}
 	db.Create(&n3)
 	// create notification for user2
-	db.Create(&models.Notification{ClientID: client2.ID, Type: "test"})
+	db.Create(&models.Notification{ClientID: client2.ID, Type: "test", LinkTo: "/link4"})
 
 	// user1 list first page
 	w = httptest.NewRecorder()

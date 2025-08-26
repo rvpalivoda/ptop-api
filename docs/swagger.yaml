@@ -128,6 +128,11 @@ definitions:
       word:
         type: string
     type: object
+  handlers.NotificationsReadAllResponse:
+    properties:
+      count:
+        type: integer
+    type: object
   handlers.OfferEvent:
     properties:
       offer:
@@ -433,6 +438,8 @@ definitions:
       createdAt:
         type: string
       id:
+        type: string
+      linkTo:
         type: string
       payload:
         type: object
@@ -1839,7 +1846,7 @@ paths:
       tags:
       - notifications
   /notifications/{id}/read:
-    patch:
+    post:
       parameters:
       - description: ID уведомления
         in: path
@@ -1860,6 +1867,20 @@ paths:
       security:
       - BearerAuth: []
       summary: Отметить уведомление прочитанным
+      tags:
+      - notifications
+  /notifications/read-all:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.NotificationsReadAllResponse'
+      security:
+      - BearerAuth: []
+      summary: Отметить все уведомления прочитанными
       tags:
       - notifications
   /offers:
@@ -2070,7 +2091,7 @@ paths:
       - notifications
   /ws/offers:
     get:
-      description: Подключение для получения событий CRUD по активным офферам. При отключении оффера отправляется событие deleted.
+      description: Подключение для получения событий CRUD по активным офферам.
       parameters:
       - description: access token
         in: query

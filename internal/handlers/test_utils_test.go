@@ -111,7 +111,8 @@ func setupTest(t *testing.T) (*gorm.DB, *gin.Engine, map[string]time.Duration) {
 	api.POST("/orders/:id/messages", CreateOrderMessage(db, store, cache))
 	api.PATCH("/orders/:id/messages/:msgId/read", ReadOrderMessage(db))
 	api.GET("/notifications", ListNotifications(db))
-	api.PATCH("/notifications/:id/read", ReadNotification(db))
+	api.POST("/notifications/:id/read", ReadNotification(db))
+	api.POST("/notifications/read-all", ReadAllNotifications(db))
 
 	maxOffers := 1
 	api.GET("/offers", ListOffers(db))

@@ -98,7 +98,7 @@ func OrderChatWS(db *gorm.DB, cache *services.ChatCache) gin.HandlerFunc {
 				otherID = order.SellerID
 			}
 			if payload, err := json.Marshal(map[string]string{"orderId": order.ID, "messageId": msg.ID}); err == nil {
-				n := models.Notification{ClientID: otherID, Type: "chat.message", Payload: payload}
+				n := models.Notification{ClientID: otherID, Type: "chat.message", Payload: payload, LinkTo: "/orders/" + order.ID}
 				if err := db.Create(&n).Error; err == nil {
 					notifications.Broadcast(otherID, n)
 				}
