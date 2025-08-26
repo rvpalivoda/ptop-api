@@ -14,7 +14,7 @@ import (
 // @Summary Websocket уведомлений
 // @Description Подключает клиента к потоку уведомлений. После подключения сервер отправляет непрочитанные уведомления.
 // @Tags notifications
-// @Security BearerAuth
+// @Param token query string true "access token"
 // @Success 101 {object} models.Notification "Switching Protocols"
 // @Failure 401 {object} ErrorResponse
 // @Router /ws/notifications [get]

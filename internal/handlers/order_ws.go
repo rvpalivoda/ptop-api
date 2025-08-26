@@ -42,7 +42,7 @@ func broadcastOrderEvent(clientID string, evt OrderEvent) {
 // @Description После подключения авторизованный клиент получает события OrderEvent о создании своих ордеров.
 // Клиенту не нужно отправлять данные, соединение используется только для чтения.
 // @Tags orders
-// @Security BearerAuth
+// @Param token query string true "access token"
 // @Success 101 {object} handlers.OrderEvent "Switching Protocols"
 // @Failure 401 {object} ErrorResponse
 // @Router /ws/orders [get]

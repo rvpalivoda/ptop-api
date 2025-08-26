@@ -27,7 +27,7 @@ var offerWSConns = struct {
 // Клиенту необходимо установить соединение и при необходимости передать query `channel`.
 // В ответ сервер отправляет сообщения формата OfferEvent: {"type":"created","offer":OfferFull}.
 // @Tags offers
-// @Security BearerAuth
+// @Param token query string true "access token"
 // @Param channel query string false "канал"
 // @Success 101 {object} handlers.OfferEvent "Switching Protocols"
 // @Failure 403 {object} ErrorResponse

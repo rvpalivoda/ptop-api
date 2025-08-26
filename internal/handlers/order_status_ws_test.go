@@ -126,17 +126,16 @@ func TestOrderStatusWS(t *testing.T) {
 	var ord models.Order
 	json.Unmarshal(w.Body.Bytes(), &ord)
 
-	wsURL := "ws" + strings.TrimPrefix(srv.URL, "http") + "/ws/orders/" + ord.ID + "/status"
+	wsURL := "ws" + strings.TrimPrefix(srv.URL, "http") + "/ws/orders/" + ord.ID + "/status?token=" + hackerTok.AccessToken
 
 	// hacker tries to connect
-	header := http.Header{"Authorization": {"Bearer " + hackerTok.AccessToken}}
-	_, resp, err := websocket.DefaultDialer.Dial(wsURL, header)
+	_, resp, err := websocket.DefaultDialer.Dial(wsURL, nil)
 	if err == nil || resp == nil || resp.StatusCode != http.StatusForbidden {
 		t.Fatalf("expected forbidden, got %v %v", err, resp)
 	}
 
-	header = http.Header{"Authorization": {"Bearer " + buyerTok.AccessToken}}
-	buyerConn, resp, err := websocket.DefaultDialer.Dial(wsURL, header)
+	wsURL = "ws" + strings.TrimPrefix(srv.URL, "http") + "/ws/orders/" + ord.ID + "/status?token=" + buyerTok.AccessToken
+	buyerConn, resp, err := websocket.DefaultDialer.Dial(wsURL, nil)
 	if err != nil {
 		t.Fatalf("buyer dial: %v", err)
 	}
@@ -145,8 +144,8 @@ func TestOrderStatusWS(t *testing.T) {
 	}
 	defer buyerConn.Close()
 
-	header = http.Header{"Authorization": {"Bearer " + sellerTok.AccessToken}}
-	sellerConn, resp, err := websocket.DefaultDialer.Dial(wsURL, header)
+	wsURL = "ws" + strings.TrimPrefix(srv.URL, "http") + "/ws/orders/" + ord.ID + "/status?token=" + sellerTok.AccessToken
+	sellerConn, resp, err := websocket.DefaultDialer.Dial(wsURL, nil)
 	if err != nil {
 		t.Fatalf("seller dial: %v", err)
 	}

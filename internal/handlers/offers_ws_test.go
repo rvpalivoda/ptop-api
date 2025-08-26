@@ -54,9 +54,8 @@ func TestOffersWS(t *testing.T) {
 		t.Fatalf("asset2: %v", err)
 	}
 
-	wsURL := "ws" + strings.TrimPrefix(srv.URL, "http") + "/ws/offers"
-	header := http.Header{"Authorization": {"Bearer " + tok.AccessToken}}
-	conn, resp, err := websocket.DefaultDialer.Dial(wsURL, header)
+	wsURL := "ws" + strings.TrimPrefix(srv.URL, "http") + "/ws/offers?token=" + tok.AccessToken
+	conn, resp, err := websocket.DefaultDialer.Dial(wsURL, nil)
 	if err != nil {
 		t.Fatalf("dial: %v", err)
 	}

@@ -74,7 +74,7 @@ func broadcastOrderStatus(order models.Order) {
 // @Summary Websocket уведомлений о статусе ордера
 // @Description Позволяет автору и владельцу оффера получать события OrderStatusEvent при каждом изменении статуса указанного ордера.
 // @Tags orders
-// @Security BearerAuth
+// @Param token query string true "access token"
 // @Param id path string true "ID ордера"
 // @Success 101 {object} handlers.OrderStatusEvent "Switching Protocols"
 // @Failure 403 {object} ErrorResponse

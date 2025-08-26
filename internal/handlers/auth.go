@@ -390,11 +390,16 @@ func AuthMiddleware(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		header := c.GetHeader("Authorization")
 		parts := strings.SplitN(header, " ", 2)
-		if len(parts) != 2 || parts[0] != "Bearer" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid authorization"})
-			return
+		tokenStr := ""
+		if len(parts) == 2 && parts[0] == "Bearer" {
+			tokenStr = parts[1]
+		} else {
+			tokenStr = c.Query("token")
+			if tokenStr == "" {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid authorization"})
+				return
+			}
 		}
-		tokenStr := parts[1]
 		var token models.Token
 		if err := db.Where("token = ? AND type = ?", tokenStr, "access").First(&token).Error; err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
