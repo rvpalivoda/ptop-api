@@ -1980,7 +1980,7 @@ paths:
       - reference
   /ws/offers:
     get:
-      description: Подключение для получения событий CRUD по офферам.
+      description: Подключение для получения событий CRUD по активным офферам. При отключении оффера отправляется событие deleted.
       parameters:
       - description: канал
         in: query

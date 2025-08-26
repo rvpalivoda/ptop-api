@@ -119,7 +119,7 @@ func CreateOffer(db *gorm.DB) gin.HandlerFunc {
 			}
 		}
 		var loaded models.Offer
-		if err := db.Preload("FromAsset").Preload("ToAsset").Preload("Client").Preload("ClientPaymentMethods").Preload("ClientPaymentMethods.Country").Preload("ClientPaymentMethods.PaymentMethod").Where("id = ?", offer.ID).First(&loaded).Error; err == nil {
+		if err := db.Preload("FromAsset").Preload("ToAsset").Preload("Client").Preload("ClientPaymentMethods").Preload("ClientPaymentMethods.Country").Preload("ClientPaymentMethods.PaymentMethod").Where("id = ?", offer.ID).First(&loaded).Error; err == nil && loaded.IsEnabled {
 			full := models.OfferFull{Offer: loaded, FromAsset: loaded.FromAsset, ToAsset: loaded.ToAsset, Client: loaded.Client, ClientPaymentMethods: loaded.ClientPaymentMethods}
 			broadcastOfferEvent("created", full)
 		}
@@ -220,7 +220,7 @@ func UpdateOffer(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		var loaded models.Offer
-		if err := db.Preload("FromAsset").Preload("ToAsset").Preload("Client").Preload("ClientPaymentMethods").Preload("ClientPaymentMethods.Country").Preload("ClientPaymentMethods.PaymentMethod").Where("id = ?", offer.ID).First(&loaded).Error; err == nil {
+		if err := db.Preload("FromAsset").Preload("ToAsset").Preload("Client").Preload("ClientPaymentMethods").Preload("ClientPaymentMethods.Country").Preload("ClientPaymentMethods.PaymentMethod").Where("id = ?", offer.ID).First(&loaded).Error; err == nil && loaded.IsEnabled {
 			full := models.OfferFull{Offer: loaded, FromAsset: loaded.FromAsset, ToAsset: loaded.ToAsset, Client: loaded.Client, ClientPaymentMethods: loaded.ClientPaymentMethods}
 			broadcastOfferEvent("updated", full)
 		}
@@ -270,6 +270,11 @@ func EnableOffer(db *gorm.DB, maxActive int) gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
 			return
 		}
+		var loaded models.Offer
+		if err := db.Preload("FromAsset").Preload("ToAsset").Preload("Client").Preload("ClientPaymentMethods").Preload("ClientPaymentMethods.Country").Preload("ClientPaymentMethods.PaymentMethod").Where("id = ?", offer.ID).First(&loaded).Error; err == nil && loaded.IsEnabled {
+			full := models.OfferFull{Offer: loaded, FromAsset: loaded.FromAsset, ToAsset: loaded.ToAsset, Client: loaded.Client, ClientPaymentMethods: loaded.ClientPaymentMethods}
+			broadcastOfferEvent("created", full)
+		}
 		c.JSON(http.StatusOK, offer)
 	}
 }
@@ -305,6 +310,11 @@ func DisableOffer(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
 			return
 		}
+		var loaded models.Offer
+		if err := db.Preload("FromAsset").Preload("ToAsset").Preload("Client").Preload("ClientPaymentMethods").Preload("ClientPaymentMethods.Country").Preload("ClientPaymentMethods.PaymentMethod").Where("id = ?", offer.ID).First(&loaded).Error; err == nil {
+			full := models.OfferFull{Offer: loaded, FromAsset: loaded.FromAsset, ToAsset: loaded.ToAsset, Client: loaded.Client, ClientPaymentMethods: loaded.ClientPaymentMethods}
+			broadcastOfferEvent("deleted", full)
+		}
 		c.JSON(http.StatusOK, offer)
 	}
 }
@@ -332,11 +342,14 @@ func DeleteOffer(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		full := models.OfferFull{Offer: offer, FromAsset: offer.FromAsset, ToAsset: offer.ToAsset, Client: offer.Client, ClientPaymentMethods: offer.ClientPaymentMethods}
+		wasEnabled := offer.IsEnabled
 		if err := db.Delete(&offer).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
 			return
 		}
-		broadcastOfferEvent("deleted", full)
+		if wasEnabled {
+			broadcastOfferEvent("deleted", full)
+		}
 		c.JSON(http.StatusOK, StatusResponse{Status: "deleted"})
 	}
 }
