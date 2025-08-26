@@ -23,9 +23,10 @@ var offerWSConns = struct {
 
 // OffersWS godoc
 // @Summary WebSocket обновления офферов
-// @Description Подключение для получения событий CRUD по офферам.
+// @Description Подключение для получения событий CRUD по активным офферам.
 // Клиенту необходимо установить соединение и при необходимости передать query `channel`.
 // В ответ сервер отправляет сообщения формата OfferEvent: {"type":"created","offer":OfferFull}.
+// При отключении оффера отправляется событие `deleted`.
 // @Tags offers
 // @Param token query string true "access token"
 // @Param channel query string false "канал"

@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/shopspring/decimal"
@@ -67,7 +68,7 @@ func TestOffersWS(t *testing.T) {
 		t.Fatalf("init write: %v", err)
 	}
 
-	// create offer
+	// create offer (inactive)
 	w = httptest.NewRecorder()
 	body = fmt.Sprintf(`{"max_amount":"100","min_amount":"1","amount":"50","price":"0.1","type":"sell","from_asset_id":"%s","to_asset_id":"%s","order_expiration_timeout":20}`, asset1.ID, asset2.ID)
 	req, _ = http.NewRequest("POST", "/client/offers", bytes.NewBufferString(body))
@@ -81,11 +82,20 @@ func TestOffersWS(t *testing.T) {
 	json.Unmarshal(w.Body.Bytes(), &created)
 
 	var evt offerWSEvent
-	if err := conn.ReadJSON(&evt); err != nil {
-		t.Fatalf("read create: %v", err)
+
+	// enable offer -> should broadcast
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("POST", "/client/offers/"+created.ID+"/enable", nil)
+	req.Header.Set("Authorization", "Bearer "+tok.AccessToken)
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("enable status %d", w.Code)
 	}
-	if evt.Type != "created" || evt.Offer.ID != created.ID || evt.Offer.FromAsset.ID != asset1.ID {
-		t.Fatalf("unexpected create event %#v", evt)
+	if err := conn.ReadJSON(&evt); err != nil {
+		t.Fatalf("read enable: %v", err)
+	}
+	if evt.Type != "created" || evt.Offer.ID != created.ID {
+		t.Fatalf("unexpected enable event %#v", evt)
 	}
 
 	// update offer
@@ -105,7 +115,22 @@ func TestOffersWS(t *testing.T) {
 		t.Fatalf("unexpected update event %#v", evt)
 	}
 
-	// delete offer
+	// disable offer -> should broadcast deleted
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("POST", "/client/offers/"+created.ID+"/disable", nil)
+	req.Header.Set("Authorization", "Bearer "+tok.AccessToken)
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("disable status %d", w.Code)
+	}
+	if err := conn.ReadJSON(&evt); err != nil {
+		t.Fatalf("read disable: %v", err)
+	}
+	if evt.Type != "deleted" || evt.Offer.ID != created.ID {
+		t.Fatalf("unexpected disable event %#v", evt)
+	}
+
+	// delete offer (already inactive) -> no event
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("DELETE", "/client/offers/"+created.ID, nil)
 	req.Header.Set("Authorization", "Bearer "+tok.AccessToken)
@@ -113,10 +138,8 @@ func TestOffersWS(t *testing.T) {
 	if w.Code != http.StatusOK {
 		t.Fatalf("delete status %d", w.Code)
 	}
-	if err := conn.ReadJSON(&evt); err != nil {
-		t.Fatalf("read delete: %v", err)
-	}
-	if evt.Type != "deleted" || evt.Offer.ID != created.ID {
-		t.Fatalf("unexpected delete event %#v", evt)
+	conn.SetReadDeadline(time.Now().Add(200 * time.Millisecond))
+	if err := conn.ReadJSON(&evt); err == nil {
+		t.Fatalf("unexpected event after delete %#v", evt)
 	}
 }
