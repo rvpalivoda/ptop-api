@@ -166,12 +166,12 @@ func CreateOrderMessage(db *gorm.DB, st storage.Storage, cache *services.ChatCac
 			}
 			objectName := id + ext
 			if _, err := st.Upload(c.Request.Context(), objectName, f, file.Size, mimeType); err != nil {
-				c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "storage error"})
+				c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
 				return
 			}
 			url, err := st.GetURL(c.Request.Context(), objectName, time.Hour)
 			if err != nil {
-				c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "storage error"})
+				c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
 				return
 			}
 			ftype := mimeType
