@@ -16,7 +16,10 @@ type Service struct {
 }
 
 // New создаёт новый сервис хранения.
-func New(endpoint, accessKey, secretKey, bucket string, useSSL bool) (*Service, error) {
+func New(endpoint, accessKey, secretKey, bucket string, useSSL bool) (Storage, error) {
+	if endpoint == "" {
+		return newMemory(), nil
+	}
 	cli, err := minio.New(endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(accessKey, secretKey, ""),
 		Secure: useSSL,
