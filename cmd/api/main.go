@@ -24,6 +24,7 @@ import (
 	"ptop/internal/ethwatcher"
 	"ptop/internal/handlers"
 	"ptop/internal/services"
+	storage "ptop/internal/services/storage"
 	"ptop/internal/solwatcher"
 	"ptop/internal/xmrwatcher"
 
@@ -53,6 +54,11 @@ func main() {
 
 	rdb := redis.NewClient(&redis.Options{Addr: cfg.RedisAddr, Password: cfg.RedisPassword, DB: cfg.RedisDB})
 	chatCache := services.NewChatCache(rdb, cfg.ChatCacheLimit)
+
+	st, err := storage.New(cfg.S3Endpoint, cfg.S3AccessKey, cfg.S3SecretKey, cfg.S3Bucket, cfg.S3UseSSL)
+	if err != nil {
+		log.Fatalf("storage init failed: %v", err)
+	}
 
 	docs.SwaggerInfo.BasePath = "/"
 
@@ -115,6 +121,9 @@ func main() {
 	api.POST("/client/order", handlers.CreateOrder(gormDB))
 	api.GET("/client/orders", handlers.ListClientOrders(gormDB))
 	api.GET("/orders/:id", handlers.GetOrder(gormDB))
+	api.GET("/orders/:id/messages", handlers.ListOrderMessages(gormDB))
+	api.POST("/orders/:id/messages", handlers.CreateOrderMessage(gormDB, st, chatCache))
+	api.PATCH("/orders/:id/messages/:msgId/read", handlers.ReadOrderMessage(gormDB))
 	api.GET("/notifications", handlers.ListNotifications(gormDB))
 	api.POST("/notifications/:id/read", handlers.ReadNotification(gormDB))
 	api.POST("/notifications/read-all", handlers.ReadAllNotifications(gormDB))
