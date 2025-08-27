@@ -8,11 +8,6 @@ import (
 	"ptop/internal/models"
 )
 
-type Event struct {
-	Type    string              `json:"type"`
-	Message models.OrderMessage `json:"message"`
-}
-
 var clients = struct {
 	sync.RWMutex
 	m map[string]map[*websocket.Conn]bool
@@ -37,12 +32,8 @@ func RemoveClient(chatID string, conn *websocket.Conn) {
 	}
 }
 
-func newEvent(msg models.OrderMessage) Event {
-	return Event{Type: string(msg.Type), Message: msg}
-}
-
 func Send(conn *websocket.Conn, msg models.OrderMessage) error {
-	return conn.WriteJSON(newEvent(msg))
+	return conn.WriteJSON(msg)
 }
 
 func Broadcast(chatID string, msg models.OrderMessage) {

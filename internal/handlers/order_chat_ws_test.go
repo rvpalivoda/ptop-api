@@ -13,7 +13,6 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/shopspring/decimal"
 	"ptop/internal/models"
-	"ptop/internal/orderchat"
 )
 
 func TestOrderChatWS(t *testing.T) {
@@ -151,11 +150,11 @@ func TestOrderChatWS(t *testing.T) {
 	if err := buyerConn.WriteJSON(OrderMessageRequest{Content: "hello"}); err != nil {
 		t.Fatalf("write: %v", err)
 	}
-	var echo orderchat.Event
+	var echo models.OrderMessage
 	if err := buyerConn.ReadJSON(&echo); err != nil {
 		t.Fatalf("read echo: %v", err)
 	}
-	if echo.Type != string(models.MessageTypeText) || echo.Message.Content != "hello" {
+	if echo.Type != models.MessageTypeText || echo.Content != "hello" {
 		t.Fatalf("unexpected echo %#v", echo)
 	}
 	buyerConn.Close()
@@ -178,15 +177,15 @@ func TestOrderChatWS(t *testing.T) {
 		t.Fatalf("seller handshake status %d", resp.StatusCode)
 	}
 	defer sellerConn.Close()
-	var history orderchat.Event
+	var history models.OrderMessage
 	if err := sellerConn.ReadJSON(&history); err != nil {
 		t.Fatalf("history read: %v", err)
 	}
-	if history.Type != string(models.MessageTypeText) || history.Message.Content != "hello" {
+	if history.Type != models.MessageTypeText || history.Content != "hello" {
 		t.Fatalf("unexpected content %#v", history)
 	}
 	var dbMsg models.OrderMessage
-	if err := db.Where("id = ?", history.Message.ID).First(&dbMsg).Error; err != nil {
+	if err := db.Where("id = ?", history.ID).First(&dbMsg).Error; err != nil {
 		t.Fatalf("db message: %v", err)
 	}
 
@@ -209,14 +208,14 @@ func TestOrderChatWS(t *testing.T) {
 		t.Fatalf("file msg status %d", w.Code)
 	}
 
-	var fileEvt orderchat.Event
+	var fileEvt models.OrderMessage
 	if err := sellerConn.ReadJSON(&fileEvt); err != nil {
 		t.Fatalf("file read: %v", err)
 	}
-	if fileEvt.Type != string(models.MessageTypeFile) || fileEvt.Message.FileURL == nil {
+	if fileEvt.Type != models.MessageTypeFile || fileEvt.FileURL == nil {
 		t.Fatalf("unexpected file event %#v", fileEvt)
 	}
-	if !strings.HasPrefix(*fileEvt.Message.FileURL, "https://example.com/") {
-		t.Fatalf("unexpected file url %s", *fileEvt.Message.FileURL)
+	if !strings.HasPrefix(*fileEvt.FileURL, "https://example.com/") {
+		t.Fatalf("unexpected file url %s", *fileEvt.FileURL)
 	}
 }
