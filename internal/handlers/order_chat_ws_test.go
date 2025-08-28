@@ -158,6 +158,9 @@ func TestOrderChatWS(t *testing.T) {
 	if echo.Type != string(models.MessageTypeText) || echo.Message.Content != "hello" {
 		t.Fatalf("unexpected echo %#v", echo)
 	}
+	if echo.Message.SenderName != "buyer" {
+		t.Fatalf("expected senderName=buyer in echo, got %s", echo.Message.SenderName)
+	}
 	buyerConn.Close()
 	var notif models.Notification
 	if err := db.Where("client_id = ? AND type = ?", seller.ID, "chat.message").First(&notif).Error; err != nil {
@@ -184,6 +187,9 @@ func TestOrderChatWS(t *testing.T) {
 	}
 	if history.Type != string(models.MessageTypeText) || history.Message.Content != "hello" {
 		t.Fatalf("unexpected content %#v", history)
+	}
+	if history.Message.SenderName != "buyer" {
+		t.Fatalf("expected senderName=buyer in history, got %s", history.Message.SenderName)
 	}
 	var dbMsg models.OrderMessage
 	if err := db.Where("id = ?", history.Message.ID).First(&dbMsg).Error; err != nil {
@@ -218,5 +224,8 @@ func TestOrderChatWS(t *testing.T) {
 	}
 	if !strings.HasPrefix(*fileEvt.Message.FileURL, "https://example.com/") {
 		t.Fatalf("unexpected file url %s", *fileEvt.Message.FileURL)
+	}
+	if fileEvt.Message.SenderName != "buyer" {
+		t.Fatalf("expected senderName=buyer in file event, got %s", fileEvt.Message.SenderName)
 	}
 }

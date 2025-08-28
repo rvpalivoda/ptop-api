@@ -25,7 +25,7 @@ type OrderMessageRequest struct {
 
 // ListOrderMessages godoc
 // @Summary Список сообщений ордера
-// @Description Возвращает историю переписки. Новые сообщения приходят в реальном времени через WebSocket `/ws/orders/{id}/chat`.
+// @Description Возвращает историю переписки. В каждом сообщении присутствует поле `senderName` — имя отправителя (по `client_id`). Новые сообщения приходят в реальном времени через WebSocket `/ws/orders/{id}/chat`.
 // @Tags orders
 // @Security BearerAuth
 // @Produce json
@@ -37,7 +37,7 @@ type OrderMessageRequest struct {
 // @Failure 404 {object} ErrorResponse
 // @Router /orders/{id}/messages [get]
 func ListOrderMessages(db *gorm.DB) gin.HandlerFunc {
-	return func(c *gin.Context) {
+    return func(c *gin.Context) {
 		orderID := c.Param("id")
 		clientIDVal, ok := c.Get("client_id")
 		if !ok {
@@ -63,7 +63,7 @@ func ListOrderMessages(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
 			return
 		}
-		q := db.Where("chat_id = ?", chat.ID)
+        q := db.Where("chat_id = ?", chat.ID)
 		if cursor := c.Query("cursor"); cursor != "" {
 			q = q.Where("id > ?", cursor)
 		}
@@ -72,18 +72,22 @@ func ListOrderMessages(db *gorm.DB) gin.HandlerFunc {
 				q = q.Where("created_at > ?", t)
 			}
 		}
-		var msgs []models.OrderMessage
-		if err := q.Order("created_at asc").Limit(50).Find(&msgs).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
-			return
-		}
-		c.JSON(http.StatusOK, msgs)
-	}
+        var msgs []models.OrderMessage
+        if err := q.Preload("Client").Order("created_at asc").Limit(50).Find(&msgs).Error; err != nil {
+            c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
+            return
+        }
+        // обогащаем ответ именем отправителя
+        for i := range msgs {
+            msgs[i].SenderName = msgs[i].Client.Username
+        }
+        c.JSON(http.StatusOK, msgs)
+    }
 }
 
 // CreateOrderMessage godoc
 // @Summary Отправить сообщение в ордер
-// @Description Поддерживаются типы файлов: image/jpeg, image/png, application/pdf. После сохранения сообщение мгновенно рассылается всем участникам через WebSocket `/ws/orders/{id}/chat`.
+// @Description Поддерживаются типы файлов: image/jpeg, image/png, application/pdf. В ответе возвращается `senderName` — имя отправителя. После сохранения сообщение мгновенно рассылается всем участникам через WebSocket `/ws/orders/{id}/chat`.
 // @Tags orders
 // @Security BearerAuth
 // @Accept json
@@ -98,7 +102,7 @@ func ListOrderMessages(db *gorm.DB) gin.HandlerFunc {
 // @Failure 404 {object} ErrorResponse
 // @Router /orders/{id}/messages [post]
 func CreateOrderMessage(db *gorm.DB, st storage.Storage, cache *services.ChatCache) gin.HandlerFunc {
-	return func(c *gin.Context) {
+    return func(c *gin.Context) {
 		orderID := c.Param("id")
 		clientIDVal, ok := c.Get("client_id")
 		if !ok {
@@ -193,16 +197,21 @@ func CreateOrderMessage(db *gorm.DB, st storage.Storage, cache *services.ChatCac
 			}
 			msg = models.OrderMessage{ChatID: chat.ID, ClientID: clientID, Type: models.MessageTypeText, Content: r.Content}
 		}
-		if err := db.Create(&msg).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
-			return
-		}
-		if cache != nil {
-			_ = cache.AddMessage(c.Request.Context(), chat.ID, msg)
-		}
-		orderchat.Broadcast(chat.ID, msg)
-		c.JSON(http.StatusOK, msg)
-	}
+        if err := db.Create(&msg).Error; err != nil {
+            c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
+            return
+        }
+        // подставляем имя отправителя
+        var snd models.Client
+        if err := db.Select("username").Where("id = ?", clientID).First(&snd).Error; err == nil {
+            msg.SenderName = snd.Username
+        }
+        if cache != nil {
+            _ = cache.AddMessage(c.Request.Context(), chat.ID, msg)
+        }
+        orderchat.Broadcast(chat.ID, msg)
+        c.JSON(http.StatusOK, msg)
+    }
 }
 
 // ReadOrderMessage godoc
@@ -217,7 +226,7 @@ func CreateOrderMessage(db *gorm.DB, st storage.Storage, cache *services.ChatCac
 // @Failure 404 {object} ErrorResponse
 // @Router /orders/{id}/messages/{msgId}/read [patch]
 func ReadOrderMessage(db *gorm.DB) gin.HandlerFunc {
-	return func(c *gin.Context) {
+    return func(c *gin.Context) {
 		orderID := c.Param("id")
 		msgID := c.Param("msgId")
 		clientIDVal, ok := c.Get("client_id")
@@ -240,17 +249,22 @@ func ReadOrderMessage(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusNotFound, ErrorResponse{Error: "invalid message"})
 			return
 		}
-		var msg models.OrderMessage
-		if err := db.Where("id = ? AND chat_id = ?", msgID, chat.ID).First(&msg).Error; err != nil {
-			c.JSON(http.StatusNotFound, ErrorResponse{Error: "invalid message"})
-			return
-		}
-		now := time.Now()
-		if err := db.Model(&msg).Update("read_at", now).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
-			return
-		}
-		msg.ReadAt = &now
-		c.JSON(http.StatusOK, msg)
-	}
+        var msg models.OrderMessage
+        if err := db.Where("id = ? AND chat_id = ?", msgID, chat.ID).First(&msg).Error; err != nil {
+            c.JSON(http.StatusNotFound, ErrorResponse{Error: "invalid message"})
+            return
+        }
+        now := time.Now()
+        if err := db.Model(&msg).Update("read_at", now).Error; err != nil {
+            c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
+            return
+        }
+        msg.ReadAt = &now
+        // подставляем имя отправителя в ответ
+        var snd models.Client
+        if err := db.Select("username").Where("id = ?", msg.ClientID).First(&snd).Error; err == nil {
+            msg.SenderName = snd.Username
+        }
+        c.JSON(http.StatusOK, msg)
+    }
 }

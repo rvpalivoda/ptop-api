@@ -146,4 +146,7 @@ func TestCreateOrderMessageBroadcast(t *testing.T) {
 	if evt.Type != string(models.MessageTypeText) || evt.Message.Content != "hi" {
 		t.Fatalf("unexpected event %#v", evt)
 	}
+	if evt.Message.SenderName != "buyer" {
+		t.Fatalf("expected senderName=buyer, got %s", evt.Message.SenderName)
+	}
 }

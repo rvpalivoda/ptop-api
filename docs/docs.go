@@ -3193,6 +3193,9 @@ const docTemplate = `{
                 "clientID": {
                     "type": "string"
                 },
+                "senderName": {
+                    "type": "string"
+                },
                 "content": {
                     "type": "string"
                 },

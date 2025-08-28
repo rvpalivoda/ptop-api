@@ -3186,6 +3186,11 @@
                 "clientID": {
                     "type": "string"
                 },
+                "senderName": {
+                    "type": "string",
+                    "example": "buyer",
+                    "description": "Имя отправителя (username по client_id)"
+                },
                 "content": {
                     "type": "string"
                 },

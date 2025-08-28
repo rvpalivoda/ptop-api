@@ -136,6 +136,9 @@ func TestOrderMessageHandler(t *testing.T) {
 	}
 	var msg models.OrderMessage
 	json.Unmarshal(w.Body.Bytes(), &msg)
+	if msg.SenderName != "buyer" {
+		t.Fatalf("expected senderName=buyer, got %s", msg.SenderName)
+	}
 
 	// buyer sends file message
 	w = httptest.NewRecorder()
@@ -155,6 +158,9 @@ func TestOrderMessageHandler(t *testing.T) {
 	json.Unmarshal(w.Body.Bytes(), &fileMsg)
 	if fileMsg.FileURL == nil || !strings.HasPrefix(*fileMsg.FileURL, "https://example.com/") {
 		t.Fatalf("expected file url")
+	}
+	if fileMsg.SenderName != "buyer" {
+		t.Fatalf("expected senderName=buyer in file msg, got %s", fileMsg.SenderName)
 	}
 
 	// hacker tries to get messages
@@ -182,6 +188,9 @@ func TestOrderMessageHandler(t *testing.T) {
 	if list[1].FileURL == nil || !strings.HasPrefix(*list[1].FileURL, "https://example.com/") {
 		t.Fatalf("expected file url in second message")
 	}
+	if list[0].SenderName != "buyer" || list[1].SenderName != "buyer" {
+		t.Fatalf("expected senderName=buyer in list")
+	}
 
 	// seller marks message read
 	w = httptest.NewRecorder()
@@ -195,5 +204,8 @@ func TestOrderMessageHandler(t *testing.T) {
 	json.Unmarshal(w.Body.Bytes(), &upd)
 	if upd.ReadAt == nil {
 		t.Fatalf("expected read at not nil")
+	}
+	if upd.SenderName != "buyer" {
+		t.Fatalf("expected senderName=buyer in read response, got %s", upd.SenderName)
 	}
 }

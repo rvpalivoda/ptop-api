@@ -18,6 +18,7 @@ import (
 // @Summary Websocket чат ордера
 // @Description Подключает покупателя и продавца к чату ордера.
 // После подключения сервер отправляет историю сообщений (models.OrderMessage).
+// Каждое сообщение содержит поле senderName — username отправителя (по client_id).
 // Клиент отправляет новые сообщения в формате OrderMessageRequest, а получает сообщения типа models.OrderMessage.
 // @Tags orders
 // @Param token query string true "access token"
@@ -27,7 +28,7 @@ import (
 // @Failure 404 {object} ErrorResponse
 // @Router /ws/orders/{id}/chat [get]
 func OrderChatWS(db *gorm.DB, cache *services.ChatCache) gin.HandlerFunc {
-	return func(c *gin.Context) {
+    return func(c *gin.Context) {
 		orderID := c.Param("id")
 		clientIDVal, ok := c.Get("client_id")
 		if !ok {
@@ -68,15 +69,21 @@ func OrderChatWS(db *gorm.DB, cache *services.ChatCache) gin.HandlerFunc {
 			conn.Close()
 		}()
 
-		if cache != nil {
-			if history, err := cache.GetHistory(c.Request.Context(), chat.ID); err == nil {
-				for _, m := range history {
-					if err := orderchat.Send(conn, m); err != nil {
-						return
-					}
-				}
-			}
-		}
+        if cache != nil {
+            if history, err := cache.GetHistory(c.Request.Context(), chat.ID); err == nil {
+                for _, m := range history {
+                    if m.SenderName == "" {
+                        var snd models.Client
+                        if err := db.Select("username").Where("id = ?", m.ClientID).First(&snd).Error; err == nil {
+                            m.SenderName = snd.Username
+                        }
+                    }
+                    if err := orderchat.Send(conn, m); err != nil {
+                        return
+                    }
+                }
+            }
+        }
 
 		for {
 			var r OrderMessageRequest
@@ -86,13 +93,18 @@ func OrderChatWS(db *gorm.DB, cache *services.ChatCache) gin.HandlerFunc {
 			if r.Content == "" {
 				continue
 			}
-			msg := models.OrderMessage{ChatID: chat.ID, ClientID: clientID, Type: models.MessageTypeText, Content: r.Content}
-			if err := db.Create(&msg).Error; err != nil {
-				continue
-			}
-			if cache != nil {
-				_ = cache.AddMessage(c.Request.Context(), chat.ID, msg)
-			}
+        msg := models.OrderMessage{ChatID: chat.ID, ClientID: clientID, Type: models.MessageTypeText, Content: r.Content}
+        if err := db.Create(&msg).Error; err != nil {
+            continue
+        }
+        // подставляем имя отправителя
+        var snd models.Client
+        if err := db.Select("username").Where("id = ?", clientID).First(&snd).Error; err == nil {
+            msg.SenderName = snd.Username
+        }
+        if cache != nil {
+            _ = cache.AddMessage(c.Request.Context(), chat.ID, msg)
+        }
 			otherID := order.BuyerID
 			if clientID == order.BuyerID {
 				otherID = order.SellerID
