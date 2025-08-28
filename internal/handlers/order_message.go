@@ -20,7 +20,12 @@ import (
 
 // OrderMessageRequest используется для текстовых сообщений.
 type OrderMessageRequest struct {
-	Content string `json:"content"`
+    Content string `json:"content"`
+}
+
+// ReadOrderMessageRequest используется для отметки прочтения
+type ReadOrderMessageRequest struct {
+    ReadAt *time.Time `json:"readAt"`
 }
 
 // ListOrderMessages godoc
@@ -219,8 +224,10 @@ func CreateOrderMessage(db *gorm.DB, st storage.Storage, cache *services.ChatCac
 // @Tags orders
 // @Security BearerAuth
 // @Produce json
+// @Accept json
 // @Param id path string true "ID ордера"
 // @Param msgId path string true "ID сообщения"
+// @Param input body handlers.ReadOrderMessageRequest false "опционально: время прочтения в RFC3339"
 // @Success 200 {object} models.OrderMessage
 // @Failure 403 {object} ErrorResponse
 // @Failure 404 {object} ErrorResponse
@@ -254,17 +261,25 @@ func ReadOrderMessage(db *gorm.DB) gin.HandlerFunc {
             c.JSON(http.StatusNotFound, ErrorResponse{Error: "invalid message"})
             return
         }
-        now := time.Now()
-        if err := db.Model(&msg).Update("read_at", now).Error; err != nil {
+        // берём readAt из тела запроса, если передано, иначе используем текущее время
+        var r ReadOrderMessageRequest
+        _ = c.BindJSON(&r)
+        when := time.Now()
+        if r.ReadAt != nil {
+            when = *r.ReadAt
+        }
+        if err := db.Model(&msg).Update("read_at", when).Error; err != nil {
             c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "db error"})
             return
         }
-        msg.ReadAt = &now
+        msg.ReadAt = &when
         // подставляем имя отправителя в ответ
         var snd models.Client
         if err := db.Select("username").Where("id = ?", msg.ClientID).First(&snd).Error; err == nil {
             msg.SenderName = snd.Username
         }
+        // уведомляем по WS о прочтении
+        orderchat.BroadcastRead(chat.ID, msg)
         c.JSON(http.StatusOK, msg)
     }
 }

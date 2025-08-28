@@ -38,12 +38,16 @@ type Order struct {
 	Price                 decimal.Decimal     `gorm:"type:decimal(32,8);not null" json:"price"`
 	ClientPaymentMethodID string              `gorm:"size:21" json:"clientPaymentMethodID"`
 	ClientPaymentMethod   ClientPaymentMethod `gorm:"foreignKey:ClientPaymentMethodID" json:"-"`
-	Status                OrderStatus         `gorm:"type:varchar(20);not null" json:"status"`
-	IsEscrow              bool                `gorm:"not null;default:false" json:"isEscrow"`
-	ExpiresAt             time.Time           `gorm:"not null" json:"expiresAt"`
-	ReleasedAt            *time.Time          `json:"releasedAt"`
-	CreatedAt             time.Time           `json:"createdAt"`
-	UpdatedAt             time.Time           `json:"updatedAt"`
+    Status                OrderStatus         `gorm:"type:varchar(20);not null" json:"status"`
+    IsEscrow              bool                `gorm:"not null;default:false" json:"isEscrow"`
+    ExpiresAt             time.Time           `gorm:"not null" json:"expiresAt"`
+    ReleasedAt            *time.Time          `json:"releasedAt"`
+    PaidAt                *time.Time          `json:"paidAt,omitempty"`
+    CancelReason          *string             `gorm:"type:text" json:"cancelReason,omitempty"`
+    DisputeReason         *string             `gorm:"type:text" json:"disputeReason,omitempty"`
+    DisputeOpenedAt       *time.Time          `json:"disputeOpenedAt,omitempty"`
+    CreatedAt             time.Time           `json:"createdAt"`
+    UpdatedAt             time.Time           `json:"updatedAt"`
 }
 
 func (o *Order) BeforeCreate(tx *gorm.DB) (err error) {

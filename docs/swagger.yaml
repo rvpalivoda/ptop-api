@@ -174,11 +174,26 @@ definitions:
         example: order.created
         type: string
     type: object
+  handlers.ChatEvent:
+    type: object
+    properties:
+      type:
+        type: string
+        example: TEXT
+      message:
+        $ref: '#/definitions/models.OrderMessage'
   handlers.OrderMessageRequest:
     properties:
       content:
         type: string
     type: object
+  handlers.ReadOrderMessageRequest:
+    type: object
+    properties:
+      readAt:
+        type: string
+        format: date-time
+        example: 2025-01-01T00:00:00Z
   handlers.OrderRequest:
     properties:
       amount:
@@ -2049,6 +2064,8 @@ paths:
       - orders
   /orders/{id}/messages/{msgId}/read:
     patch:
+      consumes:
+      - application/json
       parameters:
       - description: ID ордера
         in: path
@@ -2060,6 +2077,11 @@ paths:
         name: msgId
         required: true
         type: string
+      - description: опционально: время прочтения (RFC3339)
+        in: body
+        name: input
+        schema:
+          $ref: '#/definitions/handlers.ReadOrderMessageRequest'
       produces:
       - application/json
       responses:
@@ -2168,6 +2190,18 @@ paths:
   /ws/orders/{id}/chat:
     get:
       description: Подключает покупателя и продавца к чату ордера.
+        После подключения сервер отправляет историю сообщений (models.OrderMessage).
+        Каждое сообщение содержит senderName (username отправителя). Сервер также рассылает события READ при отметке сообщения прочитанным через REST.
+        Клиент отправляет новые сообщения в формате OrderMessageRequest, а получает сообщения типа models.OrderMessage и события READ.
+        
+        Примеры событий (application/json):
+        
+        - TEXT:
+          {"type":"TEXT","message":{"id":"m1","chatID":"chat1","clientID":"u1","senderName":"buyer","type":"TEXT","content":"hello","createdAt":"2025-01-01T00:00:00Z"}}
+        - FILE:
+          {"type":"FILE","message":{"id":"m2","chatID":"chat1","clientID":"u1","senderName":"buyer","type":"FILE","content":"document.pdf","fileURL":"https://example.com/file","fileType":"application/pdf","fileSize":12345,"createdAt":"2025-01-01T00:00:05Z"}}
+        - READ:
+          {"type":"READ","message":{"id":"m1","chatID":"chat1","clientID":"u1","senderName":"buyer","type":"TEXT","content":"hello","readAt":"2025-01-01T00:01:00Z"}}
       parameters:
       - description: access token
         in: query
@@ -2183,7 +2217,42 @@ paths:
         "101":
           description: Switching Protocols
           schema:
-            $ref: '#/definitions/models.OrderMessage'
+            $ref: '#/definitions/handlers.ChatEvent'
+          examples:
+            application/json:
+              type: READ
+              message:
+                id: m123
+                chatID: chat123
+                clientID: u123
+                senderName: buyer
+                type: TEXT
+                content: hello
+                readAt: 2025-01-01T00:00:00Z
+          x-examples:
+            TEXT:
+              type: TEXT
+              message:
+                id: m1
+                chatID: chat1
+                clientID: u1
+                senderName: buyer
+                type: TEXT
+                content: hello
+                createdAt: 2025-01-01T00:00:00Z
+            FILE:
+              type: FILE
+              message:
+                id: m2
+                chatID: chat1
+                clientID: u1
+                senderName: buyer
+                type: FILE
+                content: document.pdf
+                fileURL: https://example.com/file
+                fileType: application/pdf
+                fileSize: 12345
+                createdAt: 2025-01-01T00:00:05Z
         "403":
           description: Forbidden
           schema:

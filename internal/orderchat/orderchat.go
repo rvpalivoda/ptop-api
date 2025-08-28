@@ -9,8 +9,8 @@ import (
 )
 
 type Event struct {
-	Type    string              `json:"type"`
-	Message models.OrderMessage `json:"message"`
+    Type    string              `json:"type"`
+    Message models.OrderMessage `json:"message"`
 }
 
 var clients = struct {
@@ -46,12 +46,25 @@ func Send(conn *websocket.Conn, msg models.OrderMessage) error {
 }
 
 func Broadcast(chatID string, msg models.OrderMessage) {
-	clients.Lock()
-	defer clients.Unlock()
-	for c := range clients.m[chatID] {
-		if err := Send(c, msg); err != nil {
-			c.Close()
-			delete(clients.m[chatID], c)
-		}
-	}
+    clients.Lock()
+    defer clients.Unlock()
+    for c := range clients.m[chatID] {
+        if err := Send(c, msg); err != nil {
+            c.Close()
+            delete(clients.m[chatID], c)
+        }
+    }
+}
+
+// BroadcastRead рассылает событие о прочтении сообщения
+func BroadcastRead(chatID string, msg models.OrderMessage) {
+    clients.Lock()
+    defer clients.Unlock()
+    evt := Event{Type: "READ", Message: msg}
+    for c := range clients.m[chatID] {
+        if err := c.WriteJSON(evt); err != nil {
+            c.Close()
+            delete(clients.m[chatID], c)
+        }
+    }
 }

@@ -19,7 +19,8 @@ import (
 // @Description Подключает покупателя и продавца к чату ордера.
 // После подключения сервер отправляет историю сообщений (models.OrderMessage).
 // Каждое сообщение содержит поле senderName — username отправителя (по client_id).
-// Клиент отправляет новые сообщения в формате OrderMessageRequest, а получает сообщения типа models.OrderMessage.
+// Сервер также рассылает события READ при отметке сообщения прочитанным через REST.
+// Клиент отправляет новые сообщения в формате OrderMessageRequest, а получает сообщения типа models.OrderMessage и READ-события.
 // @Tags orders
 // @Param token query string true "access token"
 // @Param id path string true "ID ордера"

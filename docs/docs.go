@@ -1959,6 +1959,9 @@ const docTemplate = `{
         },
         "/orders/{id}/messages/{msgId}/read": {
             "patch": {
+                "consumes": [
+                    "application/json"
+                ],
                 "security": [
                     {
                         "BearerAuth": []
@@ -1985,6 +1988,14 @@ const docTemplate = `{
                         "name": "msgId",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "опционально: время прочтения (RFC3339)",
+                        "name": "input",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ReadOrderMessageRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -2140,7 +2151,7 @@ const docTemplate = `{
         },
         "/ws/orders/{id}/chat": {
             "get": {
-                "description": "Подключает покупателя и продавца к чату ордера.",
+                "description": "Подключает покупателя и продавца к чату ордера. После подключения сервер отправляет историю сообщений (models.OrderMessage). Каждое сообщение содержит senderName (username отправителя). Сервер также рассылает события READ при отметке сообщения прочитанным через REST. Клиент отправляет новые сообщения в формате OrderMessageRequest, а получает сообщения типа models.OrderMessage и события READ.",
                 "tags": [
                     "orders"
                 ],
@@ -2165,7 +2176,50 @@ const docTemplate = `{
                     "101": {
                         "description": "Switching Protocols",
                         "schema": {
-                            "$ref": "#/definitions/models.OrderMessage"
+                            "$ref": "#/definitions/handlers.ChatEvent"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "type": "READ",
+                                "message": {
+                                    "id": "m123",
+                                    "chatID": "chat123",
+                                    "clientID": "u123",
+                                    "senderName": "buyer",
+                                    "type": "TEXT",
+                                    "content": "hello",
+                                    "readAt": "2025-01-01T00:00:00Z"
+                                }
+                            }
+                        },
+                        "x-examples": {
+                            "TEXT": {
+                                "type": "TEXT",
+                                "message": {
+                                    "id": "m1",
+                                    "chatID": "chat1",
+                                    "clientID": "u1",
+                                    "senderName": "buyer",
+                                    "type": "TEXT",
+                                    "content": "hello",
+                                    "createdAt": "2025-01-01T00:00:00Z"
+                                }
+                            },
+                            "FILE": {
+                                "type": "FILE",
+                                "message": {
+                                    "id": "m2",
+                                    "chatID": "chat1",
+                                    "clientID": "u1",
+                                    "senderName": "buyer",
+                                    "type": "FILE",
+                                    "content": "document.pdf",
+                                    "fileURL": "https://example.com/file",
+                                    "fileType": "application/pdf",
+                                    "fileSize": 12345,
+                                    "createdAt": "2025-01-01T00:00:05Z"
+                                }
+                            }
                         }
                     },
                     "403": {
@@ -2498,11 +2552,33 @@ const docTemplate = `{
                 }
             }
         },
+        "handlers.ChatEvent": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "example": "TEXT"
+                },
+                "message": {
+                    "$ref": "#/definitions/models.OrderMessage"
+                }
+            }
+        },
         "handlers.OrderMessageRequest": {
             "type": "object",
             "properties": {
                 "content": {
                     "type": "string"
+                }
+            }
+        },
+        "handlers.ReadOrderMessageRequest": {
+            "type": "object",
+            "properties": {
+                "readAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2025-01-01T00:00:00Z"
                 }
             }
         },

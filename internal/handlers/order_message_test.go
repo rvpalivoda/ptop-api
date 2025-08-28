@@ -192,19 +192,21 @@ func TestOrderMessageHandler(t *testing.T) {
 		t.Fatalf("expected senderName=buyer in list")
 	}
 
-	// seller marks message read
-	w = httptest.NewRecorder()
-	req, _ = http.NewRequest("PATCH", "/orders/"+ord.ID+"/messages/"+msg.ID+"/read", nil)
-	req.Header.Set("Authorization", "Bearer "+sellerTok.AccessToken)
-	r.ServeHTTP(w, req)
+		// seller marks message read (client provides timestamp)
+		w = httptest.NewRecorder()
+		readAt := time.Now().UTC().Add(2 * time.Minute).Format(time.RFC3339)
+		req, _ = http.NewRequest("PATCH", "/orders/"+ord.ID+"/messages/"+msg.ID+"/read", bytes.NewBufferString("{\"readAt\":\""+readAt+"\"}"))
+		req.Header.Set("Authorization", "Bearer "+sellerTok.AccessToken)
+		req.Header.Set("Content-Type", "application/json")
+		r.ServeHTTP(w, req)
 	if w.Code != http.StatusOK {
 		t.Fatalf("read status %d", w.Code)
 	}
 	var upd models.OrderMessage
 	json.Unmarshal(w.Body.Bytes(), &upd)
-	if upd.ReadAt == nil {
-		t.Fatalf("expected read at not nil")
-	}
+		if upd.ReadAt == nil || upd.ReadAt.Format(time.RFC3339) != readAt {
+			t.Fatalf("expected readAt to match client timestamp")
+		}
 	if upd.SenderName != "buyer" {
 		t.Fatalf("expected senderName=buyer in read response, got %s", upd.SenderName)
 	}

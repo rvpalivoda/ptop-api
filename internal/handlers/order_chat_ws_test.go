@@ -225,6 +225,27 @@ func TestOrderChatWS(t *testing.T) {
 	if !strings.HasPrefix(*fileEvt.Message.FileURL, "https://example.com/") {
 		t.Fatalf("unexpected file url %s", *fileEvt.Message.FileURL)
 	}
+
+	// mark first message as read via REST and expect READ event
+	w = httptest.NewRecorder()
+	clientReadAt := time.Now().UTC().Add(1 * time.Minute).Format(time.RFC3339)
+	req, _ = http.NewRequest("PATCH", "/orders/"+ord.ID+"/messages/"+history.Message.ID+"/read", bytes.NewBufferString("{\"readAt\":\""+clientReadAt+"\"}"))
+	req.Header.Set("Authorization", "Bearer "+sellerTok.AccessToken)
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("read via REST status %d", w.Code)
+	}
+	var readEvt orderchat.Event
+	if err := sellerConn.ReadJSON(&readEvt); err != nil {
+		t.Fatalf("read event ws: %v", err)
+	}
+	if readEvt.Type != "READ" || readEvt.Message.ID == "" || readEvt.Message.ReadAt == nil {
+		t.Fatalf("unexpected read event %#v", readEvt)
+	}
+	if readEvt.Message.ReadAt.Format(time.RFC3339) != clientReadAt {
+		t.Fatalf("expected readAt from client in read event")
+	}
 	if fileEvt.Message.SenderName != "buyer" {
 		t.Fatalf("expected senderName=buyer in file event, got %s", fileEvt.Message.SenderName)
 	}
