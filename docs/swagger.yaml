@@ -185,7 +185,15 @@ definitions:
     description: Список действий, доступных текущему пользователю по данному ордеру.
     properties:
       actions:
+        description: |-
+          Возможные действия: markPaid, cancel, dispute, release
+          Будет сериализован как массив строк
         items:
+          enum:
+          - markPaid
+          - cancel
+          - dispute
+          - release
           type: string
         type: array
     type: object
@@ -2031,6 +2039,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/handlers.OrderActionsResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
         "403":
           description: Forbidden
           schema:

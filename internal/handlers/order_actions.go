@@ -12,7 +12,9 @@ import (
 // OrderActionsResponse ответ со списком доступных действий
 // @Description Список действий, доступных текущему пользователю по данному ордеру.
 type OrderActionsResponse struct {
-	Actions []string `json:"actions"`
+    // Возможные действия: markPaid, cancel, dispute, release
+    // Будет сериализован как массив строк
+    Actions []models.OrderAction `json:"actions" swaggertype:"array,string" enums:"markPaid,cancel,dispute,release"`
 }
 
 // GetOrderActions godoc
@@ -23,7 +25,8 @@ type OrderActionsResponse struct {
 // @Produce json
 // @Param id path string true "ID ордера"
 // @Success 200 {object} OrderActionsResponse
-// @Failure 403 {object} ErrorResponse
+    // @Failure 401 {object} ErrorResponse
+    // @Failure 403 {object} ErrorResponse
 // @Failure 404 {object} ErrorResponse
 // @Router /orders/{id}/actions [get]
 func GetOrderActions(db *gorm.DB) gin.HandlerFunc {
@@ -42,28 +45,28 @@ func GetOrderActions(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		actions := []string{}
-		switch {
-		case order.AuthorID == clientID:
-			// buyer actions
-			switch order.Status {
-			case models.OrderStatusWaitPayment:
-				actions = append(actions, "markPaid", "cancel")
-			case models.OrderStatusPaid:
-				actions = append(actions, "dispute")
-			}
-		case order.OfferOwnerID == clientID:
-			// seller actions
-			switch order.Status {
-			case models.OrderStatusWaitPayment:
-				actions = append(actions, "cancel")
-			case models.OrderStatusPaid:
-				actions = append(actions, "release", "dispute")
-			}
-		default:
-			c.JSON(http.StatusForbidden, ErrorResponse{Error: "forbidden"})
-			return
-		}
+        actions := []models.OrderAction{}
+        switch {
+        case order.AuthorID == clientID:
+            // buyer actions
+            switch order.Status {
+            case models.OrderStatusWaitPayment:
+                actions = append(actions, models.OrderActionMarkPaid, models.OrderActionCancel)
+            case models.OrderStatusPaid:
+                actions = append(actions, models.OrderActionDispute)
+            }
+        case order.OfferOwnerID == clientID:
+            // seller actions
+            switch order.Status {
+            case models.OrderStatusWaitPayment:
+                actions = append(actions, models.OrderActionCancel)
+            case models.OrderStatusPaid:
+                actions = append(actions, models.OrderActionRelease, models.OrderActionDispute)
+            }
+        default:
+            c.JSON(http.StatusForbidden, ErrorResponse{Error: "forbidden"})
+            return
+        }
 
 		c.JSON(http.StatusOK, OrderActionsResponse{Actions: actions})
 	}

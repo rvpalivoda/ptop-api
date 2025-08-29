@@ -1859,6 +1859,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/handlers.OrderActionsResponse"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
@@ -2877,9 +2883,16 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "actions": {
+                    "description": "Возможные действия: markPaid, cancel, dispute, release\nБудет сериализован как массив строк",
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "type": "string",
+                        "enum": [
+                            "markPaid",
+                            "cancel",
+                            "dispute",
+                            "release"
+                        ]
                     }
                 }
             }
