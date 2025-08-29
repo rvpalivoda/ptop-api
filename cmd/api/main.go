@@ -142,6 +142,10 @@ func main() {
 	ws.GET("/orders/:id/status", handlers.OrderStatusWS(gormDB))
 	ws.GET("/offers", gin.WrapF(handlers.OffersWS()))
 
+	// 3.1 Запускаем авто-отмену просроченных ордеров
+	exp := handlers.NewOrderExpirer(gormDB, cfg.OrderExpirerInterval)
+	exp.Start()
+
 	if cfg.WatchersDebug {
 		btcW, err := btcwatcher.New(gormDB, cfg.BtcRPCHost, cfg.BtcRPCUser, cfg.BtcRPCPass, nil, true)
 		if err != nil {

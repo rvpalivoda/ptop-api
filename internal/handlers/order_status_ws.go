@@ -29,7 +29,7 @@ func sendOrderStatusEvent(conn *websocket.Conn, ord models.OrderFull) error {
 	return conn.WriteJSON(OrderStatusEvent{Type: "order.status_changed", Order: ord})
 }
 
-func createOrderStatusNotifications(db *gorm.DB, ord models.Order) {
+func CreateOrderStatusNotifications(db *gorm.DB, ord models.Order) {
 	payload, err := json.Marshal(map[string]string{
 		"orderId": ord.ID,
 		"status":  string(ord.Status),
@@ -45,7 +45,7 @@ func createOrderStatusNotifications(db *gorm.DB, ord models.Order) {
 	}
 }
 
-func broadcastOrderStatus(order models.Order) {
+func BroadcastOrderStatus(order models.Order) {
 	ofull := models.OrderFull{
 		Order:      order,
 		Offer:      order.Offer,

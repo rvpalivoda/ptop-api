@@ -12,12 +12,13 @@ import (
 
 // Config хранит все настройки приложения
 type Config struct {
-	Port                     string
-	DSN                      string
-	TokenTypeTTL             map[string]time.Duration
-	MaxActiveOffersPerClient int
-	WatchersDebug            bool
-	CORSAllowedOrigins       []string
+    Port                     string
+    DSN                      string
+    TokenTypeTTL             map[string]time.Duration
+    MaxActiveOffersPerClient int
+    WatchersDebug            bool
+    CORSAllowedOrigins       []string
+    OrderExpirerInterval     time.Duration
 	BtcRPCHost               string
 	BtcRPCUser               string
 	BtcRPCPass               string
@@ -92,10 +93,13 @@ func Load() (*Config, error) {
 		redisDB = v
 	}
 
-	chatLimit := int64(50)
-	if v, err := strconv.ParseInt(os.Getenv("CHAT_CACHE_LIMIT"), 10, 64); err == nil {
-		chatLimit = v
-	}
+    chatLimit := int64(50)
+    if v, err := strconv.ParseInt(os.Getenv("CHAT_CACHE_LIMIT"), 10, 64); err == nil {
+        chatLimit = v
+    }
+
+    // Интервал фоновой задачи авто-отмены ордеров
+    expirerInterval := parseDuration(os.Getenv("ORDER_EXPIRER_INTERVAL"), 30*time.Second)
 
 	return &Config{
 		Port: port,
@@ -120,11 +124,12 @@ func Load() (*Config, error) {
 		S3AccessKey:              s3Access,
 		S3SecretKey:              s3Secret,
 		S3Bucket:                 s3Bucket,
-		S3Region:                 s3Region,
-		S3UseSSL:                 s3UseSSL,
-		// JWTSecret: os.Getenv("JWT_SECRET"),
-		// Timezone:  os.Getenv("TIMEZONE"),
-	}, nil
+        S3Region:                 s3Region,
+        S3UseSSL:                 s3UseSSL,
+        OrderExpirerInterval:     expirerInterval,
+        // JWTSecret: os.Getenv("JWT_SECRET"),
+        // Timezone:  os.Getenv("TIMEZONE"),
+    }, nil
 }
 
 func parseDuration(val string, def time.Duration) time.Duration {

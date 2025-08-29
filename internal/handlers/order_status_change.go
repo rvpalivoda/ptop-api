@@ -86,16 +86,16 @@ func MarkOrderPaid(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		var full models.Order
-		if err := db.Preload("Offer").
-			Preload("Buyer").Preload("Seller").Preload("Author").Preload("OfferOwner").
-			Preload("FromAsset").Preload("ToAsset").
-			Preload("ClientPaymentMethod").
-			Preload("ClientPaymentMethod.Country").
-			Preload("ClientPaymentMethod.PaymentMethod").
-			Where("id = ?", order.ID).First(&full).Error; err == nil {
-			createOrderStatusNotifications(db, full)
-			broadcastOrderStatus(full)
-		}
+        if err := db.Preload("Offer").
+            Preload("Buyer").Preload("Seller").Preload("Author").Preload("OfferOwner").
+            Preload("FromAsset").Preload("ToAsset").
+            Preload("ClientPaymentMethod").
+            Preload("ClientPaymentMethod.Country").
+            Preload("ClientPaymentMethod.PaymentMethod").
+            Where("id = ?", order.ID).First(&full).Error; err == nil {
+            CreateOrderStatusNotifications(db, full)
+            BroadcastOrderStatus(full)
+        }
 		// возвращаем OrderFull
 		var cpm *models.ClientPaymentMethod
 		if full.ClientPaymentMethodID != "" {
@@ -159,16 +159,16 @@ func ReleaseOrder(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		var full models.Order
-		if err := db.Preload("Offer").
-			Preload("Buyer").Preload("Seller").Preload("Author").Preload("OfferOwner").
-			Preload("FromAsset").Preload("ToAsset").
-			Preload("ClientPaymentMethod").
-			Preload("ClientPaymentMethod.Country").
-			Preload("ClientPaymentMethod.PaymentMethod").
-			Where("id = ?", order.ID).First(&full).Error; err == nil {
-			createOrderStatusNotifications(db, full)
-			broadcastOrderStatus(full)
-		}
+        if err := db.Preload("Offer").
+            Preload("Buyer").Preload("Seller").Preload("Author").Preload("OfferOwner").
+            Preload("FromAsset").Preload("ToAsset").
+            Preload("ClientPaymentMethod").
+            Preload("ClientPaymentMethod.Country").
+            Preload("ClientPaymentMethod.PaymentMethod").
+            Where("id = ?", order.ID).First(&full).Error; err == nil {
+            CreateOrderStatusNotifications(db, full)
+            BroadcastOrderStatus(full)
+        }
 		var cpm *models.ClientPaymentMethod
 		if full.ClientPaymentMethodID != "" {
 			cpm = &full.ClientPaymentMethod
@@ -238,16 +238,16 @@ func CancelOrder(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		var full models.Order
-		if err := db.Preload("Offer").
-			Preload("Buyer").Preload("Seller").Preload("Author").Preload("OfferOwner").
-			Preload("FromAsset").Preload("ToAsset").
-			Preload("ClientPaymentMethod").
-			Preload("ClientPaymentMethod.Country").
-			Preload("ClientPaymentMethod.PaymentMethod").
-			Where("id = ?", order.ID).First(&full).Error; err == nil {
-			createOrderStatusNotifications(db, full)
-			broadcastOrderStatus(full)
-		}
+        if err := db.Preload("Offer").
+            Preload("Buyer").Preload("Seller").Preload("Author").Preload("OfferOwner").
+            Preload("FromAsset").Preload("ToAsset").
+            Preload("ClientPaymentMethod").
+            Preload("ClientPaymentMethod.Country").
+            Preload("ClientPaymentMethod.PaymentMethod").
+            Where("id = ?", order.ID).First(&full).Error; err == nil {
+            CreateOrderStatusNotifications(db, full)
+            BroadcastOrderStatus(full)
+        }
 		var cpm *models.ClientPaymentMethod
 		if full.ClientPaymentMethodID != "" {
 			cpm = &full.ClientPaymentMethod
@@ -324,8 +324,8 @@ func OpenDispute(db *gorm.DB) gin.HandlerFunc {
 			Preload("ClientPaymentMethod.Country").
 			Preload("ClientPaymentMethod.PaymentMethod").
 			Where("id = ?", order.ID).First(&full).Error; err == nil {
-			createOrderStatusNotifications(db, full)
-			broadcastOrderStatus(full)
+            CreateOrderStatusNotifications(db, full)
+            BroadcastOrderStatus(full)
 		}
 		var cpm *models.ClientPaymentMethod
 		if full.ClientPaymentMethodID != "" {
@@ -411,8 +411,8 @@ func ResolveDispute(db *gorm.DB) gin.HandlerFunc {
 			Preload("ClientPaymentMethod.Country").
 			Preload("ClientPaymentMethod.PaymentMethod").
 			Where("id = ?", order.ID).First(&full).Error; err == nil {
-			createOrderStatusNotifications(db, full)
-			broadcastOrderStatus(full)
+            CreateOrderStatusNotifications(db, full)
+            BroadcastOrderStatus(full)
 		}
 		var cpm *models.ClientPaymentMethod
 		if full.ClientPaymentMethodID != "" {

@@ -109,9 +109,8 @@ func CreateOrder(db *gorm.DB) gin.HandlerFunc {
 			Preload("ClientPaymentMethod.PaymentMethod").
 			Where("id = ?", order.ID).
 			First(&full).Error; err == nil {
-			createOrderStatusNotifications(db, full)
-			// Новый вызов из ветки codex/add-broadcastorderstatus-function
-			broadcastOrderStatus(full)
+            CreateOrderStatusNotifications(db, full)
+            BroadcastOrderStatus(full)
 
 			// Логика из master остаётся
 			var cpm *models.ClientPaymentMethod
@@ -131,8 +130,7 @@ func CreateOrder(db *gorm.DB) gin.HandlerFunc {
 				ClientPaymentMethod: cpm,
 			}
 
-			// Можно использовать full.OfferOwnerID, он уже загружен
-			broadcastOrderEvent(full.OfferOwnerID, newOrderEvent(of))
+            broadcastOrderEvent(full.OfferOwnerID, newOrderEvent(of))
 		}
 
 		c.JSON(http.StatusOK, order)

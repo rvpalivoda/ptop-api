@@ -168,8 +168,8 @@ func TestOrderStatusWS(t *testing.T) {
 		Where("id = ?", ord.ID).First(&full).Error; err != nil {
 		t.Fatalf("preload: %v", err)
 	}
-	createOrderStatusNotifications(db, full)
-	broadcastOrderStatus(full)
+    CreateOrderStatusNotifications(db, full)
+    BroadcastOrderStatus(full)
 
 	// используем экспортируемый тип события об изменении статуса
 	var evt OrderStatusEvent
