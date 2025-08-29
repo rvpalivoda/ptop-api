@@ -21,6 +21,11 @@ definitions:
       value:
         type: string
     type: object
+  handlers.CancelOrderRequest:
+    properties:
+      reason:
+        type: string
+    type: object
   handlers.ChangePasswordRequest:
     properties:
       confirm_password:
@@ -65,6 +70,11 @@ definitions:
   handlers.Disable2FARequest:
     properties:
       password:
+        type: string
+    type: object
+  handlers.DisputeRequest:
+    properties:
+      reason:
         type: string
     type: object
   handlers.Enable2FARequest:
@@ -121,6 +131,11 @@ definitions:
       username:
         type: string
     type: object
+  handlers.MarkPaidRequest:
+    properties:
+      paidAt:
+        type: string
+    type: object
   handlers.MnemonicWord:
     properties:
       position:
@@ -166,6 +181,14 @@ definitions:
       type:
         type: string
     type: object
+  handlers.OrderActionsResponse:
+    description: Список действий, доступных текущему пользователю по данному ордеру.
+    properties:
+      actions:
+        items:
+          type: string
+        type: array
+    type: object
   handlers.OrderEvent:
     properties:
       order:
@@ -174,26 +197,11 @@ definitions:
         example: order.created
         type: string
     type: object
-  handlers.ChatEvent:
-    type: object
-    properties:
-      type:
-        type: string
-        example: TEXT
-      message:
-        $ref: '#/definitions/models.OrderMessage'
   handlers.OrderMessageRequest:
     properties:
       content:
         type: string
     type: object
-  handlers.ReadOrderMessageRequest:
-    type: object
-    properties:
-      readAt:
-        type: string
-        format: date-time
-        example: 2025-01-01T00:00:00Z
   handlers.OrderRequest:
     properties:
       amount:
@@ -220,6 +228,11 @@ definitions:
       twofa_enabled:
         type: boolean
       username:
+        type: string
+    type: object
+  handlers.ReadOrderMessageRequest:
+    properties:
+      readAt:
         type: string
     type: object
   handlers.RecoverChallengeResponse:
@@ -284,6 +297,13 @@ definitions:
           $ref: '#/definitions/handlers.MnemonicWord'
         type: array
       refresh_token:
+        type: string
+    type: object
+  handlers.ResolveDisputeRequest:
+    properties:
+      comment:
+        type: string
+      result:
         type: string
     type: object
   handlers.SetPinCodeRequest:
@@ -559,9 +579,15 @@ definitions:
         type: string
       buyerID:
         type: string
+      cancelReason:
+        type: string
       clientPaymentMethodID:
         type: string
       createdAt:
+        type: string
+      disputeOpenedAt:
+        type: string
+      disputeReason:
         type: string
       expiresAt:
         type: string
@@ -574,6 +600,8 @@ definitions:
       offerID:
         type: string
       offerOwnerID:
+        type: string
+      paidAt:
         type: string
       price:
         type: number
@@ -600,11 +628,17 @@ definitions:
         $ref: '#/definitions/models.Client'
       buyerID:
         type: string
+      cancelReason:
+        type: string
       clientPaymentMethod:
         $ref: '#/definitions/models.ClientPaymentMethod'
       clientPaymentMethodID:
         type: string
       createdAt:
+        type: string
+      disputeOpenedAt:
+        type: string
+      disputeReason:
         type: string
       expiresAt:
         type: string
@@ -623,6 +657,8 @@ definitions:
       offerOwner:
         $ref: '#/definitions/models.Client'
       offerOwnerID:
+        type: string
+      paidAt:
         type: string
       price:
         type: number
@@ -647,10 +683,6 @@ definitions:
         type: string
       clientID:
         type: string
-      senderName:
-        type: string
-        example: buyer
-        description: Имя отправителя (username по client_id)
       content:
         type: string
       createdAt:
@@ -664,6 +696,9 @@ definitions:
       id:
         type: string
       readAt:
+        type: string
+      senderName:
+        description: SenderName — имя (username) отправителя сообщения
         type: string
       type:
         $ref: '#/definitions/models.MessageType'
@@ -1979,9 +2014,164 @@ paths:
       summary: Получить ордер
       tags:
       - orders
+  /orders/{id}/actions:
+    get:
+      description: Возвращает список действий, которые может выполнить текущий пользователь
+        над ордером в зависимости от его роли и текущего статуса.
+      parameters:
+      - description: ID ордера
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.OrderActionsResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Доступные действия по ордеру
+      tags:
+      - orders
+  /orders/{id}/cancel:
+    post:
+      consumes:
+      - application/json
+      description: WAIT_PAYMENT -> CANCELLED. Автор или продавец (при отсутствии оплаты).
+        Шлёт уведомления и WS.
+      parameters:
+      - description: ID ордера
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: причина отмены
+        in: body
+        name: input
+        schema:
+          $ref: '#/definitions/handlers.CancelOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.OrderFull'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Отменить ордер
+      tags:
+      - orders
+  /orders/{id}/dispute:
+    post:
+      consumes:
+      - application/json
+      description: PAID -> DISPUTE. Любая сторона. Шлёт уведомления и WS.
+      parameters:
+      - description: ID ордера
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: причина
+        in: body
+        name: input
+        schema:
+          $ref: '#/definitions/handlers.DisputeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.OrderFull'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Открыть спор
+      tags:
+      - orders
+  /orders/{id}/dispute/resolve:
+    post:
+      consumes:
+      - application/json
+      description: DISPUTE -> RELEASED/CANCELLED. Только арбитраж. Шлёт уведомления
+        и WS.
+      parameters:
+      - description: ID ордера
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: результат спора
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.ResolveDisputeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.OrderFull'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Решить спор
+      tags:
+      - orders
   /orders/{id}/messages:
     get:
-      description: Возвращает историю переписки. Возвращает все типы сообщений: TEXT и FILE (а также SYSTEM, если он присутствует). Новые сообщения приходят в реальном времени через WebSocket `/ws/orders/{id}/chat`.
+      description: Возвращает историю переписки. В каждом сообщении присутствует поле
+        `senderName` — имя отправителя (по `client_id`). Новые сообщения приходят
+        в реальном времени через WebSocket `/ws/orders/{id}/chat`.
       parameters:
       - description: ID ордера
         in: path
@@ -2022,7 +2212,9 @@ paths:
       consumes:
       - application/json
       - multipart/form-data
-      description: 'Поддерживаются типы файлов: image/jpeg, image/png, application/pdf. В ответе всегда присутствует senderName (username отправителя). После сохранения сообщение мгновенно рассылается всем участникам через WebSocket `/ws/orders/{id}/chat`.'
+      description: 'Поддерживаются типы файлов: image/jpeg, image/png, application/pdf.
+        В ответе возвращается `senderName` — имя отправителя. После сохранения сообщение
+        мгновенно рассылается всем участникам через WebSocket `/ws/orders/{id}/chat`.'
       parameters:
       - description: ID ордера
         in: path
@@ -2077,7 +2269,7 @@ paths:
         name: msgId
         required: true
         type: string
-      - description: опционально: время прочтения (RFC3339)
+      - description: 'опционально: время прочтения в RFC3339'
         in: body
         name: input
         schema:
@@ -2100,6 +2292,81 @@ paths:
       security:
       - BearerAuth: []
       summary: Отметить сообщение прочитанным
+      tags:
+      - orders
+  /orders/{id}/paid:
+    post:
+      consumes:
+      - application/json
+      description: WAIT_PAYMENT -> PAID. Только автор ордера. Отправляет уведомления
+        и WS-событие.
+      parameters:
+      - description: ID ордера
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 'опционально: время оплаты'
+        in: body
+        name: input
+        schema:
+          $ref: '#/definitions/handlers.MarkPaidRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.OrderFull'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Отметить ордер оплаченным
+      tags:
+      - orders
+  /orders/{id}/release:
+    post:
+      description: PAID -> RELEASED. Только продавец (offerOwner). Устанавливает releasedAt,
+        шлёт уведомления и WS.
+      parameters:
+      - description: ID ордера
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.OrderFull'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Выпустить средства (завершить ордер)
       tags:
       - orders
   /payment-methods:
@@ -2190,18 +2457,6 @@ paths:
   /ws/orders/{id}/chat:
     get:
       description: Подключает покупателя и продавца к чату ордера.
-        После подключения сервер отправляет историю сообщений (models.OrderMessage).
-        Каждое сообщение содержит senderName (username отправителя). Сервер также рассылает события READ при отметке сообщения прочитанным через REST.
-        Клиент отправляет новые сообщения в формате OrderMessageRequest, а получает сообщения типа models.OrderMessage и события READ.
-        
-        Примеры событий (application/json):
-        
-        - TEXT:
-          {"type":"TEXT","message":{"id":"m1","chatID":"chat1","clientID":"u1","senderName":"buyer","type":"TEXT","content":"hello","createdAt":"2025-01-01T00:00:00Z"}}
-        - FILE:
-          {"type":"FILE","message":{"id":"m2","chatID":"chat1","clientID":"u1","senderName":"buyer","type":"FILE","content":"document.pdf","fileURL":"https://example.com/file","fileType":"application/pdf","fileSize":12345,"createdAt":"2025-01-01T00:00:05Z"}}
-        - READ:
-          {"type":"READ","message":{"id":"m1","chatID":"chat1","clientID":"u1","senderName":"buyer","type":"TEXT","content":"hello","readAt":"2025-01-01T00:01:00Z"}}
       parameters:
       - description: access token
         in: query
@@ -2217,42 +2472,7 @@ paths:
         "101":
           description: Switching Protocols
           schema:
-            $ref: '#/definitions/handlers.ChatEvent'
-          examples:
-            application/json:
-              type: READ
-              message:
-                id: m123
-                chatID: chat123
-                clientID: u123
-                senderName: buyer
-                type: TEXT
-                content: hello
-                readAt: 2025-01-01T00:00:00Z
-          x-examples:
-            TEXT:
-              type: TEXT
-              message:
-                id: m1
-                chatID: chat1
-                clientID: u1
-                senderName: buyer
-                type: TEXT
-                content: hello
-                createdAt: 2025-01-01T00:00:00Z
-            FILE:
-              type: FILE
-              message:
-                id: m2
-                chatID: chat1
-                clientID: u1
-                senderName: buyer
-                type: FILE
-                content: document.pdf
-                fileURL: https://example.com/file
-                fileType: application/pdf
-                fileSize: 12345
-                createdAt: 2025-01-01T00:00:05Z
+            $ref: '#/definitions/models.OrderMessage'
         "403":
           description: Forbidden
           schema:
