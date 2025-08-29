@@ -108,11 +108,13 @@ func setupTest(t *testing.T) (*gorm.DB, *gin.Engine, map[string]time.Duration) {
 	api.GET("/client/orders", ListClientOrders(db))
 	api.POST("/client/orders", CreateOrder(db))
 	api.GET("/orders/:id", GetOrder(db))
+	api.GET("/orders/:id/actions", GetOrderActions(db))
 	// order status change endpoints
 	api.POST("/orders/:id/paid", MarkOrderPaid(db))
 	api.POST("/orders/:id/release", ReleaseOrder(db))
 	api.POST("/orders/:id/cancel", CancelOrder(db))
 	api.POST("/orders/:id/dispute", OpenDispute(db))
+	api.POST("/orders/:id/dispute/resolve", ResolveDispute(db))
 	api.GET("/orders/:id/messages", ListOrderMessages(db))
 	api.POST("/orders/:id/messages", CreateOrderMessage(db, store, cache))
 	api.PATCH("/orders/:id/messages/:msgId/read", ReadOrderMessage(db))

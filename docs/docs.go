@@ -1828,6 +1828,242 @@ const docTemplate = `{
                 }
             }
         },
+        "/orders/{id}/actions": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Возвращает список действий, которые может выполнить текущий пользователь над ордером в зависимости от его роли и текущего статуса.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Доступные действия по ордеру",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID ордера",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.OrderActionsResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/orders/{id}/cancel": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "WAIT_PAYMENT -\u003e CANCELLED. Автор или продавец (при отсутствии оплаты). Шлёт уведомления и WS.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Отменить ордер",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID ордера",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "причина отмены",
+                        "name": "input",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.CancelOrderRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.OrderFull"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/orders/{id}/dispute": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "PAID -\u003e DISPUTE. Любая сторона. Шлёт уведомления и WS.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Открыть спор",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID ордера",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "причина",
+                        "name": "input",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.DisputeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.OrderFull"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/orders/{id}/dispute/resolve": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "DISPUTE -\u003e RELEASED/CANCELLED. Только арбитраж. Шлёт уведомления и WS.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Решить спор",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID ордера",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "результат спора",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ResolveDisputeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.OrderFull"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/orders/{id}/messages": {
             "get": {
                 "security": [
@@ -1835,7 +2071,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Возвращает историю переписки. Возвращает все типы сообщений: TEXT и FILE (а также SYSTEM, если присутствует). Новые сообщения приходят в реальном времени через WebSocket ` + "`" + `/ws/orders/{id}/chat` + "`" + `.",
+                "description": "Возвращает историю переписки. В каждом сообщении присутствует поле ` + "`" + `senderName` + "`" + ` — имя отправителя (по ` + "`" + `client_id` + "`" + `). Новые сообщения приходят в реальном времени через WebSocket ` + "`" + `/ws/orders/{id}/chat` + "`" + `.",
                 "produces": [
                     "application/json"
                 ],
@@ -1894,7 +2130,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Поддерживаются типы файлов: image/jpeg, image/png, application/pdf. В ответе всегда присутствует senderName (username отправителя). После сохранения сообщение мгновенно рассылается всем участникам через WebSocket ` + "`" + `/ws/orders/{id}/chat` + "`" + `.",
+                "description": "Поддерживаются типы файлов: image/jpeg, image/png, application/pdf. В ответе возвращается ` + "`" + `senderName` + "`" + ` — имя отправителя. После сохранения сообщение мгновенно рассылается всем участникам через WebSocket ` + "`" + `/ws/orders/{id}/chat` + "`" + `.",
                 "consumes": [
                     "application/json",
                     "multipart/form-data"
@@ -1959,13 +2195,13 @@ const docTemplate = `{
         },
         "/orders/{id}/messages/{msgId}/read": {
             "patch": {
-                "consumes": [
-                    "application/json"
-                ],
                 "security": [
                     {
                         "BearerAuth": []
                     }
+                ],
+                "consumes": [
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -1990,7 +2226,7 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "опционально: время прочтения (RFC3339)",
+                        "description": "опционально: время прочтения в RFC3339",
                         "name": "input",
                         "in": "body",
                         "schema": {
@@ -2003,6 +2239,121 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.OrderMessage"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/orders/{id}/paid": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "WAIT_PAYMENT -\u003e PAID. Только автор ордера. Отправляет уведомления и WS-событие.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Отметить ордер оплаченным",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID ордера",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "опционально: время оплаты",
+                        "name": "input",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.MarkPaidRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.OrderFull"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/orders/{id}/release": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "PAID -\u003e RELEASED. Только продавец (offerOwner). Устанавливает releasedAt, шлёт уведомления и WS.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Выпустить средства (завершить ордер)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID ордера",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.OrderFull"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "403": {
@@ -2151,7 +2502,7 @@ const docTemplate = `{
         },
         "/ws/orders/{id}/chat": {
             "get": {
-                "description": "Подключает покупателя и продавца к чату ордера. После подключения сервер отправляет историю сообщений (models.OrderMessage). Каждое сообщение содержит senderName (username отправителя). Сервер также рассылает события READ при отметке сообщения прочитанным через REST. Клиент отправляет новые сообщения в формате OrderMessageRequest, а получает сообщения типа models.OrderMessage и события READ.",
+                "description": "Подключает покупателя и продавца к чату ордера.",
                 "tags": [
                     "orders"
                 ],
@@ -2176,50 +2527,7 @@ const docTemplate = `{
                     "101": {
                         "description": "Switching Protocols",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ChatEvent"
-                        },
-                        "examples": {
-                            "application/json": {
-                                "type": "READ",
-                                "message": {
-                                    "id": "m123",
-                                    "chatID": "chat123",
-                                    "clientID": "u123",
-                                    "senderName": "buyer",
-                                    "type": "TEXT",
-                                    "content": "hello",
-                                    "readAt": "2025-01-01T00:00:00Z"
-                                }
-                            }
-                        },
-                        "x-examples": {
-                            "TEXT": {
-                                "type": "TEXT",
-                                "message": {
-                                    "id": "m1",
-                                    "chatID": "chat1",
-                                    "clientID": "u1",
-                                    "senderName": "buyer",
-                                    "type": "TEXT",
-                                    "content": "hello",
-                                    "createdAt": "2025-01-01T00:00:00Z"
-                                }
-                            },
-                            "FILE": {
-                                "type": "FILE",
-                                "message": {
-                                    "id": "m2",
-                                    "chatID": "chat1",
-                                    "clientID": "u1",
-                                    "senderName": "buyer",
-                                    "type": "FILE",
-                                    "content": "document.pdf",
-                                    "fileURL": "https://example.com/file",
-                                    "fileType": "application/pdf",
-                                    "fileSize": 12345,
-                                    "createdAt": "2025-01-01T00:00:05Z"
-                                }
-                            }
+                            "$ref": "#/definitions/models.OrderMessage"
                         }
                     },
                     "403": {
@@ -2316,6 +2624,14 @@ const docTemplate = `{
                 }
             }
         },
+        "handlers.CancelOrderRequest": {
+            "type": "object",
+            "properties": {
+                "reason": {
+                    "type": "string"
+                }
+            }
+        },
         "handlers.ChangePasswordRequest": {
             "type": "object",
             "properties": {
@@ -2383,6 +2699,14 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.DisputeRequest": {
+            "type": "object",
+            "properties": {
+                "reason": {
                     "type": "string"
                 }
             }
@@ -2471,6 +2795,14 @@ const docTemplate = `{
                 }
             }
         },
+        "handlers.MarkPaidRequest": {
+            "type": "object",
+            "properties": {
+                "paidAt": {
+                    "type": "string"
+                }
+            }
+        },
         "handlers.MnemonicWord": {
             "type": "object",
             "properties": {
@@ -2540,6 +2872,18 @@ const docTemplate = `{
                 }
             }
         },
+        "handlers.OrderActionsResponse": {
+            "description": "Список действий, доступных текущему пользователю по данному ордеру.",
+            "type": "object",
+            "properties": {
+                "actions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
         "handlers.OrderEvent": {
             "type": "object",
             "properties": {
@@ -2552,33 +2896,11 @@ const docTemplate = `{
                 }
             }
         },
-        "handlers.ChatEvent": {
-            "type": "object",
-            "properties": {
-                "type": {
-                    "type": "string",
-                    "example": "TEXT"
-                },
-                "message": {
-                    "$ref": "#/definitions/models.OrderMessage"
-                }
-            }
-        },
         "handlers.OrderMessageRequest": {
             "type": "object",
             "properties": {
                 "content": {
                     "type": "string"
-                }
-            }
-        },
-        "handlers.ReadOrderMessageRequest": {
-            "type": "object",
-            "properties": {
-                "readAt": {
-                    "type": "string",
-                    "format": "date-time",
-                    "example": "2025-01-01T00:00:00Z"
                 }
             }
         },
@@ -2621,6 +2943,14 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.ReadOrderMessageRequest": {
+            "type": "object",
+            "properties": {
+                "readAt": {
                     "type": "string"
                 }
             }
@@ -2721,6 +3051,17 @@ const docTemplate = `{
                     }
                 },
                 "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.ResolveDisputeRequest": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "type": "string"
+                },
+                "result": {
                     "type": "string"
                 }
             }
@@ -3136,10 +3477,19 @@ const docTemplate = `{
                 "buyerID": {
                     "type": "string"
                 },
+                "cancelReason": {
+                    "type": "string"
+                },
                 "clientPaymentMethodID": {
                     "type": "string"
                 },
                 "createdAt": {
+                    "type": "string"
+                },
+                "disputeOpenedAt": {
+                    "type": "string"
+                },
+                "disputeReason": {
                     "type": "string"
                 },
                 "expiresAt": {
@@ -3158,6 +3508,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "offerOwnerID": {
+                    "type": "string"
+                },
+                "paidAt": {
                     "type": "string"
                 },
                 "price": {
@@ -3198,6 +3551,9 @@ const docTemplate = `{
                 "buyerID": {
                     "type": "string"
                 },
+                "cancelReason": {
+                    "type": "string"
+                },
                 "clientPaymentMethod": {
                     "$ref": "#/definitions/models.ClientPaymentMethod"
                 },
@@ -3205,6 +3561,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "createdAt": {
+                    "type": "string"
+                },
+                "disputeOpenedAt": {
+                    "type": "string"
+                },
+                "disputeReason": {
                     "type": "string"
                 },
                 "expiresAt": {
@@ -3232,6 +3594,9 @@ const docTemplate = `{
                     "$ref": "#/definitions/models.Client"
                 },
                 "offerOwnerID": {
+                    "type": "string"
+                },
+                "paidAt": {
                     "type": "string"
                 },
                 "price": {
@@ -3269,9 +3634,6 @@ const docTemplate = `{
                 "clientID": {
                     "type": "string"
                 },
-                "senderName": {
-                    "type": "string"
-                },
                 "content": {
                     "type": "string"
                 },
@@ -3291,6 +3653,10 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "readAt": {
+                    "type": "string"
+                },
+                "senderName": {
+                    "description": "SenderName — имя (username) отправителя сообщения",
                     "type": "string"
                 },
                 "type": {
